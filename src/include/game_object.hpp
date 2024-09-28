@@ -3,59 +3,71 @@
 #include <memory>
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "virtual_transformable.hpp"
-#include "sound_component.hpp"
-#include "collidable_component.hpp"
-#include "physical_component.hpp"
+#include "transformable.hpp"
+#include "collidable.hpp"
+#include "physical.hpp"
+#include "sound_player.hpp"
 
-class GameObject : public sf::Drawable, public VirtualTransformable, public std::enable_shared_from_this<GameObject>
+class IGameObject : public sf::Drawable, public ITransformable
 {
 public:
-    GameObject() = default;
+    virtual const std::string &getTag() const = 0;
+    virtual std::shared_ptr<IGameObject> findChild(const std::string &tag) = 0;
+    virtual std::shared_ptr<const IGameObject> findChild(const std::string &tag) const = 0;
+};
+
+class IGameObjectPrivate : public IGameObject
+{
+public:
+    virtual void fullUpdate() = 0;
+};
+
+class GameObject : public std::enable_shared_from_this<GameObject>, public IGameObjectPrivate
+{
+public:
     GameObject(
         const std::string &tag,
         std::shared_ptr<sf::Drawable> drawable,
-        std::shared_ptr<CollidableComponent> collidable = nullptr,
-        std::shared_ptr<PhysicalComponent> physical = nullptr,
-        std::shared_ptr<SoundComponent> sound = nullptr);
+        std::shared_ptr<Collidable> collidable = nullptr,
+        std::shared_ptr<Physical> physical = nullptr,
+        std::shared_ptr<SoundPlayer> sound = nullptr);
     virtual ~GameObject() = default;
 
-    virtual void update();
-    virtual void onCollision(std::shared_ptr<const GameObject> other) = 0;
+    virtual void fullUpdate() override;
 
-    void addChild(std::shared_ptr<GameObject> obj);
-    std::shared_ptr<GameObject> findChild(const std::string &tag);
+    virtual const std::string &getTag() const override { return tag; }
+    virtual std::shared_ptr<IGameObject> findChild(const std::string &tag) override;
+    inline virtual std::shared_ptr<const IGameObject> findChild(const std::string &tag) const override { return findChild(tag); }
 
-    const std::string &getTag() const;
-    std::shared_ptr<sf::Drawable> getDrawable() { return drawable; }
-    std::shared_ptr<const sf::Drawable> getDrawable() const { return drawable; }
-    std::shared_ptr<CollidableComponent> getCollidable() { return collidable; }
-    std::shared_ptr<const CollidableComponent> getCollidable() const { return collidable; }
-    std::shared_ptr<PhysicalComponent> getPhysical() { return physical; }
-    std::shared_ptr<const PhysicalComponent> getPhysical() const { return physical; }
-    std::shared_ptr<SoundComponent> getSound() { return sound; }
-    std::shared_ptr<const SoundComponent> getSound() const { return sound; }
-
-    virtual void setPositionV(float x, float y) override;
-    virtual void setPositionV(const sf::Vector2f &position) override;
-    virtual void setRotationV(float angle) override;
-    virtual void setScaleV(float factorX, float factorY) override;
-    virtual void setScaleV(const sf::Vector2f &factors) override;
-    virtual void setOriginV(float x, float y) override;
-    virtual void setOriginV(const sf::Vector2f &origin) override;
-    virtual void moveV(float offsetX, float offsetY) override;
-    virtual void moveV(const sf::Vector2f &offset) override;
-    virtual void rotateV(float angle) override;
-    virtual void scaleV(float factorX, float factorY) override;
-    virtual void scaleV(const sf::Vector2f &factor) override;
+    virtual void setPosition(float x, float y) override;
+    virtual void setPosition(const sf::Vector2f &position) override;
+    virtual void setRotation(float angle) override;
+    virtual void setScale(float factorX, float factorY) override;
+    virtual void setScale(const sf::Vector2f &factors) override;
+    virtual void setOrigin(float x, float y) override;
+    virtual void setOrigin(const sf::Vector2f &origin) override;
+    virtual void move(float offsetX, float offsetY) override;
+    virtual void move(const sf::Vector2f &offset) override;
+    virtual void rotate(float angle) override;
+    virtual void scale(float factorX, float factorY) override;
+    virtual void scale(const sf::Vector2f &factor) override;
+    inline virtual const sf::Vector2f &getPosition() const override { return trans->getPosition(); }
+    inline virtual float getRotation() const override { return trans->getRotation(); }
+    inline virtual const sf::Vector2f &getScale() const override { return trans->getScale(); }
+    inline virtual const sf::Vector2f &getOrigin() const override { return trans->getOrigin(); }
+    inline virtual const sf::Transform &getTransform() const override { return trans->getTransform(); }
+    inline virtual const sf::Transform &getInverseTransform() const override { return trans->getInverseTransform(); }
 
 protected:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+    virtual void update() = 0;
 
     std::string tag;
-    std::shared_ptr<sf::Drawable> drawable;
-    std::shared_ptr<CollidableComponent> collidable;
-    std::shared_ptr<PhysicalComponent> physical;
-    std::shared_ptr<SoundComponent> sound;
     std::vector<std::shared_ptr<GameObject>> children;
+
+    std::shared_ptr<sf::Drawable> drawable;
+    std::shared_ptr<sf::Transformable> trans;
+    std::shared_ptr<Collidable> collidable;
+    std::shared_ptr<Physical> physical;
+    std::shared_ptr<SoundPlayer> soundPlayer;
 };

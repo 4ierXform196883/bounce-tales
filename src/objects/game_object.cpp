@@ -5,15 +5,10 @@
 GameObject::GameObject(
     const std::string &tag,
     std::shared_ptr<sf::Drawable> drawable,
-    std::shared_ptr<CollidableComponent> collidable,
-    std::shared_ptr<PhysicalComponent> physical,
-    std::shared_ptr<SoundComponent> sound)
-    : tag(tag), drawable(drawable), collidable(collidable), physical(physical), sound(sound) {}
-
-const std::string &GameObject::getTag() const
-{
-    return this->tag;
-}
+    std::shared_ptr<Collidable> collidable,
+    std::shared_ptr<Physical> physical,
+    std::shared_ptr<SoundPlayer> soundPlayer)
+    : trans(std::make_shared<sf::Transformable>()), tag(tag), drawable(drawable), collidable(collidable), physical(physical), soundPlayer(soundPlayer) {}
 
 void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
@@ -21,7 +16,7 @@ void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
     std::queue<std::shared_ptr<const GameObject>> objs;
     std::queue<sf::Transform> transq;
     objs.push(shared_from_this());
-    transq.push(this->getTransformV());
+    transq.push(this->getTransform());
     while (objs.size() != 0)
     {
         std::shared_ptr<const GameObject> cur = objs.front();
@@ -31,28 +26,24 @@ void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
         for (auto child : cur->children)
         {
             objs.push(child);
-            transq.push(transq.front().translate(cur->getOriginV()) * child->getTransformV());
+            const sf::Vector2f &curScale = cur->getScale();
+            transq.push(transq.front().translate(cur->getOrigin()).scale(1 / curScale.x, 1 / curScale.y) * child->getTransform());
         }
         objs.pop();
         transq.pop();
     }
 }
 
-void GameObject::update()
+void GameObject::fullUpdate()
 {
+    this->update();
     if (physical)
-        physical->update();
-    if (sound)
-        sound->update();
+    {
+        this->move(physical->updateSpeed());
+    }
 }
 
-void GameObject::addChild(std::shared_ptr<GameObject> obj)
-{
-    if (obj)
-        this->children.push_back(obj);
-}
-
-std::shared_ptr<GameObject> GameObject::findChild(const std::string &tag)
+std::shared_ptr<IGameObject> GameObject::findChild(const std::string &tag)
 {
     for (auto child : this->children)
     {
@@ -64,99 +55,110 @@ std::shared_ptr<GameObject> GameObject::findChild(const std::string &tag)
     return nullptr;
 }
 
-void GameObject::setPositionV(float x, float y)
+void GameObject::setPosition(float x, float y)
 {
-    VirtualTransformable::setPositionV(x, y);
+    trans->setPosition(x, y);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setPositionV(const sf::Vector2f &position)
+
+void GameObject::setPosition(const sf::Vector2f &position)
 {
-    VirtualTransformable::setPositionV(position);
+    trans->setPosition(position);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setRotationV(float angle)
+
+void GameObject::setRotation(float angle)
 {
-    VirtualTransformable::setRotationV(angle);
+    trans->setRotation(angle);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setScaleV(float factorX, float factorY)
+
+void GameObject::setScale(float factorX, float factorY)
 {
-    VirtualTransformable::setScaleV(factorX, factorY);
+    trans->setScale(factorX, factorY);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setScaleV(const sf::Vector2f &factors)
+
+void GameObject::setScale(const sf::Vector2f &factors)
 {
-    VirtualTransformable::setScaleV(factors);
+    trans->setScale(factors);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setOriginV(float x, float y)
+
+void GameObject::setOrigin(float x, float y)
 {
-    VirtualTransformable::setOriginV(x, y);
+    trans->setOrigin(x, y);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::setOriginV(const sf::Vector2f &origin)
+
+void GameObject::setOrigin(const sf::Vector2f &origin)
 {
-    VirtualTransformable::setOriginV(origin);
+    trans->setOrigin(origin);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::moveV(float offsetX, float offsetY)
+
+void GameObject::move(float offsetX, float offsetY)
 {
-    VirtualTransformable::moveV(offsetX, offsetY);
+    trans->move(offsetX, offsetY);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::moveV(const sf::Vector2f &offset)
+
+void GameObject::move(const sf::Vector2f &offset)
 {
-    VirtualTransformable::moveV(offset);
+    trans->move(offset);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::rotateV(float angle)
+
+void GameObject::rotate(float angle)
 {
-    VirtualTransformable::rotateV(angle);
+    trans->rotate(angle);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::scaleV(float factorX, float factorY)
+
+void GameObject::scale(float factorX, float factorY)
 {
-    VirtualTransformable::scaleV(factorX, factorY);
+    trans->scale(factorX, factorY);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }
-void GameObject::scaleV(const sf::Vector2f &factor)
+
+void GameObject::scale(const sf::Vector2f &factor)
 {
-    VirtualTransformable::scaleV(factor);
+    trans->scale(factor);
+    if (soundPlayer)
+        soundPlayer->posUpdate(trans->getPosition());
     if (collidable)
-        collidable->update();
-    if (sound)
-        sound->update();
+        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }

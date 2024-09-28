@@ -1,24 +1,23 @@
-#include "physical_component.hpp"
+#include "physical.hpp"
 #include <cmath>
-#include "game_object.hpp"
 
 #define abs(x) ((x) > 0 ? (x) : -(x))
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
-PhysicalComponent::PhysicalComponent(std::shared_ptr<GameObject> gameObject, float maxSpeed, float friction, float gravity)
-    : GameObjectComponent(gameObject), maxSpeed(maxSpeed), friction(friction)
+Physical::Physical(float maxSpeed, float friction, float gravity)
+    : maxSpeed(maxSpeed), friction(friction)
 {
     if (gravity != 0.0f)
         this->addLongForce("gravity", {0.0f, 1.0f}, gravity);
 }
 
-void PhysicalComponent::addForce(const sf::Vector2f &direction, float power)
+void Physical::addForce(const sf::Vector2f &direction, float power)
 {
     sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
     this->speed += norm * power;
 }
 
-void PhysicalComponent::addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration)
+void Physical::addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration)
 {
     sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
     longForces.emplace(name, norm * power);
@@ -33,19 +32,19 @@ void PhysicalComponent::addLongForce(const std::string &name, const sf::Vector2f
     longForceTimers.emplace(name, forceCor);
 }
 
-void PhysicalComponent::modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power)
+void Physical::modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power)
 {
     sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
     longForces.at(name) = norm * power;
 }
 
-void PhysicalComponent::removeLongForce(const std::string &name)
+void Physical::removeLongForce(const std::string &name)
 {
     longForceTimers.erase(name);
     longForces.erase(name);
 }
 
-sf::Vector2f PhysicalComponent::calcFrictionVec() const
+sf::Vector2f Physical::calcFrictionVec() const
 {
     float fricX = -sign(speed.x) * friction;
     if (abs(fricX) > abs(speed.x))
@@ -64,12 +63,12 @@ sf::Vector2f PhysicalComponent::calcFrictionVec() const
     return {fricX, fricY};
 }
 
-void PhysicalComponent::update()
+const sf::Vector2f &Physical::updateSpeed()
 {
     for (auto &[name, force] : longForces)
     {
         this->speed += force;
     }
     this->speed += calcFrictionVec();
-    this->gameObject.lock()->moveV(speed);
+    return this->speed;
 }

@@ -1,26 +1,27 @@
-#include "sound_component.hpp"
+#include "sound_player.hpp"
+
 #include "randomizer.hpp"
-#include "game_object.hpp"
+#include "transformable.hpp"
 #include <iostream>
 
-SoundComponent::SoundComponent(std::shared_ptr<GameObject> gameObject, const std::map<std::string, sf::Sound> &sounds)
-    : GameObjectComponent(gameObject), sounds(sounds) {}
+SoundPlayer::SoundPlayer(const std::map<std::string, sf::Sound> &sounds)
+    : sounds(sounds) {}
 
-void SoundComponent::play(const std::string &name)
+void SoundPlayer::play(const std::string &name)
 {
     if (sounds.find(name) == sounds.end())
     {
-        std::cerr << "[WARN] (SoundComponent::play) No \"" + name + "\" sound found\n";
+        std::cerr << "[WARN] (SoundPlayer::play) No \"" + name + "\" sound found\n";
         return;
     }
     sounds.at(name).play();
 }
 
-void SoundComponent::playRandomly(const std::string &name, float intervalMin, float intervalMax)
+void SoundPlayer::playRandomly(const std::string &name, float intervalMin, float intervalMax)
 {
     if (sounds.find(name) == sounds.end())
     {
-        std::cerr << "[WARN] (SoundComponent::play) No \"" + name + "\" sound found\n";
+        std::cerr << "[WARN] (SoundPlayer::play) No \"" + name + "\" sound found\n";
         return;
     }
     intervalMin = std::max(sounds.at(name).getBuffer()->getDuration().asSeconds(), intervalMin);
@@ -32,15 +33,15 @@ void SoundComponent::playRandomly(const std::string &name, float intervalMin, fl
                                          randomTimers[name]->duration = duration; });
 }
 
-void SoundComponent::stopPlayingRandomly(const std::string &name)
+void SoundPlayer::stopPlayingRandomly(const std::string &name)
 {
     if (sounds.find(name) == sounds.end())
-        std::cerr << "[WARN] (SoundComponent::play) No \"" + name + "\" sound found\n";
+        std::cerr << "[WARN] (SoundPlayer::play) No \"" + name + "\" sound found\n";
     randomTimers.erase(name);
 }
-void SoundComponent::update()
+
+void SoundPlayer::posUpdate(const sf::Vector2f &pos)
 {
-    auto pos = gameObject.lock()->getPositionV();
     for (auto sound : sounds)
     {
         sound.second.setPosition(pos.x, pos.y, 0);

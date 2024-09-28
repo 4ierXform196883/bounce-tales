@@ -27,7 +27,7 @@ void music_player::changeMusic(const std::string &name, float volume)
     newMusic->play();
     targetVolume = volume > 100 ? 100 : (volume < 0 ? 0 : volume);
     deltaTime = musicSwitchDuration / targetVolume;
-    startTime = game::getClock().getElapsedTime().asSeconds();
+    startTime = Game::getClock().getElapsedTime().asSeconds();
 }
 
 void music_player::update()
@@ -36,7 +36,7 @@ void music_player::update()
     bool newPlaying = newMusic->getStatus() == sf::Music::Playing;
     if (!newPlaying && curVolume == targetVolume)
         return;
-    if (game::getClock().getElapsedTime().asSeconds() - startTime > deltaTime)
+    if (Game::getClock().getElapsedTime().asSeconds() - startTime > deltaTime)
         return;
 
     if (newPlaying && curVolume != 0.0f)
@@ -48,7 +48,7 @@ void music_player::update()
     }
     else
         curMusic->setVolume(std::min(curMusic->getVolume() + 1, targetVolume));
-    startTime = game::getClock().getElapsedTime().asSeconds();
+    startTime = Game::getClock().getElapsedTime().asSeconds();
 }
 
 std::shared_ptr<sf::Music> music_player::getCurrentMusic()
