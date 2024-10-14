@@ -1,49 +1,54 @@
 #include "game_object.hpp"
 
 #include <queue>
+#include <iostream>
 
-GameObject::GameObject(
-    const std::string &tag,
-    std::shared_ptr<sf::Drawable> drawable,
-    std::shared_ptr<Collidable> collidable,
-    std::shared_ptr<Physical> physical,
-    std::shared_ptr<SoundPlayer> soundPlayer)
-    : trans(std::make_shared<sf::Transformable>()), tag(tag), drawable(drawable), collidable(collidable), physical(physical), soundPlayer(soundPlayer) {}
+GameObject::GameObject(const std::string &tag, std::shared_ptr<sf::Drawable> drawable)
+    : tag(tag), drawable(drawable) {}
 
 void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
     sf::Transform initTransform = states.transform;
     std::queue<std::shared_ptr<const GameObject>> objs;
-    std::queue<sf::Transform> transq;
+    std::queue<sf::Vector2f> positions;
+    std::queue<float> rotations;
     objs.push(shared_from_this());
-    transq.push(this->getTransform());
+    positions.push(sf::Vector2f(0, 0));
+    rotations.push(0.0f);
     while (objs.size() != 0)
     {
         std::shared_ptr<const GameObject> cur = objs.front();
-        states.transform = initTransform * transq.front();
+        states.transform = initTransform.translate(positions.front()).rotate(rotations.front()) * cur->getTransform();
         if (cur->drawable)
             target.draw(*cur->drawable, states);
+        // std::cout << cur->tag << " " << states.transform.transformPoint(sf::Vector2f(0, 0)).x << " " << states.transform.transformPoint(sf::Vector2f(0, 0)).y << std::endl;
         for (auto child : cur->children)
         {
             objs.push(child);
-            const sf::Vector2f &curScale = cur->getScale();
-            transq.push(transq.front().translate(cur->getOrigin()).scale(1 / curScale.x, 1 / curScale.y) * child->getTransform());
+            positions.push(positions.front() + cur->getPosition());
+            rotations.push(rotations.front() + cur->getRotation());
         }
         objs.pop();
-        transq.pop();
+        positions.pop();
+        rotations.pop();
     }
 }
 
 void GameObject::fullUpdate()
 {
-    this->update();
-    if (physical)
+    std::queue<std::shared_ptr<GameObject>> objs;
+    objs.push(shared_from_this());
+    while (objs.size() != 0)
     {
-        this->move(physical->updateSpeed());
+        std::shared_ptr<GameObject> cur = objs.front();
+        cur->update();
+        for (auto child : cur->children)
+            objs.push(child);
+        objs.pop();
     }
 }
 
-std::shared_ptr<IGameObject> GameObject::findChild(const std::string &tag)
+std::shared_ptr<GameObject> GameObject::findChild(const std::string &tag)
 {
     for (auto child : this->children)
     {
@@ -53,112 +58,4 @@ std::shared_ptr<IGameObject> GameObject::findChild(const std::string &tag)
             return subchild;
     }
     return nullptr;
-}
-
-void GameObject::setPosition(float x, float y)
-{
-    trans->setPosition(x, y);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setPosition(const sf::Vector2f &position)
-{
-    trans->setPosition(position);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setRotation(float angle)
-{
-    trans->setRotation(angle);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setScale(float factorX, float factorY)
-{
-    trans->setScale(factorX, factorY);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setScale(const sf::Vector2f &factors)
-{
-    trans->setScale(factors);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setOrigin(float x, float y)
-{
-    trans->setOrigin(x, y);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::setOrigin(const sf::Vector2f &origin)
-{
-    trans->setOrigin(origin);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::move(float offsetX, float offsetY)
-{
-    trans->move(offsetX, offsetY);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::move(const sf::Vector2f &offset)
-{
-    trans->move(offset);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::rotate(float angle)
-{
-    trans->rotate(angle);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::scale(float factorX, float factorY)
-{
-    trans->scale(factorX, factorY);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
-}
-
-void GameObject::scale(const sf::Vector2f &factor)
-{
-    trans->scale(factor);
-    if (soundPlayer)
-        soundPlayer->posUpdate(trans->getPosition());
-    if (collidable)
-        collidable->transUpdate(trans->getTransform(), trans->getScale());
 }

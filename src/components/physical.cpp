@@ -63,7 +63,7 @@ sf::Vector2f Physical::calcFrictionVec() const
     return {fricX, fricY};
 }
 
-const sf::Vector2f &Physical::updateSpeed()
+const sf::Vector2f &Physical::speedUpdate()
 {
     for (auto &[name, force] : longForces)
     {

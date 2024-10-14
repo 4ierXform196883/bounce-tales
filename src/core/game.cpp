@@ -13,16 +13,12 @@
 #include "curved_shape.hpp"
 #include "music_player.hpp"
 #include "object_manager.hpp"
-#include "distant_object.hpp"
 #include "background.hpp"
 
 std::unique_ptr<sf::RenderWindow> Game::window;
 sf::View Game::camera;
 sf::View Game::uiCamera;
 const sf::Clock Game::globalClock;
-
-std::vector<std::shared_ptr<IGameObject>> test;
-std::shared_ptr<IGameObject> bg;
 
 void Game::init()
 {
@@ -41,12 +37,7 @@ void Game::init()
     uiCamera.setSize(windowSize.x, windowSize.y);
     window->setView(camera);
 
-    bg = std::make_shared<Background>();
-    test.push_back(std::make_shared<DistantObject>("test", std::make_shared<PrimitiveSprite>(AssetManager::getTexture("1_0")), sf::Vector2f(0.0f, 0.0f), 0.5));
-    test.push_back(std::make_shared<DistantObject>("test", std::make_shared<PrimitiveSprite>(AssetManager::getTexture("1_0")), sf::Vector2f(100.0f, 100.0f), 0.5));
-    test.push_back(std::make_shared<DistantObject>("test", std::make_shared<PrimitiveSprite>(AssetManager::getTexture("1_0")), sf::Vector2f(500.0f, 500.0f), 0.7));
-    test.push_back(std::make_shared<DistantObject>("test", std::make_shared<PrimitiveSprite>(AssetManager::getTexture("1_0")), sf::Vector2f(0.0f, 0.0f), 0.9));
-    test.push_back(std::make_shared<DistantObject>("test", std::make_shared<PrimitiveSprite>(AssetManager::getTexture("Egg")), sf::Vector2f(-200.0f, -200.0f), 0.99));
+    ObjectManager::load("idk for now");
 
     // std::vector<sf::Vertex> verts;
     // verts.push_back(sf::Vertex({0.0f, 0.0f}, {0.0f, 0.0f}));
@@ -74,8 +65,7 @@ void Game::tick()
     processEvents();
     Timer::updateAll();
     music_player::update();
-    for (auto i : test)
-        std::dynamic_pointer_cast<DistantObject>(i)->fullUpdate();
+    ObjectManager::updateAll();
     render();
 }
 
@@ -102,6 +92,8 @@ void Game::processEvents()
                 music_player::changeMusic("level");
             if (event.key.code == sf::Keyboard::F3)
                 music_player::changeMusic("level2");
+            if (event.key.code == sf::Keyboard::F4)
+                music_player::changeMusic("level3");
             if (event.key.code == sf::Keyboard::W)
             {
                 camera.move(0, -16);
@@ -144,16 +136,13 @@ void Game::render()
 {
     window->clear(sf::Color::Black);
     window->setView(uiCamera);
-    window->draw(*bg);
-    // object_manager::drawBackground();
+    ObjectManager::drawBackground(*window);
 
     window->setView(camera);
-    // object_manager::drawObjects();
-    for (auto i : test)
-        window->draw(*i);
+    ObjectManager::drawObjects(*window);
 
     window->setView(uiCamera);
-    // object_manager::drawUI();
+    ObjectManager::drawUI(*window);
 
     window->setView(camera);
     window->display();
@@ -165,4 +154,5 @@ int main()
     while (Game::window->isOpen())
         Game::tick();
     Game::close();
+    return 0;
 }

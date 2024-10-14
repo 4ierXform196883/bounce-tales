@@ -1,23 +1,37 @@
 #include "object_manager.hpp"
 
+#include "game.hpp"
 
+std::shared_ptr<Background> ObjectManager::background;
 
-void object_manager::updateObjects()
+void ObjectManager::load(const std::string &path)
 {
-
+    background = std::make_shared<Background>();
 }
 
-void object_manager::drawBackground()
+void ObjectManager::save(const std::string &path)
 {
-
 }
 
-void object_manager::drawObjects()
+void ObjectManager::updateAll()
 {
+    background->fullUpdate();
+    // updates
 
+    // checkCollisions
+
+    // this->move(physical->speedUpdate());
 }
 
-void object_manager::drawUI()
+void ObjectManager::drawBackground(sf::RenderTarget &target)
 {
-    
+    target.draw(*background);
+}
+
+void ObjectManager::drawObjects(sf::RenderTarget &target)
+{
+}
+
+void ObjectManager::drawUI(sf::RenderTarget &target)
+{
 }
