@@ -1,9 +1,14 @@
 #pragma once
 
 #include <string>
+#include <map>
 
-namespace settings
+using IniSection = std::map<std::string, std::string>;
+using IniFile = std::map<std::string, IniSection>;
+
+class Settings
 {
+public:
     const std::string title = "Bounce Tales";
     const std::string settings_path = "settings.ini";
     const std::string textures_path = "assets/textures";
@@ -18,8 +23,11 @@ namespace settings
     void set(const std::string& section, const std::string& key, int value);
     void set(const std::string& section, const std::string& key, bool value);
 
-    std::string getString(const std::string& section, const std::string& key, const std::string& defaultValue = "");
-    double getDouble(const std::string& section, const std::string& key, double defaultValue = 0.0);
-    int getInt(const std::string& section, const std::string& key, int defaultValue = 0);
-    bool getBool(const std::string& section, const std::string& key, bool defaultValue = false);
-}
+    std::string getString(const std::string& section, const std::string& key, const std::string& defaultValue = "") const;
+    double getDouble(const std::string& section, const std::string& key, double defaultValue = 0.0) const;
+    int getInt(const std::string& section, const std::string& key, int defaultValue = 0) const;
+    bool getBool(const std::string& section, const std::string& key, bool defaultValue = false) const;
+
+private:
+    IniFile iniFile;
+};

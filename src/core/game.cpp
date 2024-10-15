@@ -15,6 +15,11 @@
 #include "object_manager.hpp"
 #include "background.hpp"
 
+AssetManager Game::assetManager;
+ObjectManager Game::objectManager;
+MusicPlayer Game::musicPlayer;
+Settings Game::settings;
+
 std::unique_ptr<sf::RenderWindow> Game::window;
 sf::View Game::camera;
 sf::View Game::uiCamera;
@@ -22,14 +27,14 @@ const sf::Clock Game::globalClock;
 
 void Game::init()
 {
-    settings::load(settings::settings_path);
-    AssetManager::loadTextures(settings::textures_path);
-    AssetManager::loadSounds(settings::sounds_path);
-    sf::Vector2i windowSize = {settings::getInt("Screen", "screenWidth", 1280), settings::getInt("Screen", "screenHeight", 720)};
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings::title, sf::Style::Default);
-    window->setFramerateLimit(settings::getInt("Screen", "maxFps", 60));
+    settings.load(settings.settings_path);
+    assetManager.loadTextures(settings.textures_path);
+    assetManager.loadSounds(settings.sounds_path);
+    sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1280), settings.getInt("Screen", "screenHeight", 720)};
+    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Default);
+    window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
     // window->setFramerateLimit(1);
-    window->setVerticalSyncEnabled(settings::getBool("Screen", "vSync", true));
+    window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
 
     camera.setCenter(0, 0);
     camera.setSize(windowSize.x, windowSize.y);
@@ -37,7 +42,7 @@ void Game::init()
     uiCamera.setSize(windowSize.x, windowSize.y);
     window->setView(camera);
 
-    ObjectManager::load("idk for now");
+    objectManager.load("idk for now");
 
     // std::vector<sf::Vertex> verts;
     // verts.push_back(sf::Vertex({0.0f, 0.0f}, {0.0f, 0.0f}));
@@ -64,16 +69,16 @@ void Game::tick()
 {
     processEvents();
     Timer::updateAll();
-    music_player::update();
-    ObjectManager::updateAll();
+    musicPlayer.update();
+    objectManager.updateAll();
     render();
 }
 
 void Game::close()
 {
-    AssetManager::unloadTextures();
-    AssetManager::unloadSounds();
-    settings::save(settings::settings_path);
+    assetManager.unloadTextures();
+    assetManager.unloadSounds();
+    settings.save(settings.settings_path);
 }
 
 void Game::processEvents()
@@ -87,13 +92,13 @@ void Game::processEvents()
             break;
         case sf::Event::KeyPressed:
             if (event.key.code == sf::Keyboard::F1)
-                music_player::changeMusic("menu");
+                musicPlayer.changeMusic("menu");
             if (event.key.code == sf::Keyboard::F2)
-                music_player::changeMusic("level");
+                musicPlayer.changeMusic("level");
             if (event.key.code == sf::Keyboard::F3)
-                music_player::changeMusic("level2");
+                musicPlayer.changeMusic("level2");
             if (event.key.code == sf::Keyboard::F4)
-                music_player::changeMusic("level3");
+                musicPlayer.changeMusic("level3");
             if (event.key.code == sf::Keyboard::W)
             {
                 camera.move(0, -16);
@@ -136,13 +141,13 @@ void Game::render()
 {
     window->clear(sf::Color::Black);
     window->setView(uiCamera);
-    ObjectManager::drawBackground(*window);
+    objectManager.drawBackground(*window);
 
     window->setView(camera);
-    ObjectManager::drawObjects(*window);
+    objectManager.drawObjects(*window);
 
     window->setView(uiCamera);
-    ObjectManager::drawUI(*window);
+    objectManager.drawUI(*window);
 
     window->setView(camera);
     window->display();

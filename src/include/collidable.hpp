@@ -23,7 +23,14 @@ struct ConcaveHitbox
 
 using Hitbox = std::variant<CircleHitbox, RectangleHitbox, ConcaveHitbox>;
 
-class Collidable
+class ICollidable
+{
+public:
+    virtual const Hitbox &getHitbox() const = 0;
+    virtual bool isTrigger() const = 0;
+};
+
+class Collidable : public ICollidable
 {
     friend class Transformable;
     friend class ObjectManager;
@@ -32,17 +39,10 @@ public:
     Collidable(const Hitbox &hitbox, bool trigger = false);
     virtual ~Collidable() = default;
 
-    inline const Hitbox &getHitbox() const { return hitbox; }
-    inline bool isTrigger() const { return trigger; }
+    inline virtual const Hitbox &getHitbox() const override { return hitbox; }
+    inline virtual bool isTrigger() const override { return trigger; }
 
-private:
-    virtual void onCollision(std::shared_ptr<const Collidable> other) = 0;
     void transUpdate(const sf::Transform &trans, const sf::Vector2f &scale);
-    
-    static void calculateCollision(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
-    static void calculateCircleCollision(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
-    static void calculateRectangleCollision(std::shared_ptr<Collidable> circle, std::shared_ptr<Collidable> rectangle);
-    static void calculateConcaveCollision(std::shared_ptr<Collidable> circle, std::shared_ptr<Collidable> concave);
 
     bool trigger;
     Hitbox hitbox;

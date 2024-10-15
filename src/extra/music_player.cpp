@@ -9,15 +9,9 @@
 
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
-std::shared_ptr<sf::Music> curMusic = std::make_shared<sf::Music>();
-std::shared_ptr<sf::Music> newMusic = std::make_shared<sf::Music>();
-float deltaTime;
-float startTime;
-float targetVolume;
-
-void music_player::changeMusic(const std::string &name, float volume)
+void MusicPlayer::changeMusic(const std::string &name, float volume)
 {
-    if (!newMusic->openFromFile(settings::music_path + "/" + name + ".ogg"))
+    if (!newMusic->openFromFile(Game::getSettings().music_path + "/" + name + ".ogg"))
         return;
 
     newMusic->setLoop(true);
@@ -30,7 +24,7 @@ void music_player::changeMusic(const std::string &name, float volume)
     startTime = Game::getClock().getElapsedTime().asSeconds();
 }
 
-void music_player::update()
+void MusicPlayer::update()
 {
     float curVolume = curMusic->getVolume();
     bool newPlaying = newMusic->getStatus() == sf::Music::Playing;
@@ -51,7 +45,7 @@ void music_player::update()
     startTime = Game::getClock().getElapsedTime().asSeconds();
 }
 
-std::shared_ptr<sf::Music> music_player::getCurrentMusic()
+std::shared_ptr<sf::Music> MusicPlayer::getCurrentMusic() const
 {
     return curMusic;
 }

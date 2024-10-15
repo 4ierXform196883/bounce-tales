@@ -7,16 +7,25 @@
 
 class ObjectManager
 {
-    friend class Game;
+public:
+    void load(const std::string &path);
+    void save(const std::string &path);
+
+    void updateAll();
+    void drawBackground(sf::RenderTarget &target);
+    void drawObjects(sf::RenderTarget &target);
+    void drawUI(sf::RenderTarget &target);
+    
 
 private:
-    static void load(const std::string &path);
-    static void save(const std::string &path);
+    void recursiveDraw(std::shared_ptr<GameObject> object, sf::RenderTarget &target);
+    void recursiveUpdate(std::shared_ptr<GameObject> object);
+    void recursiveCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second);
 
-    static void updateAll();
-    static void drawBackground(sf::RenderTarget &target);
-    static void drawObjects(sf::RenderTarget &target);
-    static void drawUI(sf::RenderTarget &target);
-
-    static std::shared_ptr<Background> background;
+    void calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second);
+    void calculateCircleCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second);
+    void calculateRectangleCollision(std::shared_ptr<GameObject> circle, std::shared_ptr<GameObject> rectangle);
+    void calculateConcaveCollision(std::shared_ptr<GameObject> circle, std::shared_ptr<GameObject> concave);
+    
+    std::shared_ptr<Background> background;
 };

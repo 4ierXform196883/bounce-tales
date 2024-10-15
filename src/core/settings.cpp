@@ -4,20 +4,13 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
-#include <string>
-#include <map>
 #include <sstream>
 
-using IniSection = std::map<std::string, std::string>;
-using IniFile = std::map<std::string, IniSection>;
-
-IniFile iniFile;
-
-void settings::load(const std::string& path)
+void Settings::load(const std::string& path)
 {
     std::ifstream file(path);
     if (!file.is_open()) {
-        std::cerr << "[ERROR] (settings::load) Couldn't open file\n";
+        std::cerr << "[ERROR] (Settings::load) Couldn't open file\n";
         return;
     }
     std::string currentSection;
@@ -44,11 +37,11 @@ void settings::load(const std::string& path)
     file.close();
 }
 
-void settings::save(const std::string& path)
+void Settings::save(const std::string& path)
 {
     std::ofstream file(path);
     if (!file.is_open()) {
-        std::cerr << "[ERROR] (settings::save) Couldn't open file\n";
+        std::cerr << "[ERROR] (Settings::save) Couldn't open file\n";
         return;
     }
 
@@ -63,69 +56,64 @@ void settings::save(const std::string& path)
     file.close();
 }
 
-void settings::set(const std::string& section, const std::string& key, const std::string& value)
+void Settings::set(const std::string& section, const std::string& key, const std::string& value)
 {
     iniFile[section][key] = value;
 }
 
-void settings::set(const std::string &section, const std::string &key, double value)
+void Settings::set(const std::string &section, const std::string &key, double value)
 {
     iniFile[section][key] = std::to_string(value);
 }
 
-void settings::set(const std::string &section, const std::string &key, int value)
+void Settings::set(const std::string &section, const std::string &key, int value)
 {
     iniFile[section][key] = std::to_string(value);
 }
 
-void settings::set(const std::string &section, const std::string &key, bool value)
+void Settings::set(const std::string &section, const std::string &key, bool value)
 {
     iniFile[section][key] = std::to_string(value);
 }
 
-std::string settings::getString(const std::string &section, const std::string &key, const std::string &defaultValue)
+std::string Settings::getString(const std::string &section, const std::string &key, const std::string &defaultValue) const
 {
     if (iniFile.count(section) && iniFile.at(section).count(key)) {
         return iniFile.at(section).at(key);
     }
-    std::cerr << "[WARN] (settings::getString) Key \"" + key + "\" not found\n";
-    set(section, key, defaultValue);
+    std::cerr << "[WARN] (Settings::getString) Key \"" + key + "\" not found\n";
     return defaultValue;
 }
 
-double settings::getDouble(const std::string &section, const std::string &key, double defaultValue)
+double Settings::getDouble(const std::string &section, const std::string &key, double defaultValue) const
 {
-    std::string valueStr = settings::getString(section, key);
+    std::string valueStr = Settings::getString(section, key);
     try {
         return std::stod(valueStr);
     } catch (const std::invalid_argument& e) {
-        std::cerr << "[WARN] (settings::getDouble) \"" + key + "\" value is not double\n";
-        set(section, key, defaultValue);
+        std::cerr << "[WARN] (Settings::getDouble) \"" + key + "\" value is not double\n";
         return defaultValue;
     } catch (const std::out_of_range& e) {
-        std::cerr << "[WARN] (settings::getDouble) \"" + key + "\" value is too big\n";
-        set(section, key, defaultValue);
+        std::cerr << "[WARN] (Settings::getDouble) \"" + key + "\" value is too big\n";
         return defaultValue;
     }
 }
 
-int settings::getInt(const std::string &section, const std::string &key, int defaultValue)
+int Settings::getInt(const std::string &section, const std::string &key, int defaultValue) const
 {
-    std::string valueStr = settings::getString(section, key);
+    std::string valueStr = Settings::getString(section, key);
     try {
         return std::stoi(valueStr);
     } catch (const std::invalid_argument& e) {
-        std::cerr << "[WARN] (settings::getInt) \"" + key + "\" value is not int\n";
-        set(section, key, defaultValue);
+        std::cerr << "[WARN] (Settings::getInt) \"" + key + "\" value is not int\n";
         return defaultValue;
     } catch (const std::out_of_range& e) {
-        std::cerr << "[WARN] (settings::getInt) \"" + key + "\" value is too big\n";
-        set(section, key, defaultValue);
+        std::cerr << "[WARN] (Settings::getInt) \"" + key + "\" value is too big\n";
         return defaultValue;
     }
 }
 
-bool settings::getBool(const std::string &section, const std::string &key, bool defaultValue)
+bool Settings::getBool(const std::string &section, const std::string &key, bool defaultValue) const
 {
     std::string valueStr = getString(section, key);
     std::transform(valueStr.begin(), valueStr.end(), valueStr.begin(), ::tolower);
@@ -134,8 +122,7 @@ bool settings::getBool(const std::string &section, const std::string &key, bool 
     } else if (valueStr == "false" || valueStr == "0") {
         return false;
     } else {
-        std::cerr << "[WARN] (settings::getBool) \"" + key + "\" value is not bool\n";
-        set(section, key, defaultValue);
+        std::cerr << "[WARN] (Settings::getBool) \"" + key + "\" value is not bool\n";
         return defaultValue;
     }
 }

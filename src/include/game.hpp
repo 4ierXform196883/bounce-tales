@@ -3,6 +3,10 @@
 #include <string>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include "asset_manager.hpp"
+#include "object_manager.hpp"
+#include "settings.hpp"
+#include "music_player.hpp"
 
 class Game
 {
@@ -16,6 +20,11 @@ public:
     inline static const sf::View &getCamera() { return camera; }
     inline static const sf::View &getUiCamera() { return uiCamera; }
 
+    inline static const AssetManager &getAssetManager() { return assetManager; }
+    inline static const ObjectManager &getObjectManager() { return objectManager; }
+    inline static const MusicPlayer &getMusicPlayer() { return musicPlayer; }
+    inline static const Settings &getSettings() { return settings; }
+
 private:
     static void init();
     static void tick();
@@ -27,4 +36,9 @@ private:
     static sf::View camera;
     static sf::View uiCamera;
     static const sf::Clock globalClock;
+
+    static AssetManager assetManager;
+    static ObjectManager objectManager;
+    static MusicPlayer musicPlayer;
+    static Settings settings;
 };

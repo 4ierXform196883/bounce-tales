@@ -11,13 +11,6 @@
 
 using json = nlohmann::json;
 
-std::unordered_map<std::string, sf::SoundBuffer> AssetManager::soundBuffers;
-std::unordered_map<std::string, std::string> AssetManager::musicPaths;
-
-std::unordered_map<std::string, sf::Texture> AssetManager::textures;
-std::unordered_map<std::string, std::unordered_map<std::string, sf::IntRect>> AssetManager::spriteBounds;
-std::unordered_map<std::string, std::unordered_map<std::string, std::vector<sf::IntRect>>> AssetManager::animationBounds;
-
 void AssetManager::loadFromJSON(const fs::path &path)
 {
     std::string filename = path.stem().generic_string();
@@ -56,6 +49,9 @@ void AssetManager::loadFromJSON(const fs::path &path)
 void AssetManager::loadTextures(const std::string &path)
 {
     textures["NULL"] = sf::Texture();
+    spriteBounds["NULL"]["NULL"] = sf::IntRect(0, 0, 100, 100);
+    animationBounds["NULL"]["NULL"].push_back(sf::IntRect(0, 0, 100, 100));
+    
     for (auto &entry : fs::directory_iterator(path))
     {
         if (entry.path().extension() == ".json")
@@ -94,38 +90,47 @@ void AssetManager::unloadSounds()
     soundBuffers.clear();
 }
 
-const sf::SoundBuffer &AssetManager::getSoundBuffer(const std::string &name)
+const sf::SoundBuffer &AssetManager::getSoundBuffer(const std::string &name) const
 {
-    return soundBuffers[name];
+    return soundBuffers.at(name);
 }
 
-const sf::Texture &AssetManager::getTexture(const std::string &name)
+const sf::Texture &AssetManager::getTexture(const std::string &name) const
 {
     if (textures.find(name) == textures.end())
+    {
         std::cerr << "[WARN] (AssetManager::getTexture) No \"" + name + "\" texture found\n";
-    return textures[name];
+        return textures.at("NULL");
+    }
+    return textures.at(name);
 }
 
-const sf::IntRect &AssetManager::getSpriteBounds(const std::string &textureName, const std::string &subtextureName)
+const sf::IntRect &AssetManager::getSpriteBounds(const std::string &textureName, const std::string &subtextureName) const
 {
     if (spriteBounds.find(textureName) == spriteBounds.end())
+    {
         std::cerr << "[WARN] (AssetManager::getSpriteBounds) No \"" + textureName + "\" texture found\n";
+        return spriteBounds.at("NULL").at("NULL");
+    }
     else if (spriteBounds.at(textureName).find(subtextureName) == spriteBounds.at(textureName).end())
+    {
         std::cerr << "[WARN] (AssetManager::getSpriteBounds) No bounds for\"" + textureName + "." + subtextureName + "\" found\n";
-    return spriteBounds[textureName][subtextureName];
+        return spriteBounds.at("NULL").at("NULL");
+    }
+    return spriteBounds.at(textureName).at(subtextureName);
 }
 
-const std::vector<sf::IntRect> &AssetManager::getAnimationBounds(const std::string &textureName, const std::string &animationName)
+const std::vector<sf::IntRect> &AssetManager::getAnimationBounds(const std::string &textureName, const std::string &animationName) const
 {
     if (animationBounds.find(textureName) == animationBounds.end())
     {
-        animationBounds[textureName][animationName].push_back(sf::IntRect());
         std::cerr << "[WARN] (AssetManager::getAnimationBounds) No \"" + textureName + "\" texture found\n";
+        return animationBounds.at("NULL").at("NULL");
     }
     else if (animationBounds.at(textureName).find(animationName) == animationBounds.at(textureName).end())
     {
-        animationBounds[textureName][animationName].push_back(sf::IntRect());
         std::cerr << "[WARN] (AssetManager::getAnimationBounds) No bounds for\"" + textureName + "." + animationName + "\" found\n";
+        return animationBounds.at("NULL").at("NULL");
     }
-    return animationBounds[textureName][animationName];
+    return animationBounds.at(textureName).at(animationName);
 }
