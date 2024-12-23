@@ -71,6 +71,8 @@ void Game::tick()
     Timer::updateAll();
     musicPlayer.update();
     objectManager.updateAll();
+    objectManager.collideAll();
+    objectManager.moveAll();
     render();
 }
 

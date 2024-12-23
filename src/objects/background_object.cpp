@@ -16,7 +16,6 @@ BackgroundObject::BackgroundObject(const std::string &tag, std::shared_ptr<Primi
 void BackgroundObject::update()
 {
     const sf::Vector2f &cSize = Game::getCamera().getSize();
-    // sf::Vector2f cSize(1280, 720);
     if (this->speed == 0)
     {
         const sf::Vector2f &cPos = Game::getCamera().getCenter();

@@ -6,7 +6,7 @@ class CurvedShape : public sf::Drawable
 {
 public:
     CurvedShape() = default;
-    CurvedShape(const sf::Texture& texture, const std::vector<sf::Vertex>& verts, sf::VertexBuffer::Usage usage = sf::VertexBuffer::Static);
+    CurvedShape(const sf::Texture& texture, const std::vector<sf::Vector2f>& vertices, sf::VertexBuffer::Usage usage = sf::VertexBuffer::Static);
     virtual ~CurvedShape() = default;
 
     void setTexture(const sf::Texture& texture);

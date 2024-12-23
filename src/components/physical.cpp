@@ -11,6 +11,11 @@ Physical::Physical(float maxSpeed, float friction, float gravity)
         this->addLongForce("gravity", {0.0f, 1.0f}, gravity);
 }
 
+void Physical::addForce(const sf::Vector2f &force)
+{
+    this->speed += force;
+}
+
 void Physical::addForce(const sf::Vector2f &direction, float power)
 {
     sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
@@ -70,5 +75,7 @@ const sf::Vector2f &Physical::speedUpdate()
         this->speed += force;
     }
     this->speed += calcFrictionVec();
+    this->speed.x = std::min(this->speed.x, maxSpeed);
+    this->speed.y = std::min(this->speed.y, maxSpeed);
     return this->speed;
 }

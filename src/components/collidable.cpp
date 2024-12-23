@@ -5,7 +5,7 @@
 #include "physical.hpp"
 
 Collidable::Collidable(const Hitbox &hitbox, bool trigger)
-    : hitbox(hitbox), trigger(trigger) {}
+    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger) {}
 
 void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &scale)
 {
@@ -19,11 +19,6 @@ void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &sca
     }
 
     case 1:
-        for (size_t i = 0; i < 4; ++i)
-            std::get<RectangleHitbox>(hitbox).points[i] = trans.transformPoint(std::get<RectangleHitbox>(initHitbox).points[i]);
-        break;
-
-    case 2:
         for (size_t i = 0; i < std::get<ConcaveHitbox>(hitbox).points.size(); ++i)
             std::get<ConcaveHitbox>(hitbox).points[i] = trans.transformPoint(std::get<ConcaveHitbox>(initHitbox).points[i]);
         break;

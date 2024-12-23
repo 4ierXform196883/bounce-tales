@@ -11,17 +11,12 @@ struct CircleHitbox
     sf::Vector2f center;
 };
 
-struct RectangleHitbox
-{
-    std::array<sf::Vector2f, 4> points;
-};
-
 struct ConcaveHitbox
 {
     std::vector<sf::Vector2f> points;
 };
 
-using Hitbox = std::variant<CircleHitbox, RectangleHitbox, ConcaveHitbox>;
+using Hitbox = std::variant<CircleHitbox, ConcaveHitbox>;
 
 class ICollidable
 {

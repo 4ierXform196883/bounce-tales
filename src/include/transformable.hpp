@@ -48,5 +48,6 @@ public:
     inline virtual const sf::Transform &getTransform() const override { return trans.getTransform(); }
     inline virtual const sf::Transform &getInverseTransform() const override { return trans.getInverseTransform(); }
 
+protected:
     sf::Transformable trans;
 };

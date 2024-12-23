@@ -6,6 +6,7 @@
 
 class IPhysical
 {
+    virtual void addForce(const sf::Vector2f &force) = 0;
     virtual void addForce(const sf::Vector2f &direction, float power) = 0;
     virtual void addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration = 0) = 0;
     virtual void modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power) = 0;
@@ -19,6 +20,7 @@ public:
     Physical(float maxSpeed, float friction, float gravity = 0.0f);
     virtual ~Physical() = default;
 
+    virtual void addForce(const sf::Vector2f &force) override;
     virtual void addForce(const sf::Vector2f &direction, float power) override;
     virtual void addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration = 0) override;
     virtual void modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power) override;

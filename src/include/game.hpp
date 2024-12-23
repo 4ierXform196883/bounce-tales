@@ -24,6 +24,7 @@ public:
     inline static const ObjectManager &getObjectManager() { return objectManager; }
     inline static const MusicPlayer &getMusicPlayer() { return musicPlayer; }
     inline static const Settings &getSettings() { return settings; }
+    inline static sf::Vector2f getMousePos() { return window->mapPixelToCoords(sf::Mouse::getPosition(*window)); }
 
 private:
     static void init();

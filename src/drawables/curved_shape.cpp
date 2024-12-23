@@ -1,23 +1,20 @@
 #include "curved_shape.hpp"
+#include "ear_clipping.hpp"
+#include <iostream>
 
-// CurvedShape::CurvedShape(const sf::Texture &texture) : texture(&texture), verts{sf::TrianglesStrip, 4}
-// {
-//     sf::Vector2u tSize = texture.getSize();
-//     this->setTextureRect({0, 0, (int)tSize.x, (int)tSize.y});
-// }
-
-// CurvedShape::CurvedShape(const sf::Texture &texture, const sf::IntRect &rect) : texture(&texture), verts{sf::TrianglesStrip, 4}
-// {
-//     this->setTextureRect(rect);
-// }
-
-CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vertex> &verts, sf::VertexBuffer::Usage usage)
-    : texture(&texture), verts{sf::PrimitiveType::TriangleStrip, usage}
+CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vector2f> &vertices, sf::VertexBuffer::Usage usage)
+    : texture(&texture), verts{sf::PrimitiveType::Triangles, usage}
 {
-    this->verts.create(verts.size());
-    this->verts.update(&verts[0]);
+    std::vector<sf::Vertex> triangleVertices;
+    for (const sf::Vector2f &vert : ear_clipping::processConcaveShape(vertices))
+    {
+        triangleVertices.emplace_back(vert, vert);
+        std::cout << vert.x << " " << vert.y << "\n";
+    }
+    this->verts.create(triangleVertices.size());
+    this->verts.update(&triangleVertices[0]);
     float bounds[4];
-    for (const sf::Vertex& vert : verts)
+    for (const sf::Vertex &vert : triangleVertices)
     {
         bounds[0] = std::min(bounds[0], vert.position.x);
         bounds[1] = std::min(bounds[1], vert.position.y);
