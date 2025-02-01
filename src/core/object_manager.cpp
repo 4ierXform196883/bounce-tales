@@ -15,7 +15,7 @@ void ObjectManager::load(const std::string &path)
     test->removeLongForce("gravity");
     std::vector<sf::Vector2f> verts = {{97, 217}, {156, 236}, {195, 275}, {176, 334}, {136, 373}, {97, 451}, {136, 549}, {215, 608}, {352, 627}, {410, 627}, {449, 569}, {700, 510}, {430, 471}, {391, 432}, {332, 393}, {332, 354}, {352, 314}, {410, 295}, {449, 256}, {469, 178}, {449, 138}, {410, 80}, {352, 60}, {234, 60}, {117, 80}, {97, 99}, {78, 158}};
     testGround = std::make_shared<Ground>(verts);
-    sf::Re
+    // sf::Re
 }
 
 void ObjectManager::save(const std::string &path)
