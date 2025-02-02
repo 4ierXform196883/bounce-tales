@@ -23,10 +23,10 @@ bool ear_clipping::isEar(const Node &n, const std::vector<Node> &nodes, const st
 
 std::vector<sf::Vector2f> ear_clipping::processConcaveShape(const std::vector<sf::Vector2f> &vertices)
 {
-    for (auto vert : vertices)
-    {
-        std::cout << vert.x << " " << vert.y << "   ";
-    }
+    // for (auto vert : vertices)
+    // {
+    //     std::cout << vert.x << " " << vert.y << "   ";
+    // }
     std::vector<sf::Vector2f> resultVertices;
     int pointCount = vertices.size();
     std::vector<sf::ConvexShape> shapes;

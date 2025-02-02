@@ -58,7 +58,7 @@ void ObjectManager::drawObjects(sf::RenderTarget &target)
     recursiveDraw(test, target);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
     {
-        player->setPosition(Game::getMousePos());
+        player->setPosition(Game::getMousePos() - sf::Vector2f(15, 15));
         player->getPhysical()->speed = {0, 0};
     }
     recursiveDraw(testGround, target);
@@ -156,33 +156,45 @@ void ObjectManager::calculateCollision(std::shared_ptr<GameObject> first, std::s
 {
     const Hitbox &firstHitbox = first->getCollidable()->getHitbox();
     const Hitbox &secondHitbox = second->getCollidable()->getHitbox();
-    auto simplex = collision_calculator::getGJKCollisionSimplex(firstHitbox, secondHitbox);
-    if (simplex.size() == 0)
-        return;
-    sf::Vector2f penetration = collision_calculator::getPenetrationVector(firstHitbox, secondHitbox, simplex);
-    if (first->getPhysical())
+    
+    switch (secondHitbox.index())
     {
-        first->getPhysical()->speed -= penetration;
+    case 0: // circle
+
+    case 1: // triangle
+    {
+        auto simplex = collision_calculator::getGJKCollisionSimplex(firstHitbox, secondHitbox);
+        if (simplex.size() == 0)
+            return;
+        sf::Vector2f penetration = collision_calculator::getPenetrationVector(firstHitbox, secondHitbox, simplex);
+        if (first->getPhysical())
+        {
+            first->getPhysical()->speed -= penetration;
+        }
+        break;
     }
-    // if (first->getCollidable()->hitbox.index() != 0)
-    //     return;
-    // switch (second->getCollidable()->hitbox.index())
-    // {
-    // case 0:
-    //     calculateCircleCollision(first, second);
-    //     break;
 
-    // case 1:
-    //     calculateRectangleCollision(first, second);
-    //     break;
+    case 2: // concave
+    {
+        sf::Vector2f penetration = {0, 0};
+        auto triangles = std::get<ConcaveHitbox>(secondHitbox).triangles;
+        for (auto triangle : triangles)
+        {
+            auto simplex = collision_calculator::getGJKCollisionSimplex(firstHitbox, triangle);
+            if (simplex.size() == 0)
+                continue;;
+            penetration += collision_calculator::getPenetrationVector(firstHitbox, triangle, simplex);
+        }
+        if (auto physical = first->getPhysical())
+        {
+            physical->speed -= penetration;
+        }
+        break;
+    }
 
-    // case 2:
-    //     calculateConcaveCollision(first, second);
-    //     break;
-
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 // void ObjectManager::calculateCircleCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second)

@@ -128,12 +128,12 @@ collision_math::SupportPoint collision_math::getSupportPoint(const Hitbox &shape
     else if (shapeA.index() == 0 && shapeB.index() == 1)
     {
         auto firstHitbox = std::get<CircleHitbox>(shapeA);
-        auto secondHitbox = std::get<ConcaveHitbox>(shapeB);
+        auto secondHitbox = std::get<TriangleHitbox>(shapeB);
         return getCircleConvexSupportPoint(firstHitbox.center, firstHitbox.radius, secondHitbox.points, dir);
     }
     else if (shapeA.index() == 1 && shapeB.index() == 0)
     {
-        auto firstHitbox = std::get<ConcaveHitbox>(shapeA);
+        auto firstHitbox = std::get<TriangleHitbox>(shapeA);
         auto secondHitbox = std::get<CircleHitbox>(shapeB);
         auto res = getCircleConvexSupportPoint(secondHitbox.center, secondHitbox.radius, firstHitbox.points, dir);
         std::swap(res.originA, res.originB);
@@ -142,8 +142,8 @@ collision_math::SupportPoint collision_math::getSupportPoint(const Hitbox &shape
     }
     else if (shapeA.index() == 1 && shapeB.index() == 1)
     {
-        auto firstHitbox = std::get<ConcaveHitbox>(shapeA);
-        auto secondHitbox = std::get<ConcaveHitbox>(shapeB);
+        auto firstHitbox = std::get<TriangleHitbox>(shapeA);
+        auto secondHitbox = std::get<TriangleHitbox>(shapeB);
         return getConvexConvexSupportPoint(firstHitbox.points, secondHitbox.points, dir);
     }
     return SupportPoint();

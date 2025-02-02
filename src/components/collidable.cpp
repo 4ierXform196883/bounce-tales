@@ -19,9 +19,19 @@ void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &sca
     }
 
     case 1:
-        for (size_t i = 0; i < std::get<ConcaveHitbox>(hitbox).points.size(); ++i)
-            std::get<ConcaveHitbox>(hitbox).points[i] = trans.transformPoint(std::get<ConcaveHitbox>(initHitbox).points[i]);
+    {
+        for (size_t i = 0; i < std::get<TriangleHitbox>(hitbox).points.size(); ++i)
+            std::get<TriangleHitbox>(hitbox).points[i] = trans.transformPoint(std::get<TriangleHitbox>(initHitbox).points[i]);
         break;
+    }
+
+    case 2:
+    {
+        for (size_t i = 0; i < std::get<ConcaveHitbox>(hitbox).triangles.size(); ++i)
+            for (size_t j = 0; j < 3; ++j)
+                std::get<ConcaveHitbox>(hitbox).triangles[i].points[j] = trans.transformPoint(std::get<ConcaveHitbox>(initHitbox).triangles[i].points[j]);
+        break;
+    }
 
     default:
         break;

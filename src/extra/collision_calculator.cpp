@@ -91,7 +91,7 @@ std::vector<collision_math::SupportPoint> collision_calculator::getGJKCollisionS
     std::vector<collision_math::SupportPoint> simplex;
 
     float radius = shapeA.index() == 0 ? std::get<CircleHitbox>(shapeA).radius : 0;
-    dir = shapeA.index() == 0 ? sf::Vector2f(radius, radius) : std::get<ConcaveHitbox>(shapeA).points[0];
+    dir = shapeA.index() == 0 ? sf::Vector2f(radius, radius) : std::get<TriangleHitbox>(shapeA).points[0];
     nextSupportPoint = collision_math::getSupportPoint(shapeA, shapeB, dir);
     simplex.push_back(nextSupportPoint);
 

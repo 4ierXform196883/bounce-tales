@@ -6,7 +6,7 @@
 #include "game.hpp"
 #include "simple_object.hpp"
 #include "background_object.hpp"
-#include <iostream>
+#include "randomizer.hpp"
 
 Background::Background() : GameObject("background", nullptr)
 {
@@ -18,10 +18,14 @@ Background::Background() : GameObject("background", nullptr)
     this->setScale(1, cSize.y / tSize.y);
     this->setOrigin(cSize.x / 2, tSize.y / 2);
 
-    children.push_back(std::make_shared<SimpleObject>("sun", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(-500, -300)));
-    children.push_back(std::make_shared<BackgroundObject>("test", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(100, 100), 0.0f, 2.0f));
-    children.push_back(std::make_shared<BackgroundObject>("test2", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(100, 100), 0.0f, 2.0f));
-    children.push_back(std::make_shared<BackgroundObject>("test2", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(100, 100), 10.0f, 2.0f));
-    children.push_back(std::make_shared<BackgroundObject>("test2", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(100, 100), 30.0f, 2.0f));
-    children.push_back(std::make_shared<BackgroundObject>("test2", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sf::Vector2f(100, 100), 0.01f, 2.0f));
+    sf::Vector2f sunPos = {-500 * cSize.x / 1280, -300 * cSize.y / 720};
+    children.push_back(std::make_shared<SimpleObject>("sun", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sunPos));
+    for (size_t i = 0; i < 20; ++i)
+    {
+        std::string name = "island" + std::to_string(i);
+        std::string textureName = "bg_island_" + std::to_string(randomizer::getRandInt(1, 8));
+        sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.4 * cSize.y, 0.25 * cSize.y)};
+        float distance = randomizer::getRandFloat(2.9 - 0.1 * i, 3 - 0.1 * i);
+        children.push_back(std::make_shared<BackgroundObject>(name, std::make_shared<PrimitiveSprite>(assetManager.getTexture(textureName)), startPos, 0.0f, distance));
+    }
 }

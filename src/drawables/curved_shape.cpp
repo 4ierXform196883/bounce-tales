@@ -6,10 +6,12 @@ CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vecto
     : texture(&texture), verts{sf::PrimitiveType::Triangles, usage}
 {
     std::vector<sf::Vertex> triangleVertices;
-    for (const sf::Vector2f &vert : ear_clipping::processConcaveShape(vertices))
+    size_t i = 0;
+    for (const sf::Vector2f &vert : vertices)
     {
-        triangleVertices.emplace_back(vert, vert);
-        std::cout << vert.x << " " << vert.y << "\n";
+        triangleVertices.emplace_back(vert, sf::Color(i * 10, i * 10, i * 10, 128), vert);
+        // std::cout << vert.x << " " << vert.y << "\n";
+        ++i;
     }
     this->verts.create(triangleVertices.size());
     this->verts.update(&triangleVertices[0]);

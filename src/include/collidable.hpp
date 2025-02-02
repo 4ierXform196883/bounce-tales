@@ -11,12 +11,17 @@ struct CircleHitbox
     sf::Vector2f center;
 };
 
-struct ConcaveHitbox
+struct TriangleHitbox
 {
     std::vector<sf::Vector2f> points;
 };
 
-using Hitbox = std::variant<CircleHitbox, ConcaveHitbox>;
+struct ConcaveHitbox
+{
+    std::vector<TriangleHitbox> triangles;
+};
+
+using Hitbox = std::variant<CircleHitbox, TriangleHitbox, ConcaveHitbox>;
 
 class ICollidable
 {
