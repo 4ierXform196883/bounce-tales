@@ -12,8 +12,7 @@ Ground::Ground(std::vector<sf::Vector2f> verticies)
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("HideZone1");
     sf::Vector2u tSize = texture.getSize();
-
-    verticies = ear_clipping::processConcaveShape(verticies);
+    // verticies = ear_clipping::processConcaveShape(verticies);
     drawable = std::make_shared<CurvedShape>(Game::getAssetManager().getTexture("HideZone1"), verticies);
     ConcaveHitbox hitbox;
     for (size_t i = 0; i < verticies.size(); i += 3)

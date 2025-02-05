@@ -14,6 +14,7 @@
 #include "music_player.hpp"
 #include "object_manager.hpp"
 #include "background.hpp"
+#include "theme.hpp"
 
 AssetManager Game::assetManager;
 ObjectManager Game::objectManager;
@@ -23,6 +24,7 @@ Settings Game::settings;
 std::unique_ptr<sf::RenderWindow> Game::window;
 sf::View Game::camera;
 sf::View Game::uiCamera;
+std::unique_ptr<tgui::Gui> Game::gui;
 const sf::Clock Game::globalClock;
 
 void Game::init()
@@ -30,19 +32,29 @@ void Game::init()
     settings.load(settings.settings_path);
     assetManager.loadTextures(settings.textures_path);
     assetManager.loadSounds(settings.sounds_path);
-    sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1280), settings.getInt("Screen", "screenHeight", 720)};
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Default);
+    sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1920), settings.getInt("Screen", "screenHeight", 1080)};
+    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Fullscreen);
     window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
     // window->setFramerateLimit(1);
     window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
 
     camera.setCenter(0, 0);
-    camera.setSize(windowSize.x, windowSize.y);
+    camera.setSize(1920, 1080);
     uiCamera.setCenter(0, 0);
-    uiCamera.setSize(windowSize.x, windowSize.y);
+    uiCamera.setSize(1920, 1080);
     window->setView(camera);
 
     objectManager.load("idk for now");
+    gui = std::make_unique<tgui::Gui>(*window);
+    // tgui::Theme::getDefault()->replace(Theme());
+    gui->loadWidgetsFromFile("form.txt");
+    // auto w1 = tgui::Button::create("Play");
+    // w1->setPosition(300, 300);
+    // w1->setSize(300, 100);
+    // w1->setTextSize(30);
+    // w1->onPress([&] {window->close(); });
+
+    // gui->add(w1);
 
     // std::vector<sf::Vertex> verts;
     // verts.push_back(sf::Vertex({0.0f, 0.0f}, {0.0f, 0.0f}));
@@ -70,6 +82,37 @@ void Game::tick()
     processEvents();
     Timer::updateAll();
     musicPlayer.update();
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+    {
+        camera.move(0, -10);
+        window->setView(camera);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+    {
+        camera.move(0, 10);
+        window->setView(camera);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+    {
+        camera.move(-10, 0);
+        window->setView(camera);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+    {
+        camera.move(10, 0);
+        window->setView(camera);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
+    {
+        camera.setSize(camera.getSize() - sf::Vector2f(16, 9));
+        uiCamera.setSize(uiCamera.getSize() - sf::Vector2f(16, 9));
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
+    {
+        camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
+        uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
+    }
     objectManager.updateAll();
     objectManager.collideAll();
     objectManager.moveAll();
@@ -87,6 +130,7 @@ void Game::processEvents()
 {
     for (auto event = sf::Event{}; window->pollEvent(event);)
     {
+        gui->handleEvent(event);
         switch (event.type)
         {
         case sf::Event::Closed:
@@ -101,36 +145,6 @@ void Game::processEvents()
                 musicPlayer.changeMusic("level2");
             if (event.key.code == sf::Keyboard::F4)
                 musicPlayer.changeMusic("level3");
-            if (event.key.code == sf::Keyboard::W)
-            {
-                camera.move(0, -16);
-                window->setView(camera);
-            }
-            if (event.key.code == sf::Keyboard::S)
-            {
-                camera.move(0, 16);
-                window->setView(camera);
-            }
-            if (event.key.code == sf::Keyboard::A)
-            {
-                camera.move(-16, 0);
-                window->setView(camera);
-            }
-            if (event.key.code == sf::Keyboard::D)
-            {
-                camera.move(16, 0);
-                window->setView(camera);
-            }
-            if (event.key.code == sf::Keyboard::F)
-            {
-                camera.setSize(camera.getSize() - sf::Vector2f(16, 9));
-                uiCamera.setSize(uiCamera.getSize() - sf::Vector2f(16, 9));
-            }
-            if (event.key.code == sf::Keyboard::G)
-            {
-                camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
-                uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
-            }
             break;
 
         default:
@@ -150,6 +164,7 @@ void Game::render()
 
     window->setView(uiCamera);
     objectManager.drawUI(*window);
+    gui->draw();
 
     window->setView(camera);
     window->display();

@@ -8,6 +8,8 @@ public:
     Player();
     virtual ~Player() = default;
 
+    virtual void update() override;
+
     // ICollidable
     inline virtual const Hitbox &getHitbox() const override { return collidable->getHitbox(); }
     inline virtual bool isTrigger() const override { return collidable->isTrigger(); }

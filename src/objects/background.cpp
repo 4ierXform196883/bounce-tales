@@ -18,14 +18,14 @@ Background::Background() : GameObject("background", nullptr)
     this->setScale(1, cSize.y / tSize.y);
     this->setOrigin(cSize.x / 2, tSize.y / 2);
 
-    sf::Vector2f sunPos = {-500 * cSize.x / 1280, -300 * cSize.y / 720};
+    sf::Vector2f sunPos = {500 * cSize.x / 1280, -300 * cSize.y / 720};
     children.push_back(std::make_shared<SimpleObject>("sun", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sunPos));
-    for (size_t i = 0; i < 20; ++i)
+    for (size_t i = 0; i < 30; ++i)
     {
         std::string name = "island" + std::to_string(i);
         std::string textureName = "bg_island_" + std::to_string(randomizer::getRandInt(1, 8));
-        sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.4 * cSize.y, 0.25 * cSize.y)};
-        float distance = randomizer::getRandFloat(2.9 - 0.1 * i, 3 - 0.1 * i);
+        sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.45 * cSize.y, 0.45 * cSize.y)};
+        float distance = randomizer::getRandFloat(3.9 - 0.1 * i, 4 - 0.1 * i);
         children.push_back(std::make_shared<BackgroundObject>(name, std::make_shared<PrimitiveSprite>(assetManager.getTexture(textureName)), startPos, 0.0f, distance));
     }
 }
