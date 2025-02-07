@@ -2,13 +2,14 @@
 
 #include "game_object.hpp"
 
-class Player : public GameObject, ICollidable, IPhysical
+class Player : public GameObject, public ICollidable, public IPhysical
 {
 public:
     Player();
     virtual ~Player() = default;
 
     virtual void update() override;
+    virtual void onCollision(std::shared_ptr<GameObject> other) override;
 
     // ICollidable
     inline virtual const Hitbox &getHitbox() const override { return collidable->getHitbox(); }
@@ -21,4 +22,8 @@ public:
     inline virtual void modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power) { physical->modifyLongForce(name, direction, power); }
     inline virtual void removeLongForce(const std::string &name) { physical->removeLongForce(name); }
     inline virtual const sf::Vector2f &getSpeed() const { return physical->getSpeed(); }
+
+private:
+    bool onGround = false;
+    float lastJumpTime = 0;
 };

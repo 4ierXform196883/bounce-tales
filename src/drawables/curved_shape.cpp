@@ -1,5 +1,4 @@
 #include "curved_shape.hpp"
-#include "ear_clipping.hpp"
 #include <iostream>
 
 CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vector2f> &vertices, sf::VertexBuffer::Usage usage)
@@ -10,7 +9,6 @@ CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vecto
     for (const sf::Vector2f &vert : vertices)
     {
         triangleVertices.emplace_back(vert, sf::Color(i * 10, i * 10, i * 10, 128), vert);
-        // std::cout << vert.x << " " << vert.y << "\n";
         ++i;
     }
     this->verts.create(triangleVertices.size());

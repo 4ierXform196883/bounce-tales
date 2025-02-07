@@ -19,7 +19,6 @@ public:
     void moveAll();
     void drawBackground(sf::RenderTarget &target);
     void drawObjects(sf::RenderTarget &target);
-    void drawUI(sf::RenderTarget &target);
 
 private:
     void recursiveDraw(std::shared_ptr<GameObject> object, sf::RenderTarget &target);
@@ -31,6 +30,7 @@ private:
 
     std::shared_ptr<Background> background;
     std::shared_ptr<Player> player;
-    std::shared_ptr<Player> test;
-    std::shared_ptr<Ground> testGround;
+    std::vector<std::shared_ptr<Ground>> ground;
+    std::vector<std::shared_ptr<GameObject>> collidables;
+    std::vector<std::shared_ptr<GameObject>> objects;
 };

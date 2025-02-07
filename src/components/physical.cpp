@@ -40,7 +40,7 @@ void Physical::addLongForce(const std::string &name, const sf::Vector2f &directi
 void Physical::modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power)
 {
     sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
-    longForces.at(name) = norm * power;
+    longForces[name] = norm * power;
 }
 
 void Physical::removeLongForce(const std::string &name)

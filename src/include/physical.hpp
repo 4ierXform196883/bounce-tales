@@ -6,6 +6,7 @@
 
 class IPhysical
 {
+public:
     virtual void addForce(const sf::Vector2f &force) = 0;
     virtual void addForce(const sf::Vector2f &direction, float power) = 0;
     virtual void addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration = 0) = 0;
@@ -14,7 +15,7 @@ class IPhysical
     virtual const sf::Vector2f &getSpeed() const = 0;
 };
 
-class Physical : IPhysical
+class Physical : public IPhysical
 {
 public:
     Physical(float maxSpeed, float friction, float gravity = 0.0f);

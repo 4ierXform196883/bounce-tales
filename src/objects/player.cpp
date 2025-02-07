@@ -2,6 +2,7 @@
 #include "asset_manager.hpp"
 #include "game.hpp"
 #include "primitive_sprite.hpp"
+#include "ground.hpp"
 #include <iostream>
 
 Player::Player()
@@ -12,13 +13,14 @@ Player::Player()
     sf::Vector2u tSize = texture.getSize();
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin(tSize.x / 2, tSize.y / 2);
-    // collidable = std::make_shared<Collidable>(ConcaveHitbox{{{-25, 25}, {0, -25}, {25, 25}}});
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f, {tSize.x / 2.0f, tSize.x / 2.0f}});
-    physical = std::make_shared<Physical>(10, 0.1, 0.5);
+    physical = std::make_shared<Physical>(10, 0.05, 0.15);
 }
 
 void Player::update()
 {
+    float curTime = Game::getClock().getElapsedTime().asSeconds();
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
     {
         this->addForce({-0.5, 0});
@@ -27,4 +29,15 @@ void Player::update()
     {
         this->addForce({0.5, 0});
     }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && onGround && curTime - lastJumpTime > 0.5)
+    {
+        this->addForce({0, -5});
+        lastJumpTime = curTime;
+    }
+    onGround = false;
+}
+
+void Player::onCollision(std::shared_ptr<GameObject> other)
+{
+    onGround = std::dynamic_pointer_cast<const Ground>(other) != nullptr;
 }

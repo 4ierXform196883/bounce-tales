@@ -41,6 +41,7 @@ private:
     static sf::View uiCamera;
     static std::unique_ptr<tgui::Gui> gui;
     static const sf::Clock globalClock;
+    static double dtime;
 
     static AssetManager assetManager;
     static ObjectManager objectManager;

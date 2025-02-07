@@ -26,14 +26,15 @@ sf::View Game::camera;
 sf::View Game::uiCamera;
 std::unique_ptr<tgui::Gui> Game::gui;
 const sf::Clock Game::globalClock;
+double Game::dtime = 0;
 
 void Game::init()
 {
     settings.load(settings.settings_path);
     assetManager.loadTextures(settings.textures_path);
     assetManager.loadSounds(settings.sounds_path);
-    sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1920), settings.getInt("Screen", "screenHeight", 1080)};
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Fullscreen);
+    sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1280), settings.getInt("Screen", "screenHeight", 720)};
+    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Default);
     window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
     // window->setFramerateLimit(1);
     window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
@@ -79,6 +80,8 @@ void Game::init()
 
 void Game::tick()
 {
+    // std::cout << 1 / (globalClock.getElapsedTime().asSeconds() - dtime) << "\n";
+    // dtime = globalClock.getElapsedTime().asSeconds();
     processEvents();
     Timer::updateAll();
     musicPlayer.update();
@@ -113,8 +116,8 @@ void Game::tick()
         camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
         uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
     }
-    objectManager.updateAll();
     objectManager.collideAll();
+    objectManager.updateAll();
     objectManager.moveAll();
     render();
 }
@@ -163,7 +166,6 @@ void Game::render()
     objectManager.drawObjects(*window);
 
     window->setView(uiCamera);
-    objectManager.drawUI(*window);
     gui->draw();
 
     window->setView(camera);

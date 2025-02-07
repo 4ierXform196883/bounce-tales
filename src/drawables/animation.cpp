@@ -12,6 +12,12 @@ void Animation::changeSpeed(double speedMultiplier)
     changeBoundsTimer->duration = 1 / (this->fps * speedMultiplier);
 }
 
+void Animation::restart()
+{
+    changeBoundsTimer->restart();
+    currentFrame = 0;
+    this->setTextureRect(this->bounds[this->currentFrame]);
+}
 void Animation::update()
 {
     this->currentFrame = (this->currentFrame + 1) % this->bounds.size();

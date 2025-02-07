@@ -2,10 +2,10 @@
 
 #include "game_object.hpp"
 
-class Ground : public GameObject, ICollidable
+class Ground : public GameObject, public ICollidable
 {
 public:
-    Ground(std::vector<sf::Vector2f> verticies);
+    Ground(const std::vector<std::array<double, 2>>& verts);
     virtual ~Ground() = default;
 
     // ICollidable
