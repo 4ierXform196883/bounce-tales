@@ -1,5 +1,6 @@
 #include "background.hpp"
 
+#include "game.hpp"
 #include "primitive_sprite.hpp"
 #include "asset_manager.hpp"
 #include "settings.hpp"
@@ -8,12 +9,13 @@
 #include "background_object.hpp"
 #include "randomizer.hpp"
 
-Background::Background() : GameObject("background", nullptr)
+Background::Background()
+    : GameObject("background", nullptr)
 {
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("Background_0");
     sf::Vector2u tSize = texture.getSize();
-    const sf::Vector2f &cSize = Game::getUiCamera().getSize();
+    const sf::Vector2f &cSize = Game::getObjectManager().getCamera().getSize();
     drawable = std::make_shared<PrimitiveSprite>(texture, sf::IntRect(0, 0, cSize.x, tSize.y));
     this->setScale(1, cSize.y / tSize.y);
     this->setOrigin(cSize.x / 2, tSize.y / 2);

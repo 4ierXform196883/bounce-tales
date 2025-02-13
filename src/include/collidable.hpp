@@ -11,17 +11,17 @@ struct CircleHitbox
     sf::Vector2f center;
 };
 
-struct TriangleHitbox
+struct ConvexHitbox
 {
     std::vector<sf::Vector2f> points;
 };
 
 struct ConcaveHitbox
 {
-    std::vector<TriangleHitbox> triangles;
+    std::vector<ConvexHitbox> triangles;
 };
 
-using Hitbox = std::variant<CircleHitbox, TriangleHitbox, ConcaveHitbox>;
+using Hitbox = std::variant<CircleHitbox, ConvexHitbox, ConcaveHitbox>;
 
 class ICollidable
 {
@@ -32,11 +32,8 @@ public:
 
 class Collidable : public ICollidable
 {
-    friend class Transformable;
-    friend class ObjectManager;
-
 public:
-    Collidable(const Hitbox &hitbox, bool trigger = false);
+    Collidable(const Hitbox &hitbox, bool trigger = false, bool onlyPushTop = false);
     virtual ~Collidable() = default;
 
     inline virtual const Hitbox &getHitbox() const override { return hitbox; }
@@ -45,6 +42,7 @@ public:
     void transUpdate(const sf::Transform &trans, const sf::Vector2f &scale);
 
     bool trigger;
+    bool onlyPushTop;
     Hitbox hitbox;
     const Hitbox initHitbox;
 };

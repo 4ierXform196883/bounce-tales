@@ -20,8 +20,6 @@ public:
     ~Game() = delete;
 
     inline static const sf::Clock &getClock() { return globalClock; }
-    inline static const sf::View &getCamera() { return camera; }
-    inline static const sf::View &getUiCamera() { return uiCamera; }
 
     inline static const AssetManager &getAssetManager() { return assetManager; }
     inline static const ObjectManager &getObjectManager() { return objectManager; }
@@ -37,8 +35,6 @@ private:
     static void close();
 
     static std::unique_ptr<sf::RenderWindow> window;
-    static sf::View camera;
-    static sf::View uiCamera;
     static std::unique_ptr<tgui::Gui> gui;
     static const sf::Clock globalClock;
     static double dtime;

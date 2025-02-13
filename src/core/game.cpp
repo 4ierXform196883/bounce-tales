@@ -22,8 +22,6 @@ MusicPlayer Game::musicPlayer;
 Settings Game::settings;
 
 std::unique_ptr<sf::RenderWindow> Game::window;
-sf::View Game::camera;
-sf::View Game::uiCamera;
 std::unique_ptr<tgui::Gui> Game::gui;
 const sf::Clock Game::globalClock;
 double Game::dtime = 0;
@@ -38,12 +36,6 @@ void Game::init()
     window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
     // window->setFramerateLimit(1);
     window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
-
-    camera.setCenter(0, 0);
-    camera.setSize(1920, 1080);
-    uiCamera.setCenter(0, 0);
-    uiCamera.setSize(1920, 1080);
-    window->setView(camera);
 
     objectManager.load("idk for now");
     gui = std::make_unique<tgui::Gui>(*window);
@@ -82,44 +74,44 @@ void Game::tick()
 {
     // std::cout << 1 / (globalClock.getElapsedTime().asSeconds() - dtime) << "\n";
     // dtime = globalClock.getElapsedTime().asSeconds();
-    processEvents();
-    Timer::updateAll();
+    Game::processEvents();
     musicPlayer.update();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-    {
-        camera.move(0, -10);
-        window->setView(camera);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-    {
-        camera.move(0, 10);
-        window->setView(camera);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-    {
-        camera.move(-10, 0);
-        window->setView(camera);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-    {
-        camera.move(10, 0);
-        window->setView(camera);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
-    {
-        camera.setSize(camera.getSize() - sf::Vector2f(16, 9));
-        uiCamera.setSize(uiCamera.getSize() - sf::Vector2f(16, 9));
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
-    {
-        camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
-        uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
-    }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+    // {
+    //     camera.move(0, -10);
+    //     window->setView(camera);
+    // }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+    // {
+    //     camera.move(0, 10);
+    //     window->setView(camera);
+    // }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+    // {
+    //     camera.move(-10, 0);
+    //     window->setView(camera);
+    // }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+    // {
+    //     camera.move(10, 0);
+    //     window->setView(camera);
+    // }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
+    // {
+    //     camera.setSize(camera.getSize() - sf::Vector2f(16, 9));
+    //     uiCamera.setSize(uiCamera.getSize() - sf::Vector2f(16, 9));
+    // }
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
+    // {
+    //     camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
+    //     uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
+    // }
     objectManager.collideAll();
+    Timer::updateAll();
     objectManager.updateAll();
     objectManager.moveAll();
-    render();
+    Game::render();
 }
 
 void Game::close()
@@ -127,6 +119,7 @@ void Game::close()
     assetManager.unloadTextures();
     assetManager.unloadSounds();
     settings.save(settings.settings_path);
+    window->close();
 }
 
 void Game::processEvents()
@@ -137,7 +130,7 @@ void Game::processEvents()
         switch (event.type)
         {
         case sf::Event::Closed:
-            window->close();
+            Game::close();
             break;
         case sf::Event::KeyPressed:
             if (event.key.code == sf::Keyboard::F1)
@@ -159,16 +152,7 @@ void Game::processEvents()
 void Game::render()
 {
     window->clear(sf::Color::Black);
-    window->setView(uiCamera);
-    objectManager.drawBackground(*window);
-
-    window->setView(camera);
-    objectManager.drawObjects(*window);
-
-    window->setView(uiCamera);
-    gui->draw();
-
-    window->setView(camera);
+    objectManager.drawAll(*window);
     window->display();
 }
 

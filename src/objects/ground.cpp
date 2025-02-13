@@ -28,7 +28,7 @@ Ground::Ground(const std::vector<std::array<double, 2>> &verts)
     ConcaveHitbox hitbox;
     for (size_t i = 0; i < sfmlVerts.size(); i += 3)
     {
-        hitbox.triangles.push_back(TriangleHitbox{{sfmlVerts[i], sfmlVerts[i + 1], sfmlVerts[i + 2]}});
+        hitbox.triangles.push_back(ConvexHitbox{{sfmlVerts[i], sfmlVerts[i + 1], sfmlVerts[i + 2]}});
     }
     collidable = std::make_shared<Collidable>(hitbox);
 }

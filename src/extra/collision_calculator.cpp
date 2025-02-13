@@ -91,7 +91,7 @@ std::vector<collision_math::SupportPoint> collision_calculator::getGJKCollisionS
     std::vector<collision_math::SupportPoint> simplex;
 
     float radius = shapeA.index() == 0 ? std::get<CircleHitbox>(shapeA).radius : 0;
-    dir = shapeA.index() == 0 ? sf::Vector2f(radius, radius) : std::get<TriangleHitbox>(shapeA).points[0];
+    dir = shapeA.index() == 0 ? sf::Vector2f(radius, radius) : std::get<ConvexHitbox>(shapeA).points[0];
     nextSupportPoint = collision_math::getSupportPoint(shapeA, shapeB, dir);
     simplex.push_back(nextSupportPoint);
 
@@ -191,6 +191,8 @@ sf::Vector2f collision_calculator::getPenetrationVector(const Hitbox &shapeA, co
     while (newSimplex.size() < 100)
     {
         e = findClosestEdge(newSimplex);
+        if (e.normal.x == 0 && e.normal.y == 0)
+            return sf::Vector2f(0, 0);
         nextSuppPoint = collision_math::getSupportPoint(shapeA, shapeB, e.normal);
 
         double d = collision_math::dot(nextSuppPoint.position, e.normal);

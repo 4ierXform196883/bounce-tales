@@ -4,8 +4,8 @@
 #include "transformable.hpp"
 #include "physical.hpp"
 
-Collidable::Collidable(const Hitbox &hitbox, bool trigger)
-    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger) {}
+Collidable::Collidable(const Hitbox &hitbox, bool trigger, bool onlyPushTop)
+    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger), onlyPushTop(onlyPushTop) {}
 
 void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &scale)
 {
@@ -20,8 +20,8 @@ void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &sca
 
     case 1:
     {
-        for (size_t i = 0; i < std::get<TriangleHitbox>(hitbox).points.size(); ++i)
-            std::get<TriangleHitbox>(hitbox).points[i] = trans.transformPoint(std::get<TriangleHitbox>(initHitbox).points[i]);
+        for (size_t i = 0; i < std::get<ConvexHitbox>(hitbox).points.size(); ++i)
+            std::get<ConvexHitbox>(hitbox).points[i] = trans.transformPoint(std::get<ConvexHitbox>(initHitbox).points[i]);
         break;
     }
 

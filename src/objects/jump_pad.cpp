@@ -6,60 +6,120 @@
 #include <iostream>
 #include "physical.hpp"
 
+const std::vector<std::string> JumpPad::frameSequence = {"3", "2", "1", "2", "3", "0", "0", "3"};
+const std::vector<int> JumpPad::heights = {58, 47, 44, 47, 58, 66, 66, 58};
+// {66, 44, 47, 58}
+
 JumpPad::JumpPad()
     : GameObject("jump_pad", nullptr)
 {
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("JumpPad");
     const sf::IntRect &idleRect = assetManager.getSpriteBounds("JumpPad", "3");
-    idleState = std::make_shared<PrimitiveSprite>(texture, idleRect);
-    activeState = std::make_shared<Animation>(texture, assetManager.getAnimationBounds("JumpPad", "jump"), 1);
-    sf::Vector2u tSize = texture.getSize();
-    drawable = idleState;
+    // idleState = std::make_shared<PrimitiveSprite>(texture, idleRect);
+    // activeState = std::make_shared<Animation>(texture, assetManager.getAnimationBounds("JumpPad", "jump"), 1);
+    // drawable = idleState;
+    drawable = std::make_shared<PrimitiveSprite>(texture, idleRect);
     this->setOrigin(idleRect.width / 2, idleRect.height);
-    ConcaveHitbox hitbox;
-    hitbox.triangles.push_back(TriangleHitbox{{sf::Vector2f(0, 10), sf::Vector2f(109, 10), sf::Vector2f(0, 15)}});
-    hitbox.triangles.push_back(TriangleHitbox{{sf::Vector2f(109, 10), sf::Vector2f(0, 15), sf::Vector2f(109, 15)}});
+    ConvexHitbox hitbox;
+    hitbox.points = {{sf::Vector2f(0, 10), sf::Vector2f(109, 10), sf::Vector2f(109, 15), sf::Vector2f(0, 15)}};
     collidable = std::make_shared<Collidable>(hitbox, true);
 }
 
 void JumpPad::update()
 {
-    float curTime = Game::getClock().getElapsedTime().asSeconds();
-    shouldPush = false;
-    if (reloading && !reloadTimer)
+    // float curTime = Game::getClock().getElapsedTime().asSeconds();
+    // shouldPush = false;
+    // if (reloading && !reloadTimer)
+    // {
+    //     reloadTimer = Timer::create(0.5, [this]()
+    //                                 { reloading = false; }, false);
+    //     jumpTimer = nullptr;
+    // }
+
+    if (currentFrame == 5)
     {
-        reloadTimer = Timer::create(0.5, [this]()
-                                    { reloading = false; }, false);
-        jumpTimer = nullptr;
+        for (auto &obj : touching)
+        {
+            std::dynamic_pointer_cast<IPhysical>(obj)->addForce({0, -15});
+        }
+        ++currentFrame;
     }
+    if (currentFrame == 7)
+    {
+        animTimer = nullptr;
+        currentFrame = 0;
+    }
+    touching.clear();
 }
 
-void JumpPad::onCollision(std::shared_ptr<GameObject> other)
+void JumpPad::onCollision(std::shared_ptr<IGameObject> other)
 {
     auto otherPhys = std::dynamic_pointer_cast<IPhysical>(other);
     if (!otherPhys)
         return;
 
-    if (shouldPush)
+    // if (currentFrame != 6 && other->getPosition().y < this->getPosition().y)
+    //     otherPhys->addForce({0, -otherPhys->getSpeed().y - otherPhys->getGravity()});
+    touching.push_back(other);
+
+    if (!animTimer)
     {
-        
-        otherPhys->addForce({0, -15});
-        shouldPush = false;
+        animTimer = Timer::create(0.05, [this]()
+                                  { updateFrame((++currentFrame) % frameSequence.size()); });
     }
-    else
+    float thisTop = std::get<ConvexHitbox>(collidable->hitbox).points.at(0).y;
+    float otherYSpeed = otherPhys->getSpeed().y;
+    float otherXPos = other->getPosition().x;
+    float otherYPos = other->getPosition().y;
+    if (otherYSpeed > 0)
     {
-        otherPhys->addForce({0, -otherPhys->getSpeed().y - 0.15});
+        // Check if the circle was above the platform in the previous frame
+        // and now has penetrated it.
+        if (otherYPos + 8 - otherYSpeed <= thisTop && otherYPos + 8 > thisTop)
+        {
+            // Snap the circle to sit on thisTop of the platform.
+            other->setPosition({otherXPos, thisTop - 8});
+            // Cancel the downward velocity.
+            otherPhys->addForce({0, -otherPhys->getSpeed().y});
+        }
     }
 
-    if (!jumpTimer && !reloading)
+    // if (shouldPush)
+    // {
+
+    //     otherPhys->addForce({0, -15});
+    //     shouldPush = false;
+    // }
+    // else
+    // {
+    //     otherPhys->addForce({0, -otherPhys->getSpeed().y - 0.15});
+    // }
+
+    // if (!jumpTimer && !reloading)
+    // {
+    //     activeState->restart();
+    //     drawable = activeState;
+    //     reloadTimer = nullptr;
+    //     jumpTimer = Timer::create(6, [this]()
+    //                               {   drawable = idleState;
+    //                                   shouldPush = true;
+    //                                   reloading = true; }, false);
+    // }
+}
+
+void JumpPad::updateFrame(size_t newFrame)
+{
+    size_t oldFrame = newFrame == 0 ? frameSequence.size() - 1 : newFrame - 1;
+    const sf::IntRect &newRect = Game::getAssetManager().getSpriteBounds("JumpPad", frameSequence.at(newFrame));
+    int diff = heights.at(newFrame) - heights.at(oldFrame);
+    std::dynamic_pointer_cast<PrimitiveSprite>(drawable)->setTextureRect(newRect);
+    for (auto &point : std::get<ConvexHitbox>(collidable->hitbox).points)
     {
-        activeState->restart();
-        drawable = activeState;
-        reloadTimer = nullptr;
-        jumpTimer = Timer::create(6, [this]()
-                                  {   drawable = idleState;
-                                      shouldPush = true;
-                                      reloading = true; }, false);
+        point.y -= diff;
+    }
+    for (auto &obj : touching)
+    {
+        obj->move({0, (float)-diff});
     }
 }

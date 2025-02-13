@@ -15,10 +15,10 @@ BackgroundObject::BackgroundObject(const std::string &tag, std::shared_ptr<Primi
 
 void BackgroundObject::update()
 {
-    const sf::Vector2f &cSize = Game::getCamera().getSize();
+    const sf::Vector2f &cSize = Game::getObjectManager().getCamera().getSize();
     if (this->speed == 0)
     {
-        const sf::Vector2f &cPos = Game::getCamera().getCenter();
+        const sf::Vector2f &cPos = Game::getObjectManager().getCamera().getCenter();
         this->move(-(cPos - prevCPos) / distance);
         this->prevCPos = cPos;
     }
