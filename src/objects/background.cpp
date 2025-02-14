@@ -9,7 +9,7 @@
 #include "background_object.hpp"
 #include "randomizer.hpp"
 
-Background::Background()
+Background::Background(size_t islands, size_t clouds, float additional_distance)
     : GameObject("background", nullptr)
 {
     const AssetManager &assetManager = Game::getAssetManager();
@@ -22,12 +22,34 @@ Background::Background()
 
     sf::Vector2f sunPos = {500 * cSize.x / 1280, -300 * cSize.y / 720};
     children.push_back(std::make_shared<SimpleObject>("sun", std::make_shared<PrimitiveSprite>(assetManager.getTexture("Sun")), sunPos));
-    for (size_t i = 0; i < 30; ++i)
+    size_t firstClouds = randomizer::getRandInt(0, clouds);
+    for (size_t i = 0; i < firstClouds; ++i)
+    {
+        std::string name = "cloud" + std::to_string(i);
+        std::string textureName = "Cloud_" + std::to_string(randomizer::getRandInt(0, 40));
+        sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.45 * cSize.y, 0 * cSize.y)};
+        float distance = clouds / 10 + 1 + additional_distance;
+        distance = randomizer::getRandFloat(distance - 0.1 * (i + 1), distance - 0.1 * i);
+        float speed = randomizer::getRandFloat(0.01, 2);
+        children.push_back(std::make_shared<BackgroundObject>(name, std::make_shared<PrimitiveSprite>(assetManager.getTexture(textureName)), startPos, speed, distance));
+    }
+    for (size_t i = 0; i < islands; ++i)
     {
         std::string name = "island" + std::to_string(i);
         std::string textureName = "bg_island_" + std::to_string(randomizer::getRandInt(1, 8));
         sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.45 * cSize.y, 0.45 * cSize.y)};
-        float distance = randomizer::getRandFloat(3.9 - 0.1 * i, 4 - 0.1 * i);
+        float distance = islands / 10 + 2;
+        distance = randomizer::getRandFloat(distance - 0.1 * (i + 1), distance - 0.1 * i);
         children.push_back(std::make_shared<BackgroundObject>(name, std::make_shared<PrimitiveSprite>(assetManager.getTexture(textureName)), startPos, 0.0f, distance));
+    }
+    for (size_t i = firstClouds; i < clouds; ++i)
+    {
+        std::string name = "cloud" + std::to_string(i);
+        std::string textureName = "Cloud_" + std::to_string(randomizer::getRandInt(0, 40));
+        sf::Vector2f startPos = {randomizer::getRandFloat(-cSize.x, cSize.x), randomizer::getRandFloat(-0.45 * cSize.y, 0 * cSize.y)};
+        float distance = clouds / 10 + 1 + additional_distance;
+        distance = randomizer::getRandFloat(distance - 0.1 * (i + 1), distance - 0.1 * i);
+        float speed = randomizer::getRandFloat(0.01, 2);
+        children.push_back(std::make_shared<BackgroundObject>(name, std::make_shared<PrimitiveSprite>(assetManager.getTexture(textureName)), startPos, speed, distance));
     }
 }

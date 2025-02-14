@@ -20,7 +20,7 @@ void ObjectManager::load(const std::string &path)
     auto &settings = Game::getSettings();
     sf::Vector2f cameraSize = {(float)settings.getInt("Screen", "cameraWidth", 640), (float)settings.getInt("Screen", "cameraWidth", 360)};
     camera = std::make_shared<Camera>(cameraSize);
-    background = std::make_shared<Background>();
+    background = std::make_shared<Background>(30, 20);
     player = std::make_shared<Player>();
     player->setPosition(500, -500);
     camera->setFollowObject(player);

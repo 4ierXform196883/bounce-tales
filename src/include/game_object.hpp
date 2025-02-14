@@ -26,10 +26,9 @@ public:
     virtual std::shared_ptr<IGameObject> findChild(const std::string &tag) override;
     inline virtual std::shared_ptr<const IGameObject> findChild(const std::string &tag) const override { return findChild(tag); }
 
+    // For object manager only
     inline virtual void update() {};
     inline virtual void onCollision(std::shared_ptr<IGameObject> other) {};
-
-    // For object manager only
     inline const std::vector<std::shared_ptr<GameObject>> &getChildren() { return children; }
     inline std::shared_ptr<sf::Drawable> getDrawable() { return drawable; }
     inline std::shared_ptr<Transformable> getTransformable() { return transformable; }

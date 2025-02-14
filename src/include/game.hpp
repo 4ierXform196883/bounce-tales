@@ -23,9 +23,10 @@ public:
 
     inline static const AssetManager &getAssetManager() { return assetManager; }
     inline static const ObjectManager &getObjectManager() { return objectManager; }
-    inline static const MusicPlayer &getMusicPlayer() { return musicPlayer; }
+    // inline static const MusicPlayer &getMusicPlayer() { return musicPlayer; }
     inline static const Settings &getSettings() { return settings; }
     inline static sf::Vector2f getMousePos() { return window->mapPixelToCoords(sf::Mouse::getPosition(*window)); }
+    inline static void changeMusic(const std::string &name, float volume = 100.0f) { musicPlayer.changeMusic(name, volume); }
 
 private:
     static void init();

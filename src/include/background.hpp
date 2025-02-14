@@ -6,6 +6,6 @@
 class Background : public GameObject
 {
 public:
-    Background();
+    Background(size_t islands, size_t clouds, float additional_distance = 0);
     virtual ~Background() = default;
 };
