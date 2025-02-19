@@ -14,7 +14,6 @@
 #include "music_player.hpp"
 #include "object_manager.hpp"
 #include "background.hpp"
-#include "theme.hpp"
 
 AssetManager Game::assetManager;
 ObjectManager Game::objectManager;

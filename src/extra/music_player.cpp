@@ -15,6 +15,7 @@ void MusicPlayer::changeMusic(const std::string &name, float volume)
         return;
 
     newMusic->setLoop(true);
+
     newMusic->setVolume(0);
     if(curMusic->getStatus() != sf::Music::Playing)
         curMusic->setVolume(0);

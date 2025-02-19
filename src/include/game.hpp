@@ -3,13 +3,11 @@
 #include <string>
 #include <memory>
 #include <SFML/Graphics.hpp>
-#include <TGUI/TGUI.hpp>
-#include <TGUI/AllWidgets.hpp>
-#include <TGUI/Backend/SFML-Graphics.hpp>
 #include "asset_manager.hpp"
 #include "object_manager.hpp"
 #include "settings.hpp"
 #include "music_player.hpp"
+#include "gui_manager.hpp"
 
 class Game
 {
@@ -36,11 +34,11 @@ private:
     static void close();
 
     static std::unique_ptr<sf::RenderWindow> window;
-    static std::unique_ptr<tgui::Gui> gui;
     static const sf::Clock globalClock;
     static double dtime;
 
     static AssetManager assetManager;
+    static GuiManager guiManager;
     static ObjectManager objectManager;
     static MusicPlayer musicPlayer;
     static Settings settings;

@@ -2,7 +2,7 @@
 
 #include "game_object.hpp"
 
-class Player : public GameObject, public ICollidable, public IPhysical
+class Player : public GameObject, public ICollidable, public IPhysical/*, public ISoundPlayer*/ // IMPLEMENT
 {
 public:
     Player();
@@ -10,6 +10,10 @@ public:
 
     virtual void update() override;
     virtual void onCollision(std::shared_ptr<IGameObject> other) override;
+
+    // IMPLEMENT
+    // void onDeath();
+    // void onWin();
 
     // ICollidable
     inline virtual const Hitbox &getHitbox() const override { return collidable->getHitbox(); }
@@ -28,5 +32,6 @@ public:
 
 private:
     bool onGround = false;
+    bool controllable = true; // IMPLEMENT
     float lastJumpTime = 0;
 };

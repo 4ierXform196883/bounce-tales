@@ -15,6 +15,7 @@ const sf::View ObjectManager::defaultView = sf::View(
     {0, 0},
     {(float)Game::getSettings().getInt("Screen", "cameraWidth", 640), (float)Game::getSettings().getInt("Screen", "cameraWidth", 360)});
 
+// IMPLEMENT
 void ObjectManager::load(const std::string &path)
 {
     auto &settings = Game::getSettings();
@@ -33,6 +34,7 @@ void ObjectManager::load(const std::string &path)
     collidables.push_back(ptr);
 }
 
+// IMPLEMENT
 void ObjectManager::save(const std::string &path)
 {
 }
@@ -168,6 +170,7 @@ void ObjectManager::recursiveCollision(std::shared_ptr<GameObject> first, std::s
     // }
 }
 
+// IMPLEMENT: добавить передачу момента при столкновении двух движущихся объектов
 void ObjectManager::calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify)
 {
     const Hitbox &firstHitbox = first->getCollidable()->getHitbox();
@@ -196,12 +199,14 @@ void ObjectManager::calculateCollision(std::shared_ptr<GameObject> first, std::s
             return;
         sf::Vector2f penetration = -collision_calculator::getPenetrationVector(firstHitbox, secondHitbox, simplex);
 
+        // Физически верная имплементация коллизий
         // first->move(penetration);
         // penetration = (1 / norm(penetration)) * penetration;
         // float vn = dot(fPhysical->speed, penetration);
         // if (vn < 0)
         //     fPhysical->speed -= penetration * vn;
 
+        // Достаточно хорошая имплементация коллизий)
         first->move(penetration);
         fPhysical->speed += penetration;
 
@@ -216,7 +221,8 @@ void ObjectManager::calculateCollision(std::shared_ptr<GameObject> first, std::s
         auto sPhysical = second->getPhysical();
         auto &triangles = std::get<ConcaveHitbox>(secondHitbox).triangles;
 
-        // for (size_t i = 0; i < 10; ++i)
+        // Физически верная имплементация коллизий
+        // for (size_t i = 0; i < (idk like 10); ++i)
         // {
         //     sf::Vector2f minPenetration = {99999.0f, 99999.0f};
         //     for (auto &triangle : triangles)
@@ -268,7 +274,7 @@ void ObjectManager::calculateCollision(std::shared_ptr<GameObject> first, std::s
         penetration = {penetration.x / count, penetration.y / count};
         first->move(penetration);
         fPhysical->speed += penetration;
-        
+
         break;
     }
 
