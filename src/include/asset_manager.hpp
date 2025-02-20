@@ -11,18 +11,20 @@ namespace fs = std::filesystem;
 
 class AssetManager
 {
+    friend class Game;
+
 public:
     const sf::SoundBuffer &getSoundBuffer(const std::string &name) const;
     const sf::Texture &getTexture(const std::string &name) const;
     const sf::IntRect &getSpriteBounds(const std::string &textureName, const std::string &subtextureName) const;
     const std::vector<sf::IntRect> &getAnimationBounds(const std::string &textureName, const std::string &animationName) const;
 
+private:
     void loadTextures(const std::string &path);
     void loadSounds(const std::string &path);
     void unloadTextures();
     void unloadSounds();
 
-private:
     void loadFromJSON(const fs::path &path);
 
     std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;

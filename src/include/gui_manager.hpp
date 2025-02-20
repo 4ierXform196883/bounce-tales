@@ -5,8 +5,10 @@
 #include <TGUI/AllWidgets.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
 
+// IMPLEMENT
 class GuiManager
 {
+    friend class Game;
     enum UI
     {
         MENU,
@@ -20,10 +22,10 @@ public:
     const std::string settings_ui_path = "assets/ui/settings.form";
     const std::string level_ui_path = "assets/ui/level.form";
     const std::string editor_ui_path = "assets/ui/editor.form";
-
-    void setUI(GuiManager::UI ui); // IMPLEMENT
+    const std::string pause_ui_path = "assets/ui/pause.form";
 
 private:
+    void setUI(GuiManager::UI ui);
     void connectMenuCallbacks();
     void connectSettingsCallbacks();
     void connectLevelCallbacks();

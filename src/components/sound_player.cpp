@@ -40,7 +40,7 @@ void SoundPlayer::stopPlayingRandomly(const std::string &name)
     randomTimers.erase(name);
 }
 
-void SoundPlayer::posUpdate(const sf::Vector2f &pos)
+void SoundPlayer::update(const sf::Vector2f &pos)
 {
     for (auto sound : sounds)
     {

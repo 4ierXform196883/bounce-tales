@@ -5,8 +5,8 @@
 #include "ground.hpp"
 #include <iostream>
 
-Player::Player()
-    : GameObject("player", nullptr)
+Player::Player(const sf::Vector2f &pos, float control_force, float maxSpeed, float friction, float graivty)
+    : GameObject("player"), control_force(control_force)
 {
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("Redy");
@@ -14,35 +14,34 @@ Player::Player()
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin(tSize.x / 2, tSize.y / 2);
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f, {tSize.x / 2.0f, tSize.x / 2.0f}});
-    physical = std::make_shared<Physical>(10, 0.05, 0.2);
+    physical = std::make_shared<Physical>(maxSpeed, friction, graivty);
+    this->setPosition(pos);
 }
 
 void Player::update()
-{   
-    // this->physical->setGravity(!onGround);
-    // if (!onGround)
-    // {
-    //     std::cout << "A";
-    // }
+{
     float curTime = Game::getClock().getElapsedTime().asSeconds();
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+    if (control_force)
     {
-        this->addForce({-0.1, 0});
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-    {
-        this->addForce({0.1, 0});
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && onGround && curTime - lastJumpTime > 2)
-    {
-        this->addForce({0, -5});
-        lastJumpTime = curTime;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+        {
+            this->addForce({-control_force, 0});
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+        {
+            this->addForce({control_force, 0});
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && onGround && curTime - lastJumpTime > 2)
+        {
+            this->addForce({0, -control_force * 50});
+            lastJumpTime = curTime;
+        }
     }
     onGround = false;
 }
 
-void Player::onCollision(std::shared_ptr<IGameObject> other)
+void Player::onCollision(std::shared_ptr<GameObject> other)
 {
-    // onGround = std::dynamic_pointer_cast<const Ground>(other) != nullptr;
-    onGround = true;
+    auto otherCol = std::dynamic_pointer_cast<ICollidable>(other);
+    onGround = otherCol && !otherCol->isTrigger() || onGround;
 }

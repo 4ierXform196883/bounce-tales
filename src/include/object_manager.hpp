@@ -11,26 +11,20 @@
 
 class ObjectManager
 {
+    friend class Game;
+
 public:
+    sf::View getCamera() const;
+
+private:
     void load(const std::string &path);
     void save(const std::string &path);
 
     void updateAll();
     void collideAll();
-    void moveAll();
     void drawAll(sf::RenderTarget &target);
 
-    sf::View getCamera() const;
-
-private:
-    void recursiveDraw(std::shared_ptr<GameObject> object, sf::RenderTarget &target);
-    void recursiveUpdate(std::shared_ptr<GameObject> object);
-    void recursiveMove(std::shared_ptr<GameObject> object);
-    void recursiveCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second);
-
-    void calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify = true);
-
-    static const sf::View defaultView;
+    const sf::View defaultView;
     std::shared_ptr<Camera> camera;
     std::shared_ptr<Background> background;
     std::shared_ptr<Player> player;

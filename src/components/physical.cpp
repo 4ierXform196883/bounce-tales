@@ -4,14 +4,13 @@
 
 #define abs(x) ((x) > 0 ? (x) : -(x))
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
+#define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 
 Physical::Physical(float maxSpeed, float friction, float gravity)
-    : maxSpeed(maxSpeed), friction(friction), gravity(gravity)
+    : maxSpeed(maxSpeed), friction(friction)
 {
-    if (gravity != 0.0f)
-    {
-        this->addLongForce("gravity", {0.0f, 1.0f}, gravity);
-    }
+    this->addLongForce("gravity", sf::Vector2f(0.0f, 1.0f), gravity);
+    this->addLongForce("NULL", sf::Vector2f(1.0f, 1.0f), 0);
 }
 
 void Physical::addForce(const sf::Vector2f &force)
@@ -21,57 +20,39 @@ void Physical::addForce(const sf::Vector2f &force)
 
 void Physical::addForce(const sf::Vector2f &direction, float power)
 {
-    sf::Vector2f norm = direction * std::sqrt(direction.x * direction.x + direction.y + direction.y);
+    if (direction.x == 0 && direction.y == 0)
+        return;
+    sf::Vector2f norm = direction * (1.0f / norm(direction));
     this->speed += norm * power;
 }
 
 void Physical::addLongForce(const std::string &name, const sf::Vector2f &direction, float power, float duration)
 {
-    sf::Vector2f norm = direction * (1.0f / std::sqrt(direction.x * direction.x + direction.y + direction.y));
-    longForces.emplace(name, norm * power);
-    if (duration == 0)
+    if (direction.x == 0 && direction.y == 0)
         return;
-    auto forceCor = Timer::create(
-        duration, [name, this]()
-        {
-                    this->longForceTimers.erase(name);
-                    this->longForces.erase(name); },
-        false);
-    longForceTimers.emplace(name, forceCor);
+    sf::Vector2f normalized = direction * (1.0f / norm(direction));
+    std::shared_ptr<Timer> timer = duration == 0 ? nullptr : Timer::create(duration, [name, this]()
+                                                                           { this->longForces.erase(name); }, false);
+    longForces.emplace(name, LongForce{normalized, power, timer});
 }
 
-void Physical::modifyLongForce(const std::string &name, const sf::Vector2f &direction)
+const LongForce &Physical::getLongForce(const std::string &name) const
 {
-    longForces[name] = direction;
+    if (longForces.find(name) == longForces.end())
+        return longForces.at("NULL");
+    return longForces.at(name);
 }
 
-void Physical::modifyLongForce(const std::string &name, const sf::Vector2f &direction, float power)
+LongForce &Physical::getLongForce(const std::string &name)
 {
-    sf::Vector2f norm = direction * (1.0f / std::sqrt(direction.x * direction.x + direction.y + direction.y));
-    longForces[name] = norm * power;
+    if (longForces.find(name) == longForces.end())
+        return longForces.at("NULL");
+    return longForces.at(name);
 }
 
 void Physical::removeLongForce(const std::string &name)
 {
-    longForceTimers.erase(name);
     longForces.erase(name);
-}
-
-void Physical::setGravity(bool state)
-{
-    if (state && this->gravity != 0.0f)
-    {
-        this->addLongForce("gravity", {0.0f, 1.0f}, gravity);
-    }
-    else
-    {
-        longForces.erase("gravity");
-    }
-}
-
-float Physical::getGravity() const
-{
-    return gravity;
 }
 
 sf::Vector2f Physical::calcFrictionVec() const
@@ -93,14 +74,13 @@ sf::Vector2f Physical::calcFrictionVec() const
     return {fricX, fricY};
 }
 
-const sf::Vector2f &Physical::speedUpdate()
+void Physical::update()
 {
     for (auto &[name, force] : longForces)
     {
-        this->speed += force;
+        this->speed += force.direction * force.power;
     }
     this->speed += calcFrictionVec();
-    this->speed.x = std::min(this->speed.x, maxSpeed);
-    this->speed.y = std::min(this->speed.y, maxSpeed);
-    return this->speed;
+    // this->speed.x = std::min(this->speed.x, maxSpeed);
+    // this->speed.y = std::min(this->speed.y, maxSpeed);
 }

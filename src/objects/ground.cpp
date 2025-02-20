@@ -7,7 +7,7 @@
 #include "earcut.hpp"
 
 Ground::Ground(const std::vector<std::array<double, 2>> &verts)
-    : GameObject("ground", nullptr)
+    : GameObject("ground")
 {
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("HideZone1");

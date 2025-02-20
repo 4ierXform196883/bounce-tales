@@ -33,16 +33,15 @@ public:
 class Collidable : public ICollidable
 {
 public:
-    Collidable(const Hitbox &hitbox, bool trigger = false, bool onlyPushTop = false);
+    Collidable(const Hitbox &hitbox, bool trigger = false);
     virtual ~Collidable() = default;
 
     inline virtual const Hitbox &getHitbox() const override { return hitbox; }
     inline virtual bool isTrigger() const override { return trigger; }
 
-    void transUpdate(const sf::Transform &trans, const sf::Vector2f &scale);
+    void update(const sf::Transform &trans, const sf::Vector2f &scale);
 
     bool trigger;
-    bool onlyPushTop;
     Hitbox hitbox;
     const Hitbox initHitbox;
 };

@@ -15,4 +15,5 @@ public:
 
 protected:
     inline virtual void update() override {};
+    inline virtual void onCollision(std::shared_ptr<GameObject> other) override {};
 };

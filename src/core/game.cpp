@@ -16,14 +16,13 @@
 #include "background.hpp"
 
 AssetManager Game::assetManager;
+GuiManager Game::guiManager;
 ObjectManager Game::objectManager;
 MusicPlayer Game::musicPlayer;
 Settings Game::settings;
 
 std::unique_ptr<sf::RenderWindow> Game::window;
-std::unique_ptr<tgui::Gui> Game::gui;
 const sf::Clock Game::globalClock;
-double Game::dtime = 0;
 
 void Game::init()
 {
@@ -33,83 +32,18 @@ void Game::init()
     sf::Vector2i windowSize = {settings.getInt("Screen", "screenWidth", 1280), settings.getInt("Screen", "screenHeight", 720)};
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, sf::Style::Default);
     window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
-    // window->setFramerateLimit(1);
     window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
 
     objectManager.load("idk for now");
-    gui = std::make_unique<tgui::Gui>(*window);
-    // tgui::Theme::getDefault()->replace(Theme());
-    gui->loadWidgetsFromFile("form.txt");
-    // auto w1 = tgui::Button::create("Play");
-    // w1->setPosition(300, 300);
-    // w1->setSize(300, 100);
-    // w1->setTextSize(30);
-    // w1->onPress([&] {window->close(); });
-
-    // gui->add(w1);
-
-    // std::vector<sf::Vertex> verts;
-    // verts.push_back(sf::Vertex({0.0f, 0.0f}, {0.0f, 0.0f}));
-    // verts.push_back(sf::Vertex({50.0f, -50.0f}, {50.0f, -50.0f}));
-    // verts.push_back(sf::Vertex({75.0f, -40.0f}, {75.0f, -40.0f}));
-    // verts.push_back(sf::Vertex({100.0f, -150.0f}, {100.0f, -150.0f}));
-    // verts.push_back(sf::Vertex({150.0f, -30.0f}, {150.0f, -30.0f}));
-    // verts.push_back(sf::Vertex({200.0f, -100.0f}, {200.0f, -100.0f}));
-    // // test = std::make_shared<TestImpl>("testObj", std::make_shared<PrimitiveSprite>(asset_manager::getTexture("JumpPad"), asset_manager::getSpriteBounds("JumpPad", "0")));
-    // test = std::make_shared<TestImpl>("testObj", std::make_shared<CurvedShape>(asset_manager::getTexture("HideZone1"), verts));
-    // std::shared_ptr<TestImpl> test2 = std::make_shared<TestImpl>("testChild", std::make_shared<PrimitiveSprite>(asset_manager::getTexture("Redy")));
-    // test->addChild(test2);
-    // // test->setPositionV(640, 360);
-    // auto tSize = asset_manager::getSpriteBounds("JumpPad", "0").getSize();
-    // auto tSize2 = asset_manager::getTexture("Redy").getSize();
-    // // test->setOriginV(tSize.x / 2.0f, tSize.y);
-    // test2->setOriginV(tSize2.x / 2.0f, tSize2.y / 2.0f);
-
-    // test2->setPositionV(0, -50);
-    // window->setView(camera);
 }
 
 void Game::tick()
 {
-    // std::cout << 1 / (globalClock.getElapsedTime().asSeconds() - dtime) << "\n";
-    // dtime = globalClock.getElapsedTime().asSeconds();
     Game::processEvents();
     musicPlayer.update();
-
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-    // {
-    //     camera.move(0, -10);
-    //     window->setView(camera);
-    // }
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-    // {
-    //     camera.move(0, 10);
-    //     window->setView(camera);
-    // }
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-    // {
-    //     camera.move(-10, 0);
-    //     window->setView(camera);
-    // }
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-    // {
-    //     camera.move(10, 0);
-    //     window->setView(camera);
-    // }
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
-    // {
-    //     camera.setSize(camera.getSize() - sf::Vector2f(16, 9));
-    //     uiCamera.setSize(uiCamera.getSize() - sf::Vector2f(16, 9));
-    // }
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
-    // {
-    //     camera.setSize(camera.getSize() + sf::Vector2f(16, 9));
-    //     uiCamera.setSize(uiCamera.getSize() + sf::Vector2f(16, 9));
-    // }
     objectManager.collideAll();
     Timer::updateAll();
     objectManager.updateAll();
-    objectManager.moveAll();
     Game::render();
 }
 
@@ -125,7 +59,7 @@ void Game::processEvents()
 {
     for (auto event = sf::Event{}; window->pollEvent(event);)
     {
-        gui->handleEvent(event);
+        // guiManager.gui->handleEvent(event);
         switch (event.type)
         {
         case sf::Event::Closed:

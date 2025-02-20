@@ -5,15 +5,16 @@
 class Camera : public GameObject
 {
 public:
-    Camera(const sf::Vector2f &size, std::shared_ptr<IGameObject> followObject = nullptr);
+    Camera(const sf::Vector2f &pos, const sf::Vector2f &size, std::shared_ptr<GameObject> followObject = nullptr);
     virtual ~Camera() = default;
 
-    virtual void update() override;
-
-    void setFollowObject(std::shared_ptr<IGameObject> followObject);
+    void setFollowObject(std::shared_ptr<GameObject> followObject);
     inline const sf::View &getView() const { return view; }
 
-private:
-    std::shared_ptr<IGameObject> followObject;
+protected:
+    virtual void update() override;
+    inline virtual void onCollision(std::shared_ptr<GameObject> other) override {};
+
+    std::shared_ptr<GameObject> followObject;
     sf::View view;
 };

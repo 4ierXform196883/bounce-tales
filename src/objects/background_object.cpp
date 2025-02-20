@@ -6,8 +6,9 @@
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
 BackgroundObject::BackgroundObject(const std::string &tag, std::shared_ptr<PrimitiveSprite> sprite, const sf::Vector2f &pos, float speed, float distance)
-    : GameObject(tag, sprite), speed(speed < 0 ? 0 : speed), distance(distance < 1 ? 1 : distance), tSize(sprite->getTexture()->getSize())
+    : GameObject(tag), speed(speed < 0 ? 0 : speed), distance(distance < 1 ? 1 : distance), tSize(sprite->getTexture()->getSize())
 {
+    drawable = sprite;
     this->setPosition(pos);
     this->setOrigin({(float)tSize.x / 2.0f, (float)tSize.y / 2.0f});
     this->setScale(1 / this->distance, 1 / this->distance);

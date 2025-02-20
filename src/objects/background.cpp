@@ -10,7 +10,7 @@
 #include "randomizer.hpp"
 
 Background::Background(size_t islands, size_t clouds, float additional_distance)
-    : GameObject("background", nullptr)
+    : GameObject("background")
 {
     const AssetManager &assetManager = Game::getAssetManager();
     const sf::Texture &texture = assetManager.getTexture("Background_0");

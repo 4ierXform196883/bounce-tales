@@ -18,13 +18,14 @@ public:
     ~Game() = delete;
 
     inline static const sf::Clock &getClock() { return globalClock; }
-
-    inline static const AssetManager &getAssetManager() { return assetManager; }
-    inline static const ObjectManager &getObjectManager() { return objectManager; }
-    // inline static const MusicPlayer &getMusicPlayer() { return musicPlayer; }
-    inline static const Settings &getSettings() { return settings; }
     inline static sf::Vector2f getMousePos() { return window->mapPixelToCoords(sf::Mouse::getPosition(*window)); }
-    inline static void changeMusic(const std::string &name, float volume = 100.0f) { musicPlayer.changeMusic(name, volume); }
+
+    inline static AssetManager &getAssetManager() { return assetManager; }
+    inline static ObjectManager &getObjectManager() { return objectManager; }
+    inline static MusicPlayer &getMusicPlayer() { return musicPlayer; }
+    inline static Settings &getSettings() { return settings; }
+
+    static void loadLevel(size_t level_id); // IMPLEMENT
 
 private:
     static void init();
@@ -35,7 +36,6 @@ private:
 
     static std::unique_ptr<sf::RenderWindow> window;
     static const sf::Clock globalClock;
-    static double dtime;
 
     static AssetManager assetManager;
     static GuiManager guiManager;

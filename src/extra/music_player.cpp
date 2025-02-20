@@ -46,7 +46,7 @@ void MusicPlayer::update()
     startTime = Game::getClock().getElapsedTime().asSeconds();
 }
 
-std::shared_ptr<sf::Music> MusicPlayer::getCurrentMusic() const
+std::shared_ptr<sf::Music> MusicPlayer::getCurrentMusic()
 {
     return curMusic;
 }

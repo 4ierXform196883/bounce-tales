@@ -4,10 +4,10 @@
 #include "transformable.hpp"
 #include "physical.hpp"
 
-Collidable::Collidable(const Hitbox &hitbox, bool trigger, bool onlyPushTop)
-    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger), onlyPushTop(onlyPushTop) {}
+Collidable::Collidable(const Hitbox &hitbox, bool trigger)
+    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger) {}
 
-void Collidable::transUpdate(const sf::Transform &trans, const sf::Vector2f &scale)
+void Collidable::update(const sf::Transform &trans, const sf::Vector2f &scale)
 {
     switch (hitbox.index())
     {

@@ -4,9 +4,10 @@
 
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 
-Camera::Camera(const sf::Vector2f &size, std::shared_ptr<IGameObject> followObject)
-    : GameObject("camera", nullptr), followObject(followObject)
+Camera::Camera(const sf::Vector2f &pos, const sf::Vector2f &size, std::shared_ptr<GameObject> followObject)
+    : GameObject("camera"), followObject(followObject)
 {
+    this->setPosition(pos);
     view.setSize(size);
 }
 
@@ -17,7 +18,7 @@ void Camera::update()
     view.setCenter(this->getPosition());
 }
 
-void Camera::setFollowObject(std::shared_ptr<IGameObject> followObject)
+void Camera::setFollowObject(std::shared_ptr<GameObject> followObject)
 {
     this->followObject = followObject;
 }

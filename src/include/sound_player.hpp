@@ -26,7 +26,7 @@ public:
     inline virtual sf::Sound &getSound(const std::string &name) override { return sounds.at(name); }
     inline virtual const sf::Sound &getSound(const std::string &name) const override { return sounds.at(name); }
     
-    void posUpdate(const sf::Vector2f &pos);
+    void update(const sf::Vector2f &pos);
 
     std::map<std::string, std::shared_ptr<Timer>> randomTimers;
     std::map<std::string, sf::Sound> sounds;
