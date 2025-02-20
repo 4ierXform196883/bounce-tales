@@ -6,8 +6,8 @@
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 
-Physical::Physical(float maxSpeed, float friction, float gravity)
-    : maxSpeed(maxSpeed), friction(friction)
+Physical::Physical(float mass, float maxSpeed, float friction, float gravity)
+    : mass(mass), maxSpeed(maxSpeed), friction(friction)
 {
     this->addLongForce("gravity", sf::Vector2f(0.0f, 1.0f), gravity);
     this->addLongForce("NULL", sf::Vector2f(1.0f, 1.0f), 0);

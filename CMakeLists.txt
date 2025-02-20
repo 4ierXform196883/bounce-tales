@@ -48,6 +48,9 @@ endif()
 add_custom_target(copy-assets
   COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+  COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+    ${CMAKE_SOURCE_DIR}/extra ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  COMMENT "Copying assets"
 )
 
 

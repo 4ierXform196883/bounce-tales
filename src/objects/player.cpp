@@ -14,7 +14,7 @@ Player::Player(const sf::Vector2f &pos, float control_force, float maxSpeed, flo
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin(tSize.x / 2, tSize.y / 2);
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f, {tSize.x / 2.0f, tSize.x / 2.0f}});
-    physical = std::make_shared<Physical>(maxSpeed, friction, graivty);
+    physical = std::make_shared<Physical>(10, maxSpeed, friction, graivty);
     this->setPosition(pos);
 }
 

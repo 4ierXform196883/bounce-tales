@@ -25,10 +25,11 @@ private:
     void drawAll(sf::RenderTarget &target);
 
     const sf::View defaultView;
-    std::shared_ptr<Camera> camera;
     std::shared_ptr<Background> background;
+    std::shared_ptr<Camera> camera;
     std::shared_ptr<Player> player;
-    std::vector<std::shared_ptr<Ground>> ground;
-    std::vector<std::shared_ptr<GameObject>> collidables;
-    std::vector<std::shared_ptr<GameObject>> objects;
+    std::map<std::string, std::shared_ptr<GameObject>> physical;
+    std::map<std::string, std::shared_ptr<GameObject>> collidable;
+    std::map<std::string, std::shared_ptr<GameObject>> updatable;
+    std::map<std::string, std::shared_ptr<GameObject>> drawable;
 };

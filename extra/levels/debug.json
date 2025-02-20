@@ -6,7 +6,7 @@
     ],
     "jump_pads": [
         {
-            "power": 15,
+            "power": 5,
             "pos": [ 750, 320 ]
         }
     ],
@@ -20,7 +20,7 @@
     "background": {
         "clouds": 20,
         "islands": 30,
-        "additional_distance": 2
+        "additional_distance": 0
     },
     "camera": {
         "follow": "player",

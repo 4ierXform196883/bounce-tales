@@ -13,8 +13,11 @@ Camera::Camera(const sf::Vector2f &pos, const sf::Vector2f &size, std::shared_pt
 
 void Camera::update()
 {
-    sf::Vector2f force = followObject->getPosition() - this->getPosition();
-    this->move(0.1f * force);
+    if (followObject)
+    {
+        sf::Vector2f force = followObject->getPosition() - this->getPosition();
+        this->move(0.1f * force);
+    }
     view.setCenter(this->getPosition());
 }
 

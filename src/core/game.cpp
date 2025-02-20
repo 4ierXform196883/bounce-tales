@@ -34,7 +34,7 @@ void Game::init()
     window->setFramerateLimit(settings.getInt("Screen", "maxFps", 60));
     window->setVerticalSyncEnabled(settings.getBool("Screen", "vSync", true));
 
-    objectManager.load("idk for now");
+    objectManager.load("levels/debug.json");
 }
 
 void Game::tick()

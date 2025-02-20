@@ -39,6 +39,7 @@ public:
     GameObject(const std::string &tag);
     virtual ~GameObject() = default;
 
+    inline bool isAlive() const { return alive; }
     inline const std::string &getTag() const { return tag; }
     std::shared_ptr<GameObject> findChild(const std::string &tag);
     inline std::shared_ptr<const GameObject> findChild(const std::string &tag) const { return findChild(tag); }
@@ -68,6 +69,7 @@ protected:
     virtual void update() = 0;
     virtual void onCollision(std::shared_ptr<GameObject> other) = 0;
 
+    bool alive = true;
     std::string tag;
     std::vector<std::shared_ptr<GameObject>> children;
 

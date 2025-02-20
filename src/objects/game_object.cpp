@@ -6,7 +6,7 @@
 
 void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify)
 {
-    if (!first->collidable || !second->collidable)
+    if (!first->collidable || !second->collidable || first.get() == second.get())
         return;
     const Hitbox &firstHitbox = first->collidable->getHitbox();
     const Hitbox &secondHitbox = second->collidable->getHitbox();

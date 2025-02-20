@@ -34,7 +34,7 @@ public:
 class Physical : public IPhysical
 {
 public:
-    Physical(float maxSpeed, float friction, float gravity = 0.0f);
+    Physical(float mass, float maxSpeed, float friction, float gravity = 0.0f);
     virtual ~Physical() = default;
 
     virtual void addForce(const sf::Vector2f &force) override;
