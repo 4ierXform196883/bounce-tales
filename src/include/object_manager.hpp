@@ -8,15 +8,19 @@
 #include "simple_object.hpp"
 #include "ground.hpp"
 #include "camera.hpp"
+#include <nlohmann/json.hpp>
 
 class ObjectManager
 {
     friend class Game;
 
 public:
+    void addObject(std::shared_ptr<GameObject> object);
+    void addObjects(const std::vector<std::shared_ptr<GameObject>>& objects);
     sf::View getCamera() const;
 
 private:
+    void loadObject(std::shared_ptr<GameObject> obj, const nlohmann::json &data);
     void load(const std::string &path);
     void save(const std::string &path);
 

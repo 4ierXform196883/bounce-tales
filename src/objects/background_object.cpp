@@ -5,11 +5,12 @@
 #define abs(x) ((x) > 0 ? (x) : -(x))
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
-BackgroundObject::BackgroundObject(const std::string &tag, std::shared_ptr<PrimitiveSprite> sprite, const sf::Vector2f &pos, float speed, float distance)
-    : GameObject(tag), speed(speed < 0 ? 0 : speed), distance(distance < 1 ? 1 : distance), tSize(sprite->getTexture()->getSize())
+BackgroundObject::BackgroundObject(const std::string &tag, const std::string& textureName, float speed, float distance)
+    : GameObject(tag), speed(speed < 0 ? 0 : speed), distance(distance < 1 ? 1 : distance)
 {
-    drawable = sprite;
-    this->setPosition(pos);
+    const sf::Texture &texture = Game::getAssetManager().getTexture(textureName);
+    const_cast<sf::Vector2u&>(this->tSize) = texture.getSize();
+    drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin({(float)tSize.x / 2.0f, (float)tSize.y / 2.0f});
     this->setScale(1 / this->distance, 1 / this->distance);
 }

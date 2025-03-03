@@ -10,6 +10,7 @@
 
 #define COLLIDABLE                                                                         \
     inline virtual const Hitbox &getHitbox() const override { return collidable->hitbox; } \
+    inline virtual float getFricCoef() const override { return collidable->fricCoef; }     \
     inline virtual bool isTrigger() const override { return collidable->trigger; }
 
 #define PHYSICAL                                                                                                                                                                                     \
@@ -20,14 +21,17 @@
     inline virtual LongForce &getLongForce(const std::string &name) override { return physical->getLongForce(name); }                                                                                \
     inline virtual void removeLongForce(const std::string &name) override { physical->removeLongForce(name); }                                                                                       \
     inline virtual const sf::Vector2f &getSpeed() const override { return physical->getSpeed(); }                                                                                                    \
-    inline virtual void setGravity(float power) override { physical->setGravity(power); }                                                                                                            \
-    inline virtual void setFriction(float power) override { physical->setFriction(power); }                                                                                                          \
-    inline virtual void setMaxSpeed(float value) override { physical->setMaxSpeed(value); }                                                                                                          \
     inline virtual void setMass(float value) override { physical->setMass(value); }                                                                                                                  \
-    inline virtual float getGravity() const override { return physical->getGravity(); }                                                                                                              \
-    inline virtual float getFriction() const override { return physical->getFriction(); }                                                                                                            \
-    inline virtual float getMaxSpeed() const override { return physical->getMaxSpeed(); }                                                                                                            \
-    inline virtual float getMass() const override { return physical->getMass(); }
+    inline virtual float getMass() const override { return physical->getMass(); }                                                                                                                    \
+    inline virtual void setAirResistance(float value) override { physical->setAirResistance(value); }                                                                                                \
+    inline virtual float getAirResistance() const override { return physical->getAirResistance(); }
+
+#define SOUND_PLAYER                                                                                                                                                            \
+    inline virtual void play(const std::string &name) override { soundPlayer->play(name); }                                                                                     \
+    inline virtual void playRandomly(const std::string &name, float intervalMin, float intervalMax = 0) override { soundPlayer->playRandomly(name, intervalMin, intervalMax); } \
+    inline virtual void stopPlayingRandomly(const std::string &name) override { soundPlayer->stopPlayingRandomly(name); }                                                       \
+    inline virtual sf::Sound &getSound(const std::string &name) override { return soundPlayer->getSound(name); }                                                                \
+    inline virtual const sf::Sound &getSound(const std::string &name) const override { return soundPlayer->getSound(name); }
 
 class GameObject : public ITransformable, public sf::Drawable
 {
@@ -43,6 +47,10 @@ public:
     inline const std::string &getTag() const { return tag; }
     std::shared_ptr<GameObject> findChild(const std::string &tag);
     inline std::shared_ptr<const GameObject> findChild(const std::string &tag) const { return findChild(tag); }
+
+    inline bool isCollidable() const { return collidable != nullptr; }
+    inline bool isPhysical() const { return physical != nullptr; }
+    inline bool isSoundPlayer() const { return soundPlayer != nullptr; }
 
     // Interface overrides
     virtual void setPosition(float x, float y) override;
@@ -63,9 +71,9 @@ public:
     inline virtual const sf::Vector2f &getOrigin() const override { return transformable->getOrigin(); }
     inline virtual const sf::Transform &getTransform() const override { return transformable->getTransform(); }
     inline virtual const sf::Transform &getInverseTransform() const override { return transformable->getInverseTransform(); }
-    inline virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const { target.draw(*drawable, states); }
 
 protected:
+    inline virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const { target.draw(*drawable, states); }
     virtual void update() = 0;
     virtual void onCollision(std::shared_ptr<GameObject> other) = 0;
 
@@ -78,4 +86,6 @@ protected:
     std::shared_ptr<Collidable> collidable;
     std::shared_ptr<Physical> physical;
     std::shared_ptr<SoundPlayer> soundPlayer;
+
+    static std::map<std::string, size_t> namesCount;
 };

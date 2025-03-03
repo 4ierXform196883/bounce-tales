@@ -12,7 +12,7 @@ class JumpPad : public GameObject, public ICollidable
 public:
     COLLIDABLE
 
-    JumpPad(const sf::Vector2f &pos, float power);
+    JumpPad(float power);
     virtual ~JumpPad() = default;
 
     float power;
@@ -26,6 +26,5 @@ protected:
     static const std::vector<std::string> frameSequence;
     static const std::vector<int> heights;
     size_t currentFrame = 0;
-    std::vector<std::shared_ptr<GameObject>> touching;
     std::shared_ptr<Timer> animTimer;
 };

@@ -44,6 +44,19 @@ const sf::Texture *PrimitiveSprite::getTexture() const
     return this->texture;
 }
 
+void PrimitiveSprite::setColor(const sf::Color &color)
+{
+    verts[0].color = color;
+    verts[1].color = color;
+    verts[2].color = color;
+    verts[3].color = color;
+}
+
+sf::Color PrimitiveSprite::getColor() const
+{
+    return verts[0].color;
+}
+
 void PrimitiveSprite::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
     states.texture = texture;

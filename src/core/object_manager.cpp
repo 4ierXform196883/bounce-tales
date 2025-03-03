@@ -6,6 +6,7 @@
 #include "curved_shape.hpp"
 #include "earcut.hpp"
 #include "jump_pad.hpp"
+#include "platform.hpp"
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -15,6 +16,22 @@
 #define dot(v1, v2) (v1.x * v2.x + v1.y * v2.y)
 
 using json = nlohmann::json;
+
+void ObjectManager::loadObject(std::shared_ptr<GameObject> obj, const nlohmann::json &data)
+{
+    if (data.contains("pos"))
+        obj->setPosition(sf::Vector2f(data["pos"][0], data["pos"][1]));
+    if (data.contains("scale"))
+        obj->setScale(sf::Vector2f(data["scale"][0], data["scale"][1]));
+    if (data.contains("origin"))
+        obj->setOrigin(sf::Vector2f(data["origin"][0], data["origin"][1]));
+    if (data.contains("rotation"))
+        obj->setRotation(data["rotation"]);
+    if (data.contains("mass") && obj->isPhysical())
+        std::dynamic_pointer_cast<IPhysical>(obj)->setMass(data["mass"]);
+    if (data.contains("air_resistance") && obj->isPhysical())
+        std::dynamic_pointer_cast<IPhysical>(obj)->setAirResistance(data["air_resistance"]);
+}
 
 void ObjectManager::load(const std::string &path)
 {
@@ -29,37 +46,57 @@ void ObjectManager::load(const std::string &path)
     json data;
     file >> data;
     file.close();
-
-    sf::Vector2f vec = {data["camera"]["pos"][0], data["camera"]["pos"][1]};
-    ;
-    camera = std::make_shared<Camera>(vec, Game::getSettings().camera_size);
-    auto &cur = data["background"];
-    background = std::make_shared<Background>(cur["islands"], cur["clouds"], cur["additional_distance"]);
-    cur = data["player"];
-    vec = {cur["pos"][0], cur["pos"][1]};
-    player = std::make_shared<Player>(vec, cur["control_force"], cur["max_speed"], cur["friction"], cur["gravity"]);
-    camera->setFollowObject(player);
-    for (const auto &ground_data : data["ground"])
+    auto &curData = data["camera"];
+    camera = std::make_shared<Camera>(sf::Vector2f(curData["size"][0], curData["size"][1]));
+    loadObject(camera, curData);
+    curData = data["background"];
+    background = std::make_shared<Background>(curData["islands"], curData["clouds"], curData["additional_distance"]);
+    curData = data["player"];
+    player = std::make_shared<Player>(curData["control_force"]);
+    loadObject(player, curData);
+    for (const auto &part : data["ground"])
     {
-        std::vector<std::array<double, 2>> verts;
-        verts.reserve(ground_data["points"].size());
+        std::vector<sf::Vector2f> verts;
+        verts.reserve(part["verts"].size());
 
-        for (const auto &point : ground_data["points"])
-            verts.emplace_back(std::array<double, 2>{point[0], point[1]});
+        for (const auto &point : part["verts"])
+            verts.emplace_back(sf::Vector2f(point[0], point[1]));
 
-        auto ptr = std::make_shared<Ground>(std::move(verts));
+        auto ptr = std::make_shared<Ground>(std::move(verts), part["texture"]);
+        loadObject(ptr, part);
         drawable.emplace(ptr->getTag(), ptr);
         collidable.emplace(ptr->getTag(), ptr);
     }
 
-    for (const auto &jump_pad_data : data["jump_pads"])
+    for (const auto &part : data["platforms"])
     {
-        vec = {jump_pad_data["pos"][0], jump_pad_data["pos"][1]};
-        auto ptr = std::make_shared<JumpPad>(vec, jump_pad_data["power"]);
+        std::vector<sf::Vector2f> verts, path;
+        verts.reserve(part["verts"].size());
+        path.reserve(part["path"].size());
+
+        for (const auto &point : part["verts"])
+            verts.emplace_back(sf::Vector2f(point[0], point[1]));
+        for (const auto &point : part["path"])
+            path.emplace_back(sf::Vector2f(point[0], point[1]));
+
+        auto ptr = std::make_shared<Platform>(std::move(verts), part["texture"], std::move(path), part["speed_mult"]);
+        loadObject(ptr, part);
+        drawable.emplace(ptr->getTag(), ptr);
+        updatable.emplace(ptr->getTag(), ptr);
+        collidable.emplace(ptr->getTag(), ptr);
+        physical.emplace(ptr->getTag(), ptr);
+    }
+
+    for (const auto &part : data["jump_pads"])
+    {
+        auto ptr = std::make_shared<JumpPad>(part["power"]);
+        loadObject(ptr, part);
         drawable.emplace(ptr->getTag(), ptr);
         updatable.emplace(ptr->getTag(), ptr);
         collidable.emplace(ptr->getTag(), ptr);
     }
+    if (data["camera"].contains("follow") && drawable.find(data["camera"]["follow"]) != drawable.end())
+        camera->setFollowObject(drawable.at(data["camera"]["follow"]));
 }
 
 // IMPLEMENT
@@ -90,19 +127,39 @@ void ObjectManager::updateAll()
     // =====
     GameObject::update(camera);
     GameObject::update(background);
-    for (auto obj : updatable)
-        GameObject::update(obj.second);
+    for (auto it = updatable.begin(); it != updatable.end();)
+    {
+        if (!it->second->isAlive())
+        {
+            it = updatable.erase(it);
+            continue;
+        }
+        GameObject::update(it->second);
+        ++it;
+    }
     GameObject::update(player);
 }
 
 void ObjectManager::collideAll()
 {
-    for (auto phys : physical)
+    for (auto it = physical.begin(); it != physical.end();)
     {
-        for (auto col : collidable)
-            GameObject::calculateCollision(phys.second, col.second);
-        for (auto sPhys : physical)
-            GameObject::calculateCollision(phys.second, sPhys.second);
+        if (!it->second->isAlive())
+        {
+            it = physical.erase(it);
+            continue;
+        }
+        for (auto itt = collidable.begin(); itt != collidable.end();)
+        {
+            if (!itt->second->isAlive())
+            {
+                itt = collidable.erase(itt);
+                continue;
+            }
+            GameObject::calculateCollision(it->second, itt->second);
+            ++itt;
+        }
+        ++it;
     }
 
     for (auto col : collidable)
@@ -116,9 +173,33 @@ void ObjectManager::drawAll(sf::RenderTarget &target)
     target.setView(defaultView);
     GameObject::draw(background, target);
     target.setView(this->getCamera());
-    for (auto obj : drawable)
-        GameObject::draw(obj.second, target);
+    for (auto it = drawable.begin(); it != drawable.end();)
+    {
+        if (!it->second->isAlive())
+        {
+            it = drawable.erase(it);
+            continue;
+        }
+        GameObject::draw(it->second, target);
+        ++it;
+    }
     GameObject::draw(player, target);
+}
+
+void ObjectManager::addObject(std::shared_ptr<GameObject> object)
+{
+    drawable.emplace(object->getTag(), object);
+    updatable.emplace(object->getTag(), object);
+    if (object->isCollidable())
+        collidable.emplace(object->getTag(), object);
+    if (object->isPhysical())
+        physical.emplace(object->getTag(), object);
+}
+
+void ObjectManager::addObjects(const std::vector<std::shared_ptr<GameObject>> &objects)
+{
+    for (const auto& object: objects)
+        this->addObject(object);
 }
 
 sf::View ObjectManager::getCamera() const
@@ -128,7 +209,7 @@ sf::View ObjectManager::getCamera() const
     return defaultView;
 }
 
-// void ObjectManager::recursiveCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second)
+// void ObjectManager::recurDatasiveCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second)
 // {
 // std::queue<std::shared_ptr<GameObject>> firstObjects;
 // firstObjects.push(first);

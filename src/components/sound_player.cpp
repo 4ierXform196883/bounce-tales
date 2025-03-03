@@ -2,10 +2,18 @@
 
 #include "randomizer.hpp"
 #include "transformable.hpp"
+#include "game.hpp"
 #include <iostream>
 
 SoundPlayer::SoundPlayer(const std::map<std::string, sf::Sound> &sounds)
-    : sounds(sounds) {}
+    : sounds(sounds)
+{
+    for (const auto &[name, sound] : sounds)
+    {
+        const_cast<sf::Sound&>(sound).setRelativeToListener(true);
+        const_cast<sf::Sound&>(sound).setAttenuation(10.f);
+    }
+}
 
 void SoundPlayer::play(const std::string &name)
 {

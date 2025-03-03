@@ -2,13 +2,14 @@
 
 #include "game_object.hpp"
 
-class Player : public GameObject, public ICollidable, public IPhysical /*, public ISoundPlayer*/ // IMPLEMENT
+class Player : public GameObject, public ICollidable, public IPhysical, public ISoundPlayer
 {
 public:
     COLLIDABLE
     PHYSICAL
+    SOUND_PLAYER
 
-    Player(const sf::Vector2f& pos, float control_force, float maxSpeed, float friction, float graivty);
+    Player(float control_force);
     virtual ~Player() = default;
 
     // IMPLEMENT

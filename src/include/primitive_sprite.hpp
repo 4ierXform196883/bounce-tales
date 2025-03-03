@@ -16,6 +16,9 @@ public:
     void setTexture(const sf::Texture& texture, bool resetRect = true);
     const sf::Texture* getTexture() const;
 
+    void setColor(const sf::Color& color);
+    sf::Color getColor() const;
+
 
 protected:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;

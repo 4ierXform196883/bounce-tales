@@ -8,7 +8,7 @@ CurvedShape::CurvedShape(const sf::Texture &texture, const std::vector<sf::Vecto
     size_t i = 0;
     for (const sf::Vector2f &vert : vertices)
     {
-        triangleVertices.emplace_back(vert, sf::Color(i * 10, i * 10, i * 10, 128), vert);
+        triangleVertices.emplace_back(vert, vert);
         ++i;
     }
     this->verts.create(triangleVertices.size());

@@ -4,6 +4,13 @@
 #include <iostream>
 #include "collision_calculator.hpp"
 
+#define abs(x) ((x) > 0 ? (x) : -(x))
+#define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
+#define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
+#define normalized(vec) (vec.x == 0 && vec.y == 0 ? sf::Vector2f(0, 0) : (1 / norm(vec)) * vec)
+
+std::map<std::string, size_t> GameObject::namesCount;
+
 void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify)
 {
     if (!first->collidable || !second->collidable || first.get() == second.get())
@@ -23,6 +30,8 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
             return;
         if (notify)
         {
+            first->collidable->colliding.emplace(second->tag, second);
+            second->collidable->colliding.emplace(first->tag, first);
             first->onCollision(second);
             second->onCollision(first);
             notify = false;
@@ -44,6 +53,8 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
                 continue;
             if (notify)
             {
+                first->collidable->colliding.emplace(second->tag, second);
+                second->collidable->colliding.emplace(first->tag, first);
                 first->onCollision(second);
                 second->onCollision(first);
                 notify = false;
@@ -62,7 +73,9 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
     default:
         return;
     }
-    // IMPLEMENT: добавить передачу момента при столкновении двух движущихся объектов
+    // на всякий случай
+    if (norm(penetration) > 20)
+        return;
     float firstMass = first->physical ? first->physical->mass : -1;
     float secondMass = second->physical ? second->physical->mass : -1;
     if (firstMass != -1 && secondMass != -1)
@@ -72,19 +85,32 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
         first->physical->speed += (1 - coef) * penetration;
         second->move(-coef * penetration);
         second->physical->speed -= coef * penetration;
-        sf::Vector2f newVel = coef * first->physical->speed + (1 - coef) * second->physical->speed;
-        first->physical->speed = newVel;
-        second->physical->speed = newVel;
+        if (first->collidable->prevColliding.find(second->tag) == first->collidable->prevColliding.end())
+        {
+            sf::Vector2f newVel = coef * first->physical->speed + (1 - coef) * second->physical->speed;
+            first->physical->speed = newVel;
+            second->physical->speed = newVel;
+        }
     }
     else if (firstMass != -1)
     {
         first->move(penetration);
         first->physical->speed += penetration;
+        // friction
+        sf::Vector2f perpPen = sf::Vector2f(-penetration.y, penetration.x);
+        float vt = first->physical->speed.x * perpPen.x + first->physical->speed.y * perpPen.y;
+        sf::Vector2f fricDir = -1.f * sign(vt) * normalized(perpPen);
+        first->physical->speed += fricDir * first->physical->mass * 0.02f * second->collidable->fricCoef;
     }
     else
     {
         second->move(-penetration);
         second->physical->speed -= penetration;
+        // friction
+        sf::Vector2f perpPen = sf::Vector2f(-penetration.y, penetration.x);
+        float vt = second->physical->speed.x * perpPen.x + second->physical->speed.y * perpPen.y;
+        sf::Vector2f fricDir = -1.f * sign(vt) * normalized(perpPen);
+        second->physical->speed += fricDir * second->physical->mass * 0.02f * first->collidable->fricCoef;
     }
 }
 
@@ -101,6 +127,12 @@ void GameObject::update(std::shared_ptr<GameObject> obj)
             cur->physical->update();
             cur->move(cur->physical->speed);
         }
+        if (cur->collidable)
+        {
+            cur->collidable->prevColliding = cur->collidable->colliding;
+            cur->collidable->colliding.clear();
+        }
+
         for (auto child : cur->children)
             objects.push(child);
         objects.pop();
@@ -134,7 +166,12 @@ void GameObject::draw(std::shared_ptr<GameObject> obj, sf::RenderTarget &target)
 }
 
 GameObject::GameObject(const std::string &tag)
-    : tag(tag), transformable(std::make_shared<sf::Transformable>()) {}
+    : tag(tag), transformable(std::make_shared<sf::Transformable>())
+{
+    if (namesCount.find(tag) != namesCount.end())
+        this->tag = tag + std::to_string(namesCount.at(tag));
+    namesCount[tag] += 1;
+}
 
 std::shared_ptr<GameObject> GameObject::findChild(const std::string &tag)
 {

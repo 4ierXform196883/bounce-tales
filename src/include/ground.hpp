@@ -6,7 +6,8 @@ class Ground : public GameObject, public ICollidable
 {
 public:
     COLLIDABLE
-    Ground(const std::vector<std::array<double, 2>> &verts);
+    
+    Ground(const std::vector<sf::Vector2f> &verts, const std::string& textureName);
     virtual ~Ground() = default;
 
 protected:

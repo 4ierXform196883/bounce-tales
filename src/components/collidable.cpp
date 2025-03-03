@@ -4,8 +4,8 @@
 #include "transformable.hpp"
 #include "physical.hpp"
 
-Collidable::Collidable(const Hitbox &hitbox, bool trigger)
-    : initHitbox(hitbox), hitbox(hitbox), trigger(trigger) {}
+Collidable::Collidable(const Hitbox &hitbox, float fricCoef, bool trigger)
+    : initHitbox(hitbox), hitbox(hitbox), fricCoef(fricCoef), trigger(trigger) {}
 
 void Collidable::update(const sf::Transform &trans, const sf::Vector2f &scale)
 {

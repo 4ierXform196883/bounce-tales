@@ -6,7 +6,7 @@
 class BackgroundObject : public GameObject
 {
 public:
-    BackgroundObject(const std::string &tag, std::shared_ptr<PrimitiveSprite> sprite, const sf::Vector2f &pos, float speed, float distance);
+    BackgroundObject(const std::string &tag, const std::string& textureName, float speed, float distance);
     virtual ~BackgroundObject() = default;
 
 protected:

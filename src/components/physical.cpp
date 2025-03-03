@@ -5,11 +5,12 @@
 #define abs(x) ((x) > 0 ? (x) : -(x))
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
+#define normalized(vec) (vec.x == 0 && vec.y == 0 ? sf::Vector2f(0, 0) : (1 / norm(vec)) * vec)
 
-Physical::Physical(float mass, float maxSpeed, float friction, float gravity)
-    : mass(mass), maxSpeed(maxSpeed), friction(friction)
+Physical::Physical(float mass, float airResistance)
+    : mass(mass), airResistance(airResistance)
 {
-    this->addLongForce("gravity", sf::Vector2f(0.0f, 1.0f), gravity);
+    this->addLongForce("gravity", sf::Vector2f(0.0f, 1.0f), mass * 0.02);
     this->addLongForce("NULL", sf::Vector2f(1.0f, 1.0f), 0);
 }
 
@@ -55,24 +56,22 @@ void Physical::removeLongForce(const std::string &name)
     longForces.erase(name);
 }
 
-sf::Vector2f Physical::calcFrictionVec() const
-{
-    float fricX = -sign(speed.x) * friction;
-    if (abs(fricX) > abs(speed.x))
-        fricX = -speed.x;
-    else if (abs(speed.x) > maxSpeed)
-        fricX = abs(speed.x) - maxSpeed > abs(fricX) * 10 ? fricX * 10 : -sign(speed.x) * (abs(speed.x) - maxSpeed);
-
-    float fricY = -sign(speed.y) * friction;
-    if (abs(fricY) > abs(speed.y))
-        fricY = -speed.y;
-    else if (speed.y > maxSpeed)
-        fricY = speed.y - maxSpeed > abs(fricY) * 10 ? fricY * 10 : -(speed.y - maxSpeed);
-    else if (speed.y < -maxSpeed)
-        fricY = abs(speed.y) - maxSpeed > abs(fricY) * 10 ? fricY * 10 : -(speed.y + maxSpeed);
-
-    return {fricX, fricY};
-}
+// sf::Vector2f Physical::calcFrictionVec() const
+// {
+//     sf::Vector2f fric = -sf::Vector2f(sign(speed.x), sign(speed.y)) * friction;
+    
+//     if (abs(fric.x) > abs(speed.x))
+//         fric.x = -speed.x;
+//     else if (abs(speed.x) > maxSpeed)
+//         fric.x = std::clamp(fric.x * 10, -abs(speed.x - maxSpeed), abs(speed.x - maxSpeed));
+    
+//     if (abs(fric.y) > abs(speed.y))
+//         fric.y = -speed.y;
+//     else if (abs(speed.y) > maxSpeed)
+//         fric.y = std::clamp(fric.y * 10, -abs(speed.y - maxSpeed), abs(speed.y - maxSpeed));
+    
+//     return fric;
+// }
 
 void Physical::update()
 {
@@ -80,7 +79,8 @@ void Physical::update()
     {
         this->speed += force.direction * force.power;
     }
-    this->speed += calcFrictionVec();
+    this->speed += -normalized(speed) * (1/2.f) * norm(speed) * norm(speed) * airResistance;
+    // this->speed += calcFrictionVec();
     // this->speed.x = std::min(this->speed.x, maxSpeed);
     // this->speed.y = std::min(this->speed.y, maxSpeed);
 }

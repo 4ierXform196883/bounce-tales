@@ -10,27 +10,27 @@ const std::vector<std::string> JumpPad::frameSequence = {"3", "2", "1", "2", "3"
 const std::vector<int> JumpPad::heights = {58, 47, 44, 47, 58, 66, 66, 58};
 // {66, 44, 47, 58}
 
-JumpPad::JumpPad(const sf::Vector2f& pos, float power)
+JumpPad::JumpPad(float power)
     : GameObject("jump_pad"), power(power)
 {
     const AssetManager &assetManager = Game::getAssetManager();
-    const sf::Texture &texture = assetManager.getTexture("JumpPad");
-    const sf::IntRect &idleRect = assetManager.getSpriteBounds("JumpPad", "3");
+    const sf::Texture &texture = assetManager.getTexture("jump_pad");
+    const sf::IntRect &idleRect = assetManager.getSpriteBounds("jump_pad", "3");
     drawable = std::make_shared<PrimitiveSprite>(texture, idleRect);
     this->setOrigin(idleRect.width / 2, idleRect.height);
     ConvexHitbox hitbox;
     hitbox.points = {{sf::Vector2f(0, 10), sf::Vector2f(109, 10), sf::Vector2f(109, 15), sf::Vector2f(0, 15)}};
-    collidable = std::make_shared<Collidable>(hitbox, true);
-    this->setPosition(pos);
+    collidable = std::make_shared<Collidable>(hitbox, 0, true);
 }
 
 void JumpPad::update()
 {
     if (currentFrame == 5)
     {
-        for (auto &obj : touching)
+        for (auto &obj : collidable->colliding)
         {
-            std::dynamic_pointer_cast<IPhysical>(obj)->addForce({0, -power});
+            if (auto ptr = std::dynamic_pointer_cast<IPhysical>(obj.second))
+                ptr->addForce({0, -power});
         }
         ++currentFrame;
     }
@@ -39,7 +39,6 @@ void JumpPad::update()
         animTimer = nullptr;
         currentFrame = 0;
     }
-    touching.clear();
 }
 
 void JumpPad::onCollision(std::shared_ptr<GameObject> other)
@@ -47,8 +46,6 @@ void JumpPad::onCollision(std::shared_ptr<GameObject> other)
     auto otherPhys = std::dynamic_pointer_cast<IPhysical>(other);
     if (!otherPhys)
         return;
-
-    touching.push_back(other);
 
     if (!animTimer)
     {
@@ -72,15 +69,15 @@ void JumpPad::onCollision(std::shared_ptr<GameObject> other)
 void JumpPad::updateFrame(size_t newFrame)
 {
     size_t oldFrame = newFrame == 0 ? frameSequence.size() - 1 : newFrame - 1;
-    const sf::IntRect &newRect = Game::getAssetManager().getSpriteBounds("JumpPad", frameSequence.at(newFrame));
+    const sf::IntRect &newRect = Game::getAssetManager().getSpriteBounds("jump_pad", frameSequence.at(newFrame));
     int diff = heights.at(newFrame) - heights.at(oldFrame);
     std::dynamic_pointer_cast<PrimitiveSprite>(drawable)->setTextureRect(newRect);
     for (auto &point : std::get<ConvexHitbox>(collidable->hitbox).points)
     {
         point.y -= diff;
     }
-    for (auto &obj : touching)
+    for (auto &obj : collidable->colliding)
     {
-        obj->move({0, (float)-diff});
+        obj.second->move({0, (float)-diff});
     }
 }
