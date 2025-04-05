@@ -3,24 +3,24 @@
 #include <string>
 #include <SFML/Audio.hpp>
 #include <memory>
+#include "timer.hpp"
 
 class MusicPlayer
 {
     friend class Game;
 
 public:
-    void changeMusic(const std::string &name, float volume = 100.0f);
+    void setMusic(const std::string &name, float volume = 100.0f);
+    inline void setVolume(float volume) { music.setVolume(volume); }
+    inline void stopMusic() { music.stop(); }
+    inline const std::string &getMusicName() { return musicName; }
 
-    std::shared_ptr<sf::Music> getCurrentMusic();
-
-    const float musicSwitchDuration = 3.0f;
+    const float musicSwitchDuration = 1.5f;
 
 private:
-    void update();
+    void switchMusic(const std::string &name, float volume = 100.0f);
 
-    std::shared_ptr<sf::Music> curMusic = std::make_shared<sf::Music>();
-    std::shared_ptr<sf::Music> newMusic = std::make_shared<sf::Music>();
-    float deltaTime;
-    float startTime;
-    float targetVolume;
+    sf::Music music;
+    std::string musicName;
+    std::shared_ptr<Timer> volumeTimer;
 };

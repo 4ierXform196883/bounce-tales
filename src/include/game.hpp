@@ -8,6 +8,7 @@
 #include "settings.hpp"
 #include "music_player.hpp"
 #include "gui_manager.hpp"
+#include "stats.hpp"
 
 class Game
 {
@@ -24,15 +25,20 @@ public:
     inline static ObjectManager &getObjectManager() { return objectManager; }
     inline static MusicPlayer &getMusicPlayer() { return musicPlayer; }
     inline static Settings &getSettings() { return settings; }
+    inline static Stats &getStats() { return stats; }
 
-    static void loadLevel(size_t level_id); // IMPLEMENT
+    static void reinitWindow(const sf::Vector2i &resolution, bool fullscreen);
+    static void loadLevel(const std::string &name);
+    static void saveStats();
+    static void close();
+
+    static bool paused;
 
 private:
     static void init();
     static void tick();
     static void processEvents();
     static void render();
-    static void close();
 
     static std::unique_ptr<sf::RenderWindow> window;
     static const sf::Clock globalClock;
@@ -42,4 +48,5 @@ private:
     static ObjectManager objectManager;
     static MusicPlayer musicPlayer;
     static Settings settings;
+    static Stats stats;
 };

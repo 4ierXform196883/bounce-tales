@@ -6,6 +6,8 @@ class SimpleObject : public GameObject
 {
 public:
     SimpleObject(const std::string &tag, const std::string &textureName);
+    SimpleObject(const std::string &tag, const std::string &textureName, const std::string &subtextureName);
+    SimpleObject(const std::string &tag, const std::string &textureName, const std::string &animationName, double fps);
     virtual ~SimpleObject() = default;
 
 protected:

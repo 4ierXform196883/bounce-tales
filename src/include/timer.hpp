@@ -7,19 +7,20 @@
 
 class Timer
 {
+    friend class Game;
+
 public:
     static std::shared_ptr<Timer> create(double duration, std::function<void()> callback, bool autoReset = true);
 
-    static void updateAll();
-
-    sf::Clock& getClock();
+    sf::Clock &getClock();
     void restart();
-    
+
     double duration = 0;
 
 private:
+    static void updateAll();
     Timer(double duration, std::function<void()> callback, bool autoReset);
-    
+
     sf::Clock clock;
     std::function<void()> callback;
     bool autoReset;

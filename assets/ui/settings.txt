@@ -1,0 +1,269 @@
+Renderer.1 {
+    BorderColor = #000000;
+    Borders = 1;
+    TextureThumb = None;
+    TextureThumbHover = None;
+    TextureTrack = None;
+    TextureTrackHover = None;
+    ThumbColor = #00000010;
+    ThumbColorHover = #80FF8040;
+    TrackColor = #00000010;
+    TrackColorHover = #80FF8040;
+}
+
+Label.label_settings_resolution {
+    AutoSize = true;
+    Position = (27%, 32%);
+    Size = (84, 27);
+    Text = Resolution;
+    TextSize = 20;
+    VerticalAlignment = Center;
+
+    Renderer {
+        BorderColor = #000000;
+        Font = "andy.otf";
+        TextColor = #FFFFFF;
+        TextOutlineColor = #000000;
+        TextOutlineThickness = 1;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #00000010;
+            ArrowBackgroundColorHover = #80FF8040;
+            ArrowColor = #000000;
+            ArrowColorHover = #80FF80;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = rgba(185, 185, 185, 215);
+            ThumbColorHover = rgba(195, 195, 195, 215);
+            TrackColor = rgba(160, 160, 160, 215);
+            TrackColorHover = rgba(170, 170, 170, 215);
+        }
+    }
+}
+
+ComboBox.settings_resolution {
+    ChangeItemOnScroll = false;
+    Items = [800x600, 1024×768, 1280x720, 1280x1024, 1366×768, 1600×900, 1920x1080];
+    ItemsToDisplay = 0;
+    MaximumItems = 0;
+    Position = (40%, 32.5%);
+    SelectedItemIndex = 0;
+    Size = (10%, 3%);
+    TextSize = 15;
+    UserData = "";
+
+    Renderer {
+        ArrowBackgroundColor = #00000010;
+        ArrowBackgroundColorHover = #80FF8040;
+        ArrowColor = #000000;
+        ArrowColorHover = #80FF80;
+        BackgroundColor = #00000010;
+        BorderColor = #000000;
+        Borders = 1;
+        Font = "andy.otf";
+        TextColor = #FFFFFF;
+        TextureArrow = None;
+        TextureArrowDisabled = None;
+        TextureArrowHover = None;
+        TextureBackground = None;
+        TextureBackgroundDisabled = None;
+
+        ListBox {
+            BackgroundColor = #00000010;
+            BackgroundColorHover = #80FF8040;
+            BorderColor = #000000;
+            Borders = 1;
+            SelectedBackgroundColor = #00000010;
+            SelectedTextColor = #FFFFFF;
+            TextColor = #FFFFFF;
+            TextColorHover = #80FF80;
+            TextureBackground = None;
+
+            Scrollbar {
+                ArrowBackgroundColor = #00000010;
+                ArrowBackgroundColorHover = #80FF8040;
+                ArrowColor = #000000;
+                ArrowColorHover = #80FF80;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
+                ThumbColor = rgba(185, 185, 185, 215);
+                ThumbColorHover = rgba(195, 195, 195, 215);
+                TrackColor = rgba(160, 160, 160, 215);
+                TrackColorHover = rgba(170, 170, 170, 215);
+            }
+        }
+    }
+}
+
+Label.label_settings_fullscreen {
+    AutoSize = true;
+    Position = (27%, 37%);
+    Size = (85, 27);
+    Text = Fullscreen;
+    TextSize = 20;
+    VerticalAlignment = Center;
+
+    Renderer {
+        BorderColor = #000000;
+        Font = "andy.otf";
+        TextColor = #FFFFFF;
+        TextOutlineColor = #000000;
+        TextOutlineThickness = 1;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #00000010;
+            ArrowBackgroundColorHover = #80FF8040;
+            ArrowColor = #000000;
+            ArrowColorHover = #80FF80;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = rgba(185, 185, 185, 215);
+            ThumbColorHover = rgba(195, 195, 195, 215);
+            TrackColor = rgba(160, 160, 160, 215);
+            TrackColorHover = rgba(170, 170, 170, 215);
+        }
+    }
+}
+
+CheckBox.settings_fullscreen {
+    Position = (47%, 37.5%);
+    Size = (3%, 3%);
+    TextSize = 13;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = #000000;
+        Borders = 1;
+        CheckColor = rgba(255, 255, 255, 180);
+        CheckColorHover = rgba(255, 255, 255, 200);
+        TextColor = #FFFFFF;
+        TextColorHover = #80FF80;
+        TextureChecked = None;
+        TextureCheckedDisabled = None;
+        TextureCheckedFocused = None;
+        TextureCheckedHover = None;
+        TextureUnchecked = None;
+        TextureUncheckedDisabled = None;
+        TextureUncheckedFocused = None;
+        TextureUncheckedHover = None;
+    }
+}
+
+Label.label_settings_music {
+    AutoSize = true;
+    Position = (58%, 62%);
+    Size = (50, 27);
+    Text = Music;
+    TextSize = 20;
+    VerticalAlignment = Center;
+
+    Renderer {
+        BorderColor = #000000;
+        Font = "andy.otf";
+        TextColor = #FFFFFF;
+        TextOutlineColor = #000000;
+        TextOutlineThickness = 1;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #00000010;
+            ArrowBackgroundColorHover = #80FF8040;
+            ArrowColor = #000000;
+            ArrowColorHover = #80FF80;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = rgba(185, 185, 185, 215);
+            ThumbColorHover = rgba(195, 195, 195, 215);
+            TrackColor = rgba(160, 160, 160, 215);
+            TrackColorHover = rgba(170, 170, 170, 215);
+        }
+    }
+}
+
+Slider.settings_music {
+    ChangeValueOnScroll = true;
+    InvertedDirection = false;
+    Maximum = 100;
+    Minimum = 0;
+    Position = (69%, 63%);
+    Renderer = &1;
+    Size = (15%, 1.5%);
+    Step = 1;
+    Value = 0;
+}
+
+Label.label_settings_sounds {
+    AutoSize = true;
+    Position = (58%, 67%);
+    Size = (65, 27);
+    Text = Sounds;
+    TextSize = 20;
+    VerticalAlignment = Center;
+
+    Renderer {
+        BorderColor = #000000;
+        Font = "andy.otf";
+        TextColor = #FFFFFF;
+        TextOutlineColor = #000000;
+        TextOutlineThickness = 1;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #00000010;
+            ArrowBackgroundColorHover = #80FF8040;
+            ArrowColor = #000000;
+            ArrowColorHover = #80FF80;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = rgba(185, 185, 185, 215);
+            ThumbColorHover = rgba(195, 195, 195, 215);
+            TrackColor = rgba(160, 160, 160, 215);
+            TrackColorHover = rgba(170, 170, 170, 215);
+        }
+    }
+}
+
+Slider.settings_sounds {
+    ChangeValueOnScroll = true;
+    InvertedDirection = false;
+    Maximum = 100;
+    Minimum = 0;
+    Position = (69%, 68%);
+    Renderer = &1;
+    Size = (15%, 1.5%);
+    Step = 1;
+    Value = 0;
+}

@@ -1,16 +1,25 @@
 #include "object_manager.hpp"
 
-#include "game.hpp"
 #include <queue>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <algorithm>
+#include <nlohmann/json.hpp>
+
+#include "game.hpp"
 #include "collision_calculator.hpp"
 #include "curved_shape.hpp"
 #include "earcut.hpp"
 #include "jump_pad.hpp"
 #include "platform.hpp"
-#include <iostream>
-#include <filesystem>
-#include <fstream>
-#include <nlohmann/json.hpp>
+#include "trigger_object.hpp"
+#include "spikes.hpp"
+#include "door.hpp"
+#include "switch.hpp"
+#include "wind.hpp"
+#include "water.hpp"
+#include "particle.hpp"
 
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 #define dot(v1, v2) (v1.x * v2.x + v1.y * v2.y)
@@ -35,8 +44,10 @@ void ObjectManager::loadObject(std::shared_ptr<GameObject> obj, const nlohmann::
 
 void ObjectManager::load(const std::string &path)
 {
+    this->loaded = true;
     const_cast<sf::View &>(defaultView) = sf::View({0, 0}, Game::getSettings().camera_size);
 
+    // Opening json
     std::ifstream file(path);
     if (!file.is_open())
     {
@@ -46,28 +57,93 @@ void ObjectManager::load(const std::string &path)
     json data;
     file >> data;
     file.close();
-    auto &curData = data["camera"];
-    camera = std::make_shared<Camera>(sf::Vector2f(curData["size"][0], curData["size"][1]));
-    loadObject(camera, curData);
-    curData = data["background"];
+
+    // Background
+    auto &curData = data["background"];
     background = std::make_shared<Background>(curData["islands"], curData["clouds"], curData["additional_distance"]);
     curData = data["player"];
-    player = std::make_shared<Player>(curData["control_force"]);
+    player = std::make_shared<Player>(sf::Vector2f(curData["spawn_pos"][0], curData["spawn_pos"][1]), curData["control_force"]);
     loadObject(player, curData);
-    for (const auto &part : data["ground"])
+    drawable.push_back(player);
+    updatable.push_back(player);
+    collidable.push_back(player);
+    physical.push_back(player);
+
+    // Music
+    Game::getMusicPlayer().setMusic(data["music"], Game::getSettings().getDouble("Volume", "music", 50));
+
+    // Triggers
+    for (const auto &part : data["triggers"])
     {
-        std::vector<sf::Vector2f> verts;
-        verts.reserve(part["verts"].size());
+        std::shared_ptr<TriggerObject> ptr;
+        std::function<void(std::shared_ptr<GameObject> other)> callback;
+        if (part["type"] == "death_zone")
+        {
+            callback = [](std::shared_ptr<GameObject> other)
+            {
+                if (auto otherPtr = std::dynamic_pointer_cast<Player>(other))
+                    otherPtr->onDeath();
+            };
+        }
+        else if (part["type"] == "win_zone")
+        {
+            callback = [](std::shared_ptr<GameObject> other)
+            {
+                if (auto otherPtr = std::dynamic_pointer_cast<Player>(other))
+                    otherPtr->onWin();
+            };
+        }
 
-        for (const auto &point : part["verts"])
-            verts.emplace_back(sf::Vector2f(point[0], point[1]));
-
-        auto ptr = std::make_shared<Ground>(std::move(verts), part["texture"]);
+        else if (part["type"] == "player_set_skin")
+        {
+            Player::Skin type = part["skin"] == "heavy" ? Player::Skin::HEAVY : (part["skin"] == "light" ? Player::Skin::LIGHT : Player::Skin::NORMAL);
+            callback = [type](std::shared_ptr<GameObject> other)
+            {
+                if (auto otherPtr = std::dynamic_pointer_cast<Player>(other))
+                    otherPtr->setSkin(type);
+            };
+        }
+        else if (part["type"] == "egg")
+        {
+            callback = [this, ptr](std::shared_ptr<GameObject> other)
+            {
+                Particle::spawnCircle("particles", "star", 2, ptr->getPosition(), 1, 10, 10);
+                ptr->alive = false;
+                Game::getStats().currentEggs += 1;
+            };
+            Game::getStats().currentTotalEggs += 1;
+        }
+        if (part.contains("size"))
+            ptr = std::make_shared<TriggerObject>(sf::Vector2f(part["size"][0], part["size"][1]), callback);
+        else if (part.contains("animation"))
+            ptr = std::make_shared<TriggerObject>(part["texture"], part["animation"], part["fps"], callback);
+        else if (part.contains("subtexture"))
+            ptr = std::make_shared<TriggerObject>(part["texture"], part["subtexture"], callback);
+        else if (part.contains("texture"))
+            ptr = std::make_shared<TriggerObject>(part["texture"], callback);
+        else
+            continue;
         loadObject(ptr, part);
-        drawable.emplace(ptr->getTag(), ptr);
-        collidable.emplace(ptr->getTag(), ptr);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
     }
 
+    // Simple objects
+    for (const auto &part : data["simple"])
+    {
+        std::shared_ptr<SimpleObject> ptr;
+        if (part.contains("subtexture"))
+            ptr = std::make_shared<SimpleObject>(part["tag"], part["texture"], part["subtexture"]);
+        else if (part.contains("animation"))
+            ptr = std::make_shared<SimpleObject>(part["tag"], part["texture"], part["animation"], part["fps"]);
+        else
+            ptr = std::make_shared<SimpleObject>(part["tag"], part["texture"]);
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+    }
+
+    // Platforms
     for (const auto &part : data["platforms"])
     {
         std::vector<sf::Vector2f> verts, path;
@@ -79,24 +155,117 @@ void ObjectManager::load(const std::string &path)
         for (const auto &point : part["path"])
             path.emplace_back(sf::Vector2f(point[0], point[1]));
 
-        auto ptr = std::make_shared<Platform>(std::move(verts), part["texture"], std::move(path), part["speed_mult"]);
+        auto ptr = std::make_shared<Platform>(part["texture"], std::move(verts), std::move(path), part["speed_mult"]);
         loadObject(ptr, part);
-        drawable.emplace(ptr->getTag(), ptr);
-        updatable.emplace(ptr->getTag(), ptr);
-        collidable.emplace(ptr->getTag(), ptr);
-        physical.emplace(ptr->getTag(), ptr);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+        physical.push_back(ptr);
     }
 
+    // Jump pads
     for (const auto &part : data["jump_pads"])
     {
         auto ptr = std::make_shared<JumpPad>(part["power"]);
         loadObject(ptr, part);
-        drawable.emplace(ptr->getTag(), ptr);
-        updatable.emplace(ptr->getTag(), ptr);
-        collidable.emplace(ptr->getTag(), ptr);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
     }
-    if (data["camera"].contains("follow") && drawable.find(data["camera"]["follow"]) != drawable.end())
-        camera->setFollowObject(drawable.at(data["camera"]["follow"]));
+
+    // Spikes
+    for (const auto &part : data["spikes"])
+    {
+        auto ptr = std::make_shared<Spikes>(part["count"]);
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Doors
+    for (const auto &part : data["doors"])
+    {
+        auto ptr = std::make_shared<Door>(part["tag"], sf::Vector2f(part["start_pos"][0], part["start_pos"][1]), part["elevation"]);
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Switches
+    for (const auto &part : data["switches"])
+    {
+        std::vector<std::shared_ptr<Door>> doors(part["doors"].size());
+        for (const auto &doorName : part["doors"])
+        {
+            auto it = std::find_if(updatable.begin(), updatable.end(),
+                                   [doorName](const std::shared_ptr<GameObject> &obj)
+                                   { return obj->getTag() == doorName; });
+            if (it == updatable.end())
+                continue;
+            if (auto doorPtr = std::dynamic_pointer_cast<Door>((*it)))
+                doors.push_back(doorPtr);
+        }
+        auto ptr = std::make_shared<Switch>(doors);
+        if (part.contains("is_on"))
+            ptr->setState(part["is_on"]);
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Wind
+    for (const auto &part : data["wind"])
+    {
+        sf::Vector2f wSize = sf::Vector2f(part["size"][0], part["size"][1]);
+        sf::Vector2f wDirection = sf::Vector2f(part["direction"][0], part["direction"][1]);
+        auto ptr = std::make_shared<Wind>(wSize, wDirection);
+
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Water
+    for (const auto &part : data["water"])
+    {
+        auto ptr = std::make_shared<Water>(sf::Vector2f(part["size"][0], part["size"][1]));
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Ground
+    for (const auto &part : data["ground"])
+    {
+        std::vector<sf::Vector2f> verts;
+        verts.reserve(part["verts"].size());
+
+        for (const auto &point : part["verts"])
+            verts.emplace_back(sf::Vector2f(point[0], point[1]));
+
+        auto ptr = std::make_shared<Ground>(std::move(verts), part["texture"]);
+        loadObject(ptr, part);
+        drawable.push_back(ptr);
+        updatable.push_back(ptr);
+        collidable.push_back(ptr);
+    }
+
+    // Camera
+    curData = data["camera"];
+    camera = std::make_shared<Camera>(sf::Vector2f(curData["size"][0], curData["size"][1]));
+    loadObject(camera, curData);
+    if (!curData.contains("follow"))
+        return;
+    auto followIt = std::find_if(drawable.begin(), drawable.end(),
+                                 [&curData](const std::shared_ptr<GameObject> &obj)
+                                 { return obj->getTag() == static_cast<std::string>(curData["follow"]); });
+    if (followIt != drawable.end())
+        camera->setFollowObject(*followIt);
 }
 
 // IMPLEMENT
@@ -104,105 +273,96 @@ void ObjectManager::save(const std::string &path)
 {
 }
 
+void ObjectManager::clear()
+{
+    loaded = false;
+    background = nullptr;
+    camera = nullptr;
+    player = nullptr;
+    drawable.clear();
+    updatable.clear();
+    collidable.clear();
+    physical.clear();
+}
+
 void ObjectManager::updateAll()
 {
-    // DEBUG
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
     {
         player->setPosition(Game::getMousePos());
         player->addForce(-player->getSpeed());
     }
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-    {
-        camera->setPosition(Game::getMousePos());
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
-    {
-        camera->setFollowObject(player);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::H))
-    {
-        camera->setFollowObject(nullptr);
-    }
-    // =====
     GameObject::update(camera);
     GameObject::update(background);
     for (auto it = updatable.begin(); it != updatable.end();)
     {
-        if (!it->second->isAlive())
+        if (!(*it)->alive)
         {
             it = updatable.erase(it);
             continue;
         }
-        GameObject::update(it->second);
+        GameObject::update((*it));
         ++it;
     }
-    GameObject::update(player);
 }
 
 void ObjectManager::collideAll()
 {
     for (auto it = physical.begin(); it != physical.end();)
     {
-        if (!it->second->isAlive())
+        if (!(*it)->alive)
         {
             it = physical.erase(it);
             continue;
         }
         for (auto itt = collidable.begin(); itt != collidable.end();)
         {
-            if (!itt->second->isAlive())
+            if (!(*itt)->alive)
             {
                 itt = collidable.erase(itt);
                 continue;
             }
-            GameObject::calculateCollision(it->second, itt->second);
+            GameObject::calculateCollision((*it), (*itt));
             ++itt;
         }
         ++it;
     }
-
-    for (auto col : collidable)
-        GameObject::calculateCollision(player, col.second);
-    for (auto sPhys : physical)
-        GameObject::calculateCollision(player, sPhys.second);
 }
 
 void ObjectManager::drawAll(sf::RenderTarget &target)
 {
     target.setView(defaultView);
     GameObject::draw(background, target);
-    target.setView(this->getCamera());
+    target.setView(this->getView());
     for (auto it = drawable.begin(); it != drawable.end();)
     {
-        if (!it->second->isAlive())
+        if (!(*it)->alive)
         {
             it = drawable.erase(it);
             continue;
         }
-        GameObject::draw(it->second, target);
+        GameObject::draw((*it), target);
         ++it;
     }
-    GameObject::draw(player, target);
 }
 
 void ObjectManager::addObject(std::shared_ptr<GameObject> object)
 {
-    drawable.emplace(object->getTag(), object);
-    updatable.emplace(object->getTag(), object);
+    drawable.push_back(object);
+    updatable.push_back(object);
     if (object->isCollidable())
-        collidable.emplace(object->getTag(), object);
+        collidable.push_back(object);
     if (object->isPhysical())
-        physical.emplace(object->getTag(), object);
+        physical.push_back(object);
 }
 
 void ObjectManager::addObjects(const std::vector<std::shared_ptr<GameObject>> &objects)
 {
-    for (const auto& object: objects)
+    for (const auto &object : objects)
         this->addObject(object);
 }
 
-sf::View ObjectManager::getCamera() const
+sf::View ObjectManager::getView() const
 {
     if (camera)
         return camera->getView();

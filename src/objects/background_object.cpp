@@ -17,10 +17,10 @@ BackgroundObject::BackgroundObject(const std::string &tag, const std::string& te
 
 void BackgroundObject::update()
 {
-    const sf::Vector2f &cSize = Game::getObjectManager().getCamera().getSize();
+    const sf::Vector2f &cSize = Game::getObjectManager().getView().getSize();
     if (this->speed == 0)
     {
-        const sf::Vector2f &cPos = Game::getObjectManager().getCamera().getCenter();
+        const sf::Vector2f &cPos = Game::getObjectManager().getView().getCenter();
         this->move(-(cPos - prevCPos) / distance);
         this->prevCPos = cPos;
     }

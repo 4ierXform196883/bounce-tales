@@ -9,11 +9,15 @@
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 #define normalized(vec) (vec.x == 0 && vec.y == 0 ? sf::Vector2f(0, 0) : (1 / norm(vec)) * vec)
 
-std::map<std::string, size_t> GameObject::namesCount;
-
 void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify)
 {
-    if (!first->collidable || !second->collidable || first.get() == second.get())
+    if (first.get() == second.get())
+        return;
+    if (!first->collidable || !second->collidable)
+        return;
+    if (!first->physical && !second->physical)
+        return;
+    if (first->collidable->trigger && second->collidable->trigger)
         return;
     const Hitbox &firstHitbox = first->collidable->getHitbox();
     const Hitbox &secondHitbox = second->collidable->getHitbox();
@@ -35,7 +39,7 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
             first->onCollision(second);
             second->onCollision(first);
             notify = false;
-            if (!first->physical || second->collidable->isTrigger())
+            if (first->collidable->trigger || second->collidable->trigger)
                 return;
         }
         penetration = -collision_calculator::getPenetrationVector(firstHitbox, secondHitbox, simplex);
@@ -58,7 +62,7 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
                 first->onCollision(second);
                 second->onCollision(first);
                 notify = false;
-                if (!first->physical || second->collidable->isTrigger())
+                if (first->collidable->trigger || second->collidable->trigger)
                     return;
             }
             penetration -= collision_calculator::getPenetrationVector(firstHitbox, triangle, simplex);
@@ -133,15 +137,14 @@ void GameObject::update(std::shared_ptr<GameObject> obj)
             cur->collidable->colliding.clear();
         }
 
-        for (auto child : cur->children)
-            objects.push(child);
+        for (auto [tag, object] : cur->children)
+            objects.push(object);
         objects.pop();
     }
 }
 
 void GameObject::draw(std::shared_ptr<GameObject> obj, sf::RenderTarget &target)
 {
-    sf::Transform identity = sf::Transform::Identity;
     std::queue<std::shared_ptr<GameObject>> objects;
     std::queue<sf::Vector2f> positions;
     std::queue<float> rotations;
@@ -150,12 +153,13 @@ void GameObject::draw(std::shared_ptr<GameObject> obj, sf::RenderTarget &target)
     rotations.push(0.0f);
     while (objects.size() != 0)
     {
+        sf::Transform identity = sf::Transform::Identity;
         std::shared_ptr<GameObject> cur = objects.front();
-        if (cur->drawable)
+        if (cur->drawable && !cur->hidden)
             target.draw(*cur->drawable, identity.translate(positions.front()).rotate(rotations.front()) * cur->getTransform());
-        for (auto child : cur->children)
+        for (auto [tag, object] : cur->children)
         {
-            objects.push(child);
+            objects.push(object);
             positions.push(positions.front() + cur->getPosition());
             rotations.push(rotations.front() + cur->getRotation());
         }
@@ -166,24 +170,7 @@ void GameObject::draw(std::shared_ptr<GameObject> obj, sf::RenderTarget &target)
 }
 
 GameObject::GameObject(const std::string &tag)
-    : tag(tag), transformable(std::make_shared<sf::Transformable>())
-{
-    if (namesCount.find(tag) != namesCount.end())
-        this->tag = tag + std::to_string(namesCount.at(tag));
-    namesCount[tag] += 1;
-}
-
-std::shared_ptr<GameObject> GameObject::findChild(const std::string &tag)
-{
-    for (auto child : this->children)
-    {
-        if (child->tag == tag)
-            return child;
-        if (auto subchild = child->findChild(tag))
-            return subchild;
-    }
-    return nullptr;
-}
+    : tag(tag), transformable(std::make_shared<sf::Transformable>()) {}
 
 void GameObject::setPosition(float x, float y)
 {

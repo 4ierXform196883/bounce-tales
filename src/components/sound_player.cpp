@@ -15,13 +15,14 @@ SoundPlayer::SoundPlayer(const std::map<std::string, sf::Sound> &sounds)
     }
 }
 
-void SoundPlayer::play(const std::string &name)
+void SoundPlayer::play(const std::string &name, float volume)
 {
     if (sounds.find(name) == sounds.end())
     {
         std::cerr << "[WARN] (SoundPlayer::play) No \"" + name + "\" sound found\n";
         return;
     }
+    sounds.at(name).setVolume(volume);
     sounds.at(name).play();
 }
 

@@ -8,7 +8,7 @@ public:
     COLLIDABLE
     PHYSICAL
 
-    Platform(const std::vector<sf::Vector2f> &verts, const std::string& textureName, const std::vector<sf::Vector2f> &path, float speedMult = 1);
+    Platform(const std::string &textureName, const std::vector<sf::Vector2f> &verts, const std::vector<sf::Vector2f> &path, float speedMult = 1);
     virtual ~Platform() = default;
 
 protected:

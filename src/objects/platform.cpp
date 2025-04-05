@@ -13,7 +13,7 @@
 
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 
-Platform::Platform(const std::vector<sf::Vector2f> &verts, const std::string& textureName, const std::vector<sf::Vector2f> &path, float speedMult)
+Platform::Platform(const std::string& textureName, const std::vector<sf::Vector2f> &verts, const std::vector<sf::Vector2f> &path, float speedMult)
     : GameObject("platform"), path(path), speedMult(speedMult)
 {
     const AssetManager &assetManager = Game::getAssetManager();

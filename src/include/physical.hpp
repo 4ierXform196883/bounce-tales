@@ -40,7 +40,7 @@ public:
     virtual LongForce &getLongForce(const std::string &name) override;
     virtual void removeLongForce(const std::string &name) override;
     inline virtual const sf::Vector2f &getSpeed() const override { return speed; }
-    inline virtual void setMass(float value) override { this->mass = value; }
+    virtual void setMass(float value) override;
     inline virtual float getMass() const override { return mass; }
     inline virtual void setAirResistance(float value) override { this->airResistance = value; }
     inline virtual float getAirResistance() const override { return airResistance; }

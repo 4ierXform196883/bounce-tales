@@ -56,6 +56,12 @@ void Physical::removeLongForce(const std::string &name)
     longForces.erase(name);
 }
 
+void Physical::setMass(float value)
+{
+    this->mass = value;
+    this->getLongForce("gravity").power = mass * 0.02;
+}
+
 // sf::Vector2f Physical::calcFrictionVec() const
 // {
 //     sf::Vector2f fric = -sf::Vector2f(sign(speed.x), sign(speed.y)) * friction;

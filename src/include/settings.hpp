@@ -14,6 +14,7 @@ class Settings
 public:
     const std::string title = "Bounce Tales";
     const std::string settings_path = "settings.ini";
+    const std::string stats_path = "stats.json";
     const std::string textures_path = "assets/textures";
     const std::string sounds_path = "assets/sounds";
     const std::string music_path = "assets/music";

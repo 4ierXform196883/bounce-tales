@@ -9,12 +9,20 @@ public:
     PHYSICAL
     SOUND_PLAYER
 
-    Player(float control_force);
+    enum Skin
+    {
+        NORMAL,
+        HEAVY,
+        LIGHT
+    };
+
+    Player(const sf::Vector2f &spawnPos, float control_force);
     virtual ~Player() = default;
 
-    // IMPLEMENT
-    // void onDeath();
-    // void onWin();
+    void setSkin(Skin skin);
+
+        void onDeath();
+    void onWin();
 
     float control_force = 0.1;
 
@@ -22,6 +30,10 @@ protected:
     virtual void update() override;
     virtual void onCollision(std::shared_ptr<GameObject> other) override;
 
-    bool onGround = false;
+    sf::Vector2f spawnPos;
+    float spawnTime;
+    std::shared_ptr<Timer> respawnTimer;
+    std::shared_ptr<Timer> reloadTimer;
+    bool onGround = false, hasWon = false;
     float lastJumpTime = 0;
 };

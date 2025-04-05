@@ -19,6 +19,10 @@ public:
     const sf::IntRect &getSpriteBounds(const std::string &textureName, const std::string &subtextureName) const;
     const std::vector<sf::IntRect> &getAnimationBounds(const std::string &textureName, const std::string &animationName) const;
 
+    bool hasTexture(const std::string &name) const;
+    bool hasSpriteBounds(const std::string &textureName, const std::string &subtextureName) const;
+    bool hasAnimationBounds(const std::string &textureName, const std::string &animationName) const;
+
 private:
     void loadTextures(const std::string &path);
     void loadSounds(const std::string &path);

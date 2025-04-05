@@ -55,4 +55,4 @@ add_custom_target(copy-assets
 
 
 add_dependencies(${PROJECT_NAME} copy-assets)
-install(TARGETS ${PROJECT_NAME})
+# install(TARGETS ${PROJECT_NAME})

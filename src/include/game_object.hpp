@@ -27,7 +27,7 @@
     inline virtual float getAirResistance() const override { return physical->getAirResistance(); }
 
 #define SOUND_PLAYER                                                                                                                                                            \
-    inline virtual void play(const std::string &name) override { soundPlayer->play(name); }                                                                                     \
+    inline virtual void play(const std::string &name, float volume = 100.f) override { soundPlayer->play(name, volume); }                                                       \
     inline virtual void playRandomly(const std::string &name, float intervalMin, float intervalMax = 0) override { soundPlayer->playRandomly(name, intervalMin, intervalMax); } \
     inline virtual void stopPlayingRandomly(const std::string &name) override { soundPlayer->stopPlayingRandomly(name); }                                                       \
     inline virtual sf::Sound &getSound(const std::string &name) override { return soundPlayer->getSound(name); }                                                                \
@@ -43,10 +43,9 @@ public:
     GameObject(const std::string &tag);
     virtual ~GameObject() = default;
 
-    inline bool isAlive() const { return alive; }
+    inline bool isHidden() const { return hidden; }
+    inline void setHidden(bool value) { this->hidden = value; }
     inline const std::string &getTag() const { return tag; }
-    std::shared_ptr<GameObject> findChild(const std::string &tag);
-    inline std::shared_ptr<const GameObject> findChild(const std::string &tag) const { return findChild(tag); }
 
     inline bool isCollidable() const { return collidable != nullptr; }
     inline bool isPhysical() const { return physical != nullptr; }
@@ -72,20 +71,20 @@ public:
     inline virtual const sf::Transform &getTransform() const override { return transformable->getTransform(); }
     inline virtual const sf::Transform &getInverseTransform() const override { return transformable->getInverseTransform(); }
 
+    bool alive = true;
+
 protected:
     inline virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const { target.draw(*drawable, states); }
     virtual void update() = 0;
     virtual void onCollision(std::shared_ptr<GameObject> other) = 0;
 
-    bool alive = true;
+    bool hidden = false;
     std::string tag;
-    std::vector<std::shared_ptr<GameObject>> children;
+    std::map<std::string, std::shared_ptr<GameObject>> children;
 
     std::shared_ptr<sf::Drawable> drawable;
     std::shared_ptr<sf::Transformable> transformable;
     std::shared_ptr<Collidable> collidable;
     std::shared_ptr<Physical> physical;
     std::shared_ptr<SoundPlayer> soundPlayer;
-
-    static std::map<std::string, size_t> namesCount;
 };

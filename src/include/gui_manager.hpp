@@ -9,27 +9,35 @@
 class GuiManager
 {
     friend class Game;
+
+public:
     enum UI
     {
         MENU,
-        SETTINGS,
         LEVEL,
         EDITOR
     };
 
-public:
-    const std::string menu_ui_path = "assets/ui/menu.form";
-    const std::string settings_ui_path = "assets/ui/settings.form";
-    const std::string level_ui_path = "assets/ui/level.form";
-    const std::string editor_ui_path = "assets/ui/editor.form";
-    const std::string pause_ui_path = "assets/ui/pause.form";
+    const std::string menu_ui_path = "assets/ui/menu.txt";
+    const std::string settings_ui_path = "assets/ui/settings.txt";
+    const std::string level_ui_path = "assets/ui/level.txt";
+    const std::string editor_ui_path = "assets/ui/editor.txt";
+    const std::string pause_ui_path = "assets/ui/pause.txt";
 
 private:
+    void init();
+
     void setUI(GuiManager::UI ui);
     void connectMenuCallbacks();
-    void connectSettingsCallbacks();
     void connectLevelCallbacks();
     void connectEditorCallbacks();
+    void connectSettingsGroupCallbacks();
+    void connectPauseGroupCallbacks();
 
     std::unique_ptr<tgui::Gui> gui;
+    size_t currentLevel = 0;
+    std::vector<std::string> levelNames;
+    std::vector<std::string> levelPaths;
+    std::map<std::string, tgui::Group::Ptr> groups;
+    GuiManager::UI currentUI;
 };

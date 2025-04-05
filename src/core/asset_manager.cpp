@@ -22,6 +22,15 @@ void AssetManager::loadFromJSON(const fs::path &path)
     }
     json j;
     file >> j;
+    // SpriteBounds
+    for (auto &[key, value] : j.items())
+    {
+        if (value.is_array() && !value[0].is_string())
+        {
+            spriteBounds[filename][key] = sf::IntRect(value[0], value[1], value[2], value[3]);
+        }
+    }
+    // AnimationBounds
     for (auto &[key, value] : j.items())
     {
         if (value.is_array() && value[0].is_string())
@@ -32,15 +41,6 @@ void AssetManager::loadFromJSON(const fs::path &path)
                     std::cerr << "[WARN] (AssetManager::loadTextures) No \"" + static_cast<std::string>(subkey) + "\" frame found for \"" + filename + "\"\n";
                 animationBounds[filename][key].push_back(spriteBounds[filename][static_cast<std::string>(subkey)]);
             }
-        }
-        else if (value.is_array() && value.size() == 4)
-        {
-            spriteBounds[filename][key] = sf::IntRect(value[0], value[1], value[2], value[3]);
-        }
-        else
-        {
-            std::cerr << "[WARN] (AssetManager::loadTextures) Incorrect JSON entry with key \"" + key + "\"\n";
-            continue;
         }
     }
     file.close();
@@ -114,7 +114,7 @@ const sf::IntRect &AssetManager::getSpriteBounds(const std::string &textureName,
     }
     else if (spriteBounds.at(textureName).find(subtextureName) == spriteBounds.at(textureName).end())
     {
-        std::cerr << "[WARN] (AssetManager::getSpriteBounds) No bounds for\"" + textureName + "." + subtextureName + "\" found\n";
+        std::cerr << "[WARN] (AssetManager::getSpriteBounds) No bounds for \"" + textureName + "." + subtextureName + "\" found\n";
         return spriteBounds.at("NULL").at("NULL");
     }
     return spriteBounds.at(textureName).at(subtextureName);
@@ -129,8 +129,23 @@ const std::vector<sf::IntRect> &AssetManager::getAnimationBounds(const std::stri
     }
     else if (animationBounds.at(textureName).find(animationName) == animationBounds.at(textureName).end())
     {
-        std::cerr << "[WARN] (AssetManager::getAnimationBounds) No bounds for\"" + textureName + "." + animationName + "\" found\n";
+        std::cerr << "[WARN] (AssetManager::getAnimationBounds) No bounds for \"" + textureName + "." + animationName + "\" found\n";
         return animationBounds.at("NULL").at("NULL");
     }
     return animationBounds.at(textureName).at(animationName);
+}
+
+bool AssetManager::hasTexture(const std::string &name) const
+{
+    return textures.find(name) != textures.end();
+}
+
+bool AssetManager::hasSpriteBounds(const std::string &textureName, const std::string &subtextureName) const
+{
+    return spriteBounds.find(textureName) != spriteBounds.end();
+}
+
+bool AssetManager::hasAnimationBounds(const std::string &textureName, const std::string &animationName) const
+{
+    return animationBounds.find(textureName) != animationBounds.end();
 }

@@ -1,0 +1,135 @@
+Button.button_respawn {
+    Position = (34%, 87.5%);
+    Size = (10%, 5%);
+    Text = Respawn;
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = white;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.button_exit {
+    Position = (78%, 87.5%);
+    Size = (10%, 5%);
+    Text = Exit;
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = #80FF80;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.button_menu {
+    Position = (56%, 87.5%);
+    Size = (10%, 5%);
+    Text = "Exit menu";
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = white;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.button_resume {
+    Position = (12%, 87.5%);
+    Size = (10%, 5%);
+    Text = Resume;
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = white;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}

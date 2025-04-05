@@ -8,6 +8,7 @@ public:
     Camera(const sf::Vector2f &size, std::shared_ptr<GameObject> followObject = nullptr);
     virtual ~Camera() = default;
 
+    inline std::shared_ptr<GameObject> getFollowObject() const { return followObject; }
     void setFollowObject(std::shared_ptr<GameObject> followObject);
     inline const sf::View &getView() const { return view; }
 
