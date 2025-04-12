@@ -2,12 +2,11 @@
 
 #include "game_object.hpp"
 
-class Player : public GameObject, public ICollidable, public IPhysical, public ISoundPlayer
+class Player : public GameObject, public ICollidable, public IPhysical
 {
 public:
     COLLIDABLE
     PHYSICAL
-    SOUND_PLAYER
 
     enum Skin
     {

@@ -70,7 +70,7 @@ void ObjectManager::load(const std::string &path)
     physical.push_back(player);
 
     // Music
-    Game::getMusicPlayer().setMusic(data["music"], Game::getSettings().getDouble("Volume", "music", 50));
+    Game::getSoundManager().setMusic(data["music"], Game::getSettings().getDouble("Volume", "music", 50));
 
     // Triggers
     for (const auto &part : data["triggers"])

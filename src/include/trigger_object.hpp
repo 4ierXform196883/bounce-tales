@@ -2,11 +2,10 @@
 
 #include "game_object.hpp"
 
-class TriggerObject : public GameObject, public ICollidable, public ISoundPlayer
+class TriggerObject : public GameObject, public ICollidable
 {
 public:
     COLLIDABLE
-    SOUND_PLAYER
 
     TriggerObject(const sf::Vector2f &size, const std::function<void(std::shared_ptr<GameObject> other)> &callback);
     TriggerObject(const std::string &textureName, const std::function<void(std::shared_ptr<GameObject> other)> &callback);

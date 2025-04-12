@@ -11,14 +11,14 @@
 #include "game_object.hpp"
 #include "animation.hpp"
 #include "curved_shape.hpp"
-#include "music_player.hpp"
+#include "sound_manager.hpp"
 #include "object_manager.hpp"
 #include "background.hpp"
 
 AssetManager Game::assetManager;
 GuiManager Game::guiManager;
 ObjectManager Game::objectManager;
-MusicPlayer Game::musicPlayer;
+SoundManager Game::soundManager;
 Settings Game::settings;
 Stats Game::stats;
 bool Game::paused = false;
@@ -69,6 +69,7 @@ void Game::init()
     stats.load(settings.stats_path);
     assetManager.loadTextures(settings.textures_path);
     assetManager.loadSounds(settings.sounds_path);
+    soundManager.init();
     sf::Vector2i windowSize = {settings.getInt("Screen", "width", 1280), settings.getInt("Screen", "height", 720)};
     auto fullscreen = settings.getBool("Screen", "fullscreen", false) ? sf::Style::Fullscreen : sf::Style::Default;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings.title, fullscreen);
@@ -101,7 +102,7 @@ void Game::close()
     assetManager.unloadSounds();
     settings.save(settings.settings_path);
     stats.save(settings.stats_path);
-    musicPlayer.stopMusic();
+    soundManager.stopMusic();
     window->close();
 }
 
@@ -122,13 +123,13 @@ void Game::processEvents()
                 paused = !paused;
             }
             if (event.key.code == sf::Keyboard::F1)
-                musicPlayer.setMusic("menu");
+                soundManager.setMusic("menu");
             if (event.key.code == sf::Keyboard::F2)
-                musicPlayer.setMusic("level");
+                soundManager.setMusic("level");
             if (event.key.code == sf::Keyboard::F3)
-                musicPlayer.setMusic("level2");
+                soundManager.setMusic("level2");
             if (event.key.code == sf::Keyboard::F4)
-                musicPlayer.setMusic("level3");
+                soundManager.setMusic("level3");
             break;
 
         default:

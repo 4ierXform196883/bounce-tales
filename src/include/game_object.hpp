@@ -6,7 +6,6 @@
 #include "transformable.hpp"
 #include "collidable.hpp"
 #include "physical.hpp"
-#include "sound_player.hpp"
 
 #define COLLIDABLE                                                                         \
     inline virtual const Hitbox &getHitbox() const override { return collidable->hitbox; } \
@@ -26,13 +25,6 @@
     inline virtual void setAirResistance(float value) override { physical->setAirResistance(value); }                                                                                                \
     inline virtual float getAirResistance() const override { return physical->getAirResistance(); }
 
-#define SOUND_PLAYER                                                                                                                                                            \
-    inline virtual void play(const std::string &name, float volume = 100.f) override { soundPlayer->play(name, volume); }                                                       \
-    inline virtual void playRandomly(const std::string &name, float intervalMin, float intervalMax = 0) override { soundPlayer->playRandomly(name, intervalMin, intervalMax); } \
-    inline virtual void stopPlayingRandomly(const std::string &name) override { soundPlayer->stopPlayingRandomly(name); }                                                       \
-    inline virtual sf::Sound &getSound(const std::string &name) override { return soundPlayer->getSound(name); }                                                                \
-    inline virtual const sf::Sound &getSound(const std::string &name) const override { return soundPlayer->getSound(name); }
-
 class GameObject : public ITransformable, public sf::Drawable
 {
 public:
@@ -49,7 +41,6 @@ public:
 
     inline bool isCollidable() const { return collidable != nullptr; }
     inline bool isPhysical() const { return physical != nullptr; }
-    inline bool isSoundPlayer() const { return soundPlayer != nullptr; }
 
     // Interface overrides
     virtual void setPosition(float x, float y) override;
@@ -86,5 +77,4 @@ protected:
     std::shared_ptr<sf::Transformable> transformable;
     std::shared_ptr<Collidable> collidable;
     std::shared_ptr<Physical> physical;
-    std::shared_ptr<SoundPlayer> soundPlayer;
 };

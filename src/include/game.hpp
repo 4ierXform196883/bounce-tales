@@ -6,7 +6,7 @@
 #include "asset_manager.hpp"
 #include "object_manager.hpp"
 #include "settings.hpp"
-#include "music_player.hpp"
+#include "sound_manager.hpp"
 #include "gui_manager.hpp"
 #include "stats.hpp"
 
@@ -23,7 +23,7 @@ public:
 
     inline static AssetManager &getAssetManager() { return assetManager; }
     inline static ObjectManager &getObjectManager() { return objectManager; }
-    inline static MusicPlayer &getMusicPlayer() { return musicPlayer; }
+    inline static SoundManager &getSoundManager() { return soundManager; }
     inline static Settings &getSettings() { return settings; }
     inline static Stats &getStats() { return stats; }
 
@@ -46,7 +46,7 @@ private:
     static AssetManager assetManager;
     static GuiManager guiManager;
     static ObjectManager objectManager;
-    static MusicPlayer musicPlayer;
+    static SoundManager soundManager;
     static Settings settings;
     static Stats stats;
 };

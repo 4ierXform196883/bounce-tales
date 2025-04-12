@@ -181,7 +181,7 @@ void GuiManager::connectSettingsGroupCallbacks()
     auto musicChangeCallback = [this](float newValue)
     {
         Settings &settings = Game::getSettings();
-        Game::getMusicPlayer().setVolume(newValue);
+        Game::getSoundManager().setMusicVolume(newValue);
         settings.set("Volume", "music", newValue);
     };
     groups.at("settings")->get<tgui::Slider>("settings_music")->onValueChange(musicChangeCallback);

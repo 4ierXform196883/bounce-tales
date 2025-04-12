@@ -175,8 +175,6 @@ GameObject::GameObject(const std::string &tag)
 void GameObject::setPosition(float x, float y)
 {
     transformable->setPosition(x, y);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -184,8 +182,6 @@ void GameObject::setPosition(float x, float y)
 void GameObject::setPosition(const sf::Vector2f &position)
 {
     transformable->setPosition(position);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -193,8 +189,6 @@ void GameObject::setPosition(const sf::Vector2f &position)
 void GameObject::setRotation(float angle)
 {
     transformable->setRotation(angle);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -202,8 +196,6 @@ void GameObject::setRotation(float angle)
 void GameObject::setScale(float factorX, float factorY)
 {
     transformable->setScale(factorX, factorY);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -211,8 +203,6 @@ void GameObject::setScale(float factorX, float factorY)
 void GameObject::setScale(const sf::Vector2f &factors)
 {
     transformable->setScale(factors);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -220,8 +210,6 @@ void GameObject::setScale(const sf::Vector2f &factors)
 void GameObject::setOrigin(float x, float y)
 {
     transformable->setOrigin(x, y);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -229,8 +217,6 @@ void GameObject::setOrigin(float x, float y)
 void GameObject::setOrigin(const sf::Vector2f &origin)
 {
     transformable->setOrigin(origin);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -238,8 +224,6 @@ void GameObject::setOrigin(const sf::Vector2f &origin)
 void GameObject::move(float offsetX, float offsetY)
 {
     transformable->move(offsetX, offsetY);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -247,8 +231,6 @@ void GameObject::move(float offsetX, float offsetY)
 void GameObject::move(const sf::Vector2f &offset)
 {
     transformable->move(offset);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -256,8 +238,6 @@ void GameObject::move(const sf::Vector2f &offset)
 void GameObject::rotate(float angle)
 {
     transformable->rotate(angle);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -265,8 +245,6 @@ void GameObject::rotate(float angle)
 void GameObject::scale(float factorX, float factorY)
 {
     transformable->scale(factorX, factorY);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }
@@ -274,8 +252,6 @@ void GameObject::scale(float factorX, float factorY)
 void GameObject::scale(const sf::Vector2f &factor)
 {
     transformable->scale(factor);
-    if (soundPlayer)
-        soundPlayer->update(getPosition());
     if (collidable)
         collidable->update(getTransform(), getScale());
 }

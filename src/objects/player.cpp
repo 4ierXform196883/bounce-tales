@@ -16,7 +16,6 @@ Player::Player(const sf::Vector2f &spawnPos, float control_force)
     this->setOrigin(tSize.x / 2, tSize.y / 2);
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f - 2, {tSize.x / 2.0f, tSize.x / 2.0f}});
     physical = std::make_shared<Physical>(10, 0.001);
-    std::map<std::string, sf::Sound> sounds;
     auto ptr = std::make_shared<SimpleObject>("dots", "redy_dots");
     children.emplace(ptr->getTag(), ptr);
     ptr = std::make_shared<SimpleObject>("eyes_death", "redy_emotions", "eyes_ouch");
@@ -27,9 +26,6 @@ Player::Player(const sf::Vector2f &spawnPos, float control_force)
     ptr->move({0.f, 25.f});
     ptr->setHidden(true);
     children.emplace(ptr->getTag(), ptr);
-    sounds.emplace("win", assetManager.getSoundBuffer("win"));
-    sounds.emplace("death", assetManager.getSoundBuffer("death"));
-    soundPlayer = std::make_shared<SoundPlayer>(sounds);
     spawnTime = Game::getClock().getElapsedTime().asSeconds();
     this->setPosition(spawnPos);
 }
@@ -69,16 +65,16 @@ void Player::onDeath()
         this->respawnTimer = nullptr;
         Game::getObjectManager().getCamera()->setFollowObject(followObject);
         float volume = (float)Game::getSettings().getDouble("Volume", "music", 50);
-        Game::getMusicPlayer().setMusic(Game::getMusicPlayer().getMusicName(), volume); }, false);
+        Game::getSoundManager().setMusic(Game::getSoundManager().getMusicName(), volume); }, false);
     this->setRotation(0);
     this->physical->speed = {0.f, 0.f};
     this->addForce({0, -5});
     this->collidable->trigger = true;
     this->control_force = 0;
     this->children.at("eyes_death")->setHidden(false);
-    this->play("death", Game::getSettings().getDouble("Volume", "sounds", 100));
+    Game::getSoundManager().playSound("death", Game::getSettings().getDouble("Volume", "sounds", 100));
     Game::getObjectManager().getCamera()->setFollowObject(nullptr);
-    Game::getMusicPlayer().stopMusic();
+    Game::getSoundManager().stopMusic();
 }
 
 void Player::onWin()
@@ -93,9 +89,9 @@ void Player::onWin()
     this->physical->speed = {0.f, 0.f};
     this->control_force = 0;
     this->children.at("eyes_win")->setHidden(false);
-    this->play("win", Game::getSettings().getDouble("Volume", "sounds", 100));
+    Game::getSoundManager().playSound("win", Game::getSettings().getDouble("Volume", "sounds", 100));
     Game::getObjectManager().getCamera()->setFollowObject(nullptr);
-    Game::getMusicPlayer().stopMusic();
+    Game::getSoundManager().stopMusic();
     Particle::spawnScatter("particles", "conf_red", 10, this->getPosition(), 1, {5.f, 5.f}, 10);
     Particle::spawnScatter("particles", "conf_blue", 10, this->getPosition(), 2, {15.f, 15.f}, 10);
     Particle::spawnScatter("particles", "star", 10, this->getPosition(), 0.5, {10.f, 10.f}, 10);
