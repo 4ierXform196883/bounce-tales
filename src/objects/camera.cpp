@@ -10,6 +10,13 @@ Camera::Camera(const sf::Vector2f &size, std::shared_ptr<GameObject> followObjec
     view.setSize(size);
 }
 
+void Camera::setZoom(float factor)
+{
+    sf::Vector2f unzoomedSize = view.getSize() * (1.0f / zoom);
+    zoom = factor;
+    view.setSize(unzoomedSize * zoom);
+}
+
 void Camera::update()
 {
     if (followObject)
@@ -18,9 +25,4 @@ void Camera::update()
         this->move(0.1f * force);
     }
     view.setCenter(this->getPosition());
-}
-
-void Camera::setFollowObject(std::shared_ptr<GameObject> followObject)
-{
-    this->followObject = followObject;
 }

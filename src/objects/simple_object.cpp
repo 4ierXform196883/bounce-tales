@@ -8,7 +8,7 @@
 SimpleObject::SimpleObject(const std::string &tag, const std::string &textureName)
     : GameObject(tag)
 {
-    const sf::Texture &texture = Game::getAssetManager().getTexture(textureName);
+    const sf::Texture &texture = Game::getAssetManager()->getTexture(textureName);
     sf::Vector2u tSize = texture.getSize();
     this->setOrigin(sf::Vector2f(tSize.x / 2.0f, tSize.y / 2.0f));
     drawable = std::make_shared<PrimitiveSprite>(texture);
@@ -18,18 +18,18 @@ SimpleObject::SimpleObject(const std::string &tag, const std::string &textureNam
     : GameObject(tag)
 {
     const auto &am = Game::getAssetManager();
-    const sf::Texture &texture = am.getTexture(textureName);
+    const sf::Texture &texture = am->getTexture(textureName);
     sf::Vector2u tSize = texture.getSize();
     this->setOrigin(sf::Vector2f(tSize.x / 2.0f, tSize.y / 2.0f));
-    drawable = std::make_shared<PrimitiveSprite>(texture, am.getSpriteBounds(textureName, subtextureName));
+    drawable = std::make_shared<PrimitiveSprite>(texture, am->getSpriteBounds(textureName, subtextureName));
 }
 
 SimpleObject::SimpleObject(const std::string &tag, const std::string &textureName, const std::string &animationName, double fps)
     : GameObject(tag)
 {
     const auto &am = Game::getAssetManager();
-    const sf::Texture &texture = am.getTexture(textureName);
+    const sf::Texture &texture = am->getTexture(textureName);
     sf::Vector2u tSize = texture.getSize();
     this->setOrigin(sf::Vector2f(tSize.x / 2.0f, tSize.y / 2.0f));
-    drawable = std::make_shared<Animation>(texture, am.getAnimationBounds(textureName, animationName), fps);
+    drawable = std::make_shared<Animation>(texture, am->getAnimationBounds(textureName, animationName), fps);
 }

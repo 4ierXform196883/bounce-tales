@@ -13,9 +13,9 @@ const std::vector<int> JumpPad::heights = {58, 47, 44, 47, 58, 66, 66, 58};
 JumpPad::JumpPad(float power)
     : GameObject("jump_pad"), power(power)
 {
-    const AssetManager &assetManager = Game::getAssetManager();
-    const sf::Texture &texture = assetManager.getTexture("jump_pad");
-    const sf::IntRect &idleRect = assetManager.getSpriteBounds("jump_pad", "3");
+    auto &assetManager = Game::getAssetManager();
+    const sf::Texture &texture = assetManager->getTexture("jump_pad");
+    const sf::IntRect &idleRect = assetManager->getSpriteBounds("jump_pad", "3");
     drawable = std::make_shared<PrimitiveSprite>(texture, idleRect);
     this->setOrigin(idleRect.width / 2, idleRect.height);
     ConvexHitbox hitbox;
@@ -69,7 +69,7 @@ void JumpPad::onCollision(std::shared_ptr<GameObject> other)
 void JumpPad::updateFrame(size_t newFrame)
 {
     size_t oldFrame = newFrame == 0 ? frameSequence.size() - 1 : newFrame - 1;
-    const sf::IntRect &newRect = Game::getAssetManager().getSpriteBounds("jump_pad", frameSequence.at(newFrame));
+    const sf::IntRect &newRect = Game::getAssetManager()->getSpriteBounds("jump_pad", frameSequence.at(newFrame));
     int diff = heights.at(newFrame) - heights.at(oldFrame);
     std::dynamic_pointer_cast<PrimitiveSprite>(drawable)->setTextureRect(newRect);
     for (auto &point : std::get<ConvexHitbox>(collidable->hitbox).points)

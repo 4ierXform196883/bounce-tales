@@ -16,8 +16,8 @@
 Platform::Platform(const std::string& textureName, const std::vector<sf::Vector2f> &verts, const std::vector<sf::Vector2f> &path, float speedMult)
     : GameObject("platform"), path(path), speedMult(speedMult)
 {
-    const AssetManager &assetManager = Game::getAssetManager();
-    const sf::Texture &texture = assetManager.getTexture(textureName);
+    auto &assetManager = Game::getAssetManager();
+    const sf::Texture &texture = assetManager->getTexture(textureName);
     sf::Vector2u tSize = texture.getSize();
     this->setOrigin(sf::Vector2f(tSize.x / 2.0f, tSize.y / 2.0f));
 

@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "drawable.hpp"
 #include "transformable.hpp"
 #include "collidable.hpp"
 #include "physical.hpp"
@@ -25,7 +26,7 @@
     inline virtual void setAirResistance(float value) override { physical->setAirResistance(value); }                                                                                                \
     inline virtual float getAirResistance() const override { return physical->getAirResistance(); }
 
-class GameObject : public ITransformable, public sf::Drawable
+class GameObject : public ITransformable, public Drawable
 {
 public:
     static void calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify = true);
@@ -61,6 +62,10 @@ public:
     inline virtual const sf::Vector2f &getOrigin() const override { return transformable->getOrigin(); }
     inline virtual const sf::Transform &getTransform() const override { return transformable->getTransform(); }
     inline virtual const sf::Transform &getInverseTransform() const override { return transformable->getInverseTransform(); }
+    inline virtual const sf::Color &getColor() const override { return drawable->getColor(); }
+    inline virtual void setColor(const sf::Color &color) override { drawable->setColor(color); }
+    inline virtual sf::FloatRect getLocalBounds() const override { return drawable->getLocalBounds(); }
+    inline sf::FloatRect getGlobalBounds() const { return getTransform().transformRect(getLocalBounds()); }
 
     bool alive = true;
 
@@ -73,7 +78,7 @@ protected:
     std::string tag;
     std::map<std::string, std::shared_ptr<GameObject>> children;
 
-    std::shared_ptr<sf::Drawable> drawable;
+    std::shared_ptr<Drawable> drawable;
     std::shared_ptr<sf::Transformable> transformable;
     std::shared_ptr<Collidable> collidable;
     std::shared_ptr<Physical> physical;

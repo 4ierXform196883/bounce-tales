@@ -8,7 +8,7 @@
 BackgroundObject::BackgroundObject(const std::string &tag, const std::string& textureName, float speed, float distance)
     : GameObject(tag), speed(speed < 0 ? 0 : speed), distance(distance < 1 ? 1 : distance)
 {
-    const sf::Texture &texture = Game::getAssetManager().getTexture(textureName);
+    const sf::Texture &texture = Game::getAssetManager()->getTexture(textureName);
     const_cast<sf::Vector2u&>(this->tSize) = texture.getSize();
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin({(float)tSize.x / 2.0f, (float)tSize.y / 2.0f});
@@ -17,10 +17,10 @@ BackgroundObject::BackgroundObject(const std::string &tag, const std::string& te
 
 void BackgroundObject::update()
 {
-    const sf::Vector2f &cSize = Game::getObjectManager().getView().getSize();
+    const sf::Vector2f &cSize = Game::getObjectManager()->getView().getSize();
     if (this->speed == 0)
     {
-        const sf::Vector2f &cPos = Game::getObjectManager().getView().getCenter();
+        const sf::Vector2f &cPos = Game::getObjectManager()->getView().getCenter();
         this->move(-(cPos - prevCPos) / distance);
         this->prevCPos = cPos;
     }

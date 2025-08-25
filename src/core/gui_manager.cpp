@@ -7,7 +7,7 @@
 
 void GuiManager::init()
 {
-    for (auto &entry : fs::directory_iterator("levels"))
+    for (auto &entry : fs::directory_iterator(Game::getSettings()->levels_path))
     {
         if (entry.is_regular_file() && entry.path().stem().generic_string() != "menu")
         {
@@ -37,8 +37,9 @@ void GuiManager::setUI(GuiManager::UI ui)
         break;
 
     case EDITOR:
+        gui->removeAllWidgets();
         // gui->loadWidgetsFromFile(editor_ui_path);
-        // connectEditorCallbacks();
+        connectEditorCallbacks();
         break;
 
     default:
@@ -70,7 +71,7 @@ void GuiManager::connectMenuCallbacks()
     // Exit button
     auto exitCallback = [this]
     {
-        Game::close();
+        Game::running = false;
     };
     gui->get<tgui::Button>("button_exit")->onPress(exitCallback);
 
@@ -83,8 +84,8 @@ void GuiManager::connectMenuCallbacks()
     {
         currentLevel = currentLevel == 0 ? levelNames.size() - 1 : currentLevel - 1;
         gui->get<tgui::Label>("label_level")->setText(levelNames.at(currentLevel));
-        gui->get<tgui::Label>("label_time")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_time"));
-        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
+        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
     };
     gui->get<tgui::Button>("button_level_prev")->onPress(prevLevelCallback);
 
@@ -93,14 +94,14 @@ void GuiManager::connectMenuCallbacks()
     {
         currentLevel = (currentLevel + 1) % levelNames.size();
         gui->get<tgui::Label>("label_level")->setText(levelNames.at(currentLevel));
-        gui->get<tgui::Label>("label_time")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_time"));
-        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
+        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
     };
     gui->get<tgui::Button>("button_level_next")->onPress(nextLevelCallback);
 
     // Stats
-    gui->get<tgui::Label>("label_time")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_time"));
-    gui->get<tgui::Label>("label_eggs")->setText(Game::getStats().getAsString(levelPaths.at(currentLevel), "best_eggs"));
+    gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
+    gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
 }
 
 void GuiManager::connectLevelCallbacks()
@@ -115,7 +116,7 @@ void GuiManager::connectLevelCallbacks()
     // Time label
     auto timeUpdateCallback = [this]
     {
-        float curTime = Game::getClock().getElapsedTime().asSeconds() - Game::getStats().currentStartTime;
+        float curTime = Game::getClock().getElapsedTime().asSeconds() - Game::getStats()->currentStartTime;
         std::string minutes = std::to_string((int)curTime / 60);
         minutes = minutes.size() == 1 ? "0" + minutes : minutes;
         std::string seconds = std::to_string((int)curTime % 60);
@@ -128,8 +129,8 @@ void GuiManager::connectLevelCallbacks()
     // Eggs label
     auto eggUpdateCallback = [this]
     {
-        std::string currentEggs = std::to_string(Game::getStats().currentEggs);
-        std::string totalEggs =  std::to_string(Game::getStats().get(levelPaths.at(currentLevel), "total_eggs"));
+        std::string currentEggs = std::to_string(Game::getStats()->currentEggs);
+        std::string totalEggs = std::to_string(Game::getStats()->get(levelPaths.at(currentLevel), "total_eggs"));
         gui->get<tgui::Label>("label_eggs")->setText(currentEggs + "/" + totalEggs);
     };
     auto eggUpdateTimer = Timer::create(0.05, eggUpdateCallback);
@@ -138,6 +139,12 @@ void GuiManager::connectLevelCallbacks()
 
 void GuiManager::connectEditorCallbacks()
 {
+    // Pause group
+    groups.emplace("pause", tgui::Group::create());
+    groups.at("pause")->loadWidgetsFromFile(pause_ui_path);
+    groups.at("pause")->setVisible(false);
+    gui->add(groups.at("pause"));
+    connectPauseGroupCallbacks();
 }
 
 void GuiManager::connectSettingsGroupCallbacks()
@@ -145,54 +152,54 @@ void GuiManager::connectSettingsGroupCallbacks()
     if (currentUI != MENU)
         return;
 
-    Settings &settings = Game::getSettings();
+    auto &settings = Game::getSettings();
 
     // Resolution
-    tgui::String resolution = settings.getString("Screen", "width", "1280") + "x" + settings.getString("Screen", "height", "720");
+    tgui::String resolution = settings->getString("Screen", "width", "1280") + "x" + settings->getString("Screen", "height", "720");
     groups.at("settings")->get<tgui::ComboBox>("settings_resolution")->setSelectedItem(resolution);
     auto resolutionChangeCallback = [this](const tgui::String &selectedItem)
     {
-        Settings &settings = Game::getSettings();
+        auto &settings = Game::getSettings();
         int width = selectedItem.substr(0, selectedItem.find("x")).toInt(1280);
         int height = selectedItem.substr(selectedItem.find("x") + 1).toInt(720);
-        bool fullscreen = settings.getBool("Screen", "fullscreen", false);
+        bool fullscreen = settings->getBool("Screen", "fullscreen", false);
         Game::reinitWindow(sf::Vector2i(width, height), fullscreen);
-        settings.set("Screen", "width", width);
-        settings.set("Screen", "height", height);
+        settings->set("Screen", "width", width);
+        settings->set("Screen", "height", height);
     };
     groups.at("settings")->get<tgui::ComboBox>("settings_resolution")->onItemSelect(resolutionChangeCallback);
 
     // Fullscreen
-    bool fullscreen = settings.getBool("Screen", "fullscreen", false);
+    bool fullscreen = settings->getBool("Screen", "fullscreen", false);
     groups.at("settings")->get<tgui::CheckBox>("settings_fullscreen")->setChecked(fullscreen);
     auto fullscreenChangeCallback = [this](bool isChecked)
     {
-        Settings &settings = Game::getSettings();
-        int width = settings.getInt("Screen", "width", 1280);
-        int height = settings.getInt("Screen", "height", 720);
+        auto &settings = Game::getSettings();
+        int width = settings->getInt("Screen", "width", 1280);
+        int height = settings->getInt("Screen", "height", 720);
         Game::reinitWindow(sf::Vector2i(width, height), isChecked);
-        settings.set("Screen", "fullscreen", isChecked);
+        settings->set("Screen", "fullscreen", isChecked);
     };
     groups.at("settings")->get<tgui::CheckBox>("settings_fullscreen")->onChange(fullscreenChangeCallback);
 
     // Music volume
-    double musicVolume = settings.getDouble("Volume", "music", 50.0);
+    double musicVolume = settings->getDouble("Volume", "music", 50.0);
     groups.at("settings")->get<tgui::Slider>("settings_music")->setValue(musicVolume);
     auto musicChangeCallback = [this](float newValue)
     {
-        Settings &settings = Game::getSettings();
-        Game::getSoundManager().setMusicVolume(newValue);
-        settings.set("Volume", "music", newValue);
+        auto &settings = Game::getSettings();
+        Game::getSoundManager()->setMusicVolume(newValue);
+        settings->set("Volume", "music", newValue);
     };
     groups.at("settings")->get<tgui::Slider>("settings_music")->onValueChange(musicChangeCallback);
 
     // Sounds volume
-    double soundsVolume = settings.getDouble("Volume", "sounds", 50.0);
+    double soundsVolume = settings->getDouble("Volume", "sounds", 50.0);
     groups.at("settings")->get<tgui::Slider>("settings_sounds")->setValue(soundsVolume);
     auto soundsChangeCallback = [this](float newValue)
     {
-        Settings &settings = Game::getSettings();
-        settings.set("Volume", "sounds", newValue);
+        auto &settings = Game::getSettings();
+        settings->set("Volume", "sounds", newValue);
     };
     groups.at("settings")->get<tgui::Slider>("settings_sounds")->onValueChange(soundsChangeCallback);
 }
@@ -210,7 +217,7 @@ void GuiManager::connectPauseGroupCallbacks()
     // Respawn button
     auto respawnCallback = [this]
     {
-        Game::getObjectManager().getPlayer()->onDeath();
+        Game::getObjectManager()->getPlayer()->onDeath();
         groups.at("pause")->setVisible(false);
         Game::paused = false;
     };
@@ -228,7 +235,7 @@ void GuiManager::connectPauseGroupCallbacks()
     // Exit button
     auto exitCallback = [this]
     {
-        Game::close();
+        Game::running = false;
     };
     gui->get<tgui::Button>("button_exit")->onPress(exitCallback);
 }

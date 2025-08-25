@@ -10,16 +10,16 @@
 Water::Water(const sf::Vector2f &size)
     : GameObject("a_water"), size(size)
 {
-    const AssetManager& am = Game::getAssetManager();
-    const sf::Texture& texture = am.getTexture("water");
+    const auto &am = Game::getAssetManager();
+    const sf::Texture &texture = am->getTexture("water");
     const sf::Vector2f tSize = sf::Vector2f(texture.getSize().x, texture.getSize().y);
-    this->drawable = std::make_shared<PrimitiveSprite>(am.getTexture("water"));
-this->collidable = std::make_shared<Collidable>(ConvexHitbox{{{0, 0}, {tSize.x, 0}, tSize, {0, tSize.y}}}, 0, true);
+    this->drawable = std::make_shared<PrimitiveSprite>(am->getTexture("water"));
+    this->collidable = std::make_shared<Collidable>(ConvexHitbox{{{0, 0}, {tSize.x, 0}, tSize, {0, tSize.y}}}, 0, true);
     this->setOrigin(tSize.x / 2.f, tSize.y / 2.f);
     this->setScale(size.x / tSize.x, size.y / tSize.y);
     this->particleTimer = Timer::create(0.33, [this]()
                                         {
-        const AssetManager& am = Game::getAssetManager();
+        const auto& am = Game::getAssetManager();
         size_t amount = randomizer::getRandInt(2, 5);
         Particle::spawnScatter("particles", "bubble", this->getPosition(), 0.1f, 0.4f * this->size, amount);
         this->particleTimer->duration = randomizer::getRandFloat(0.1f, 0.9f); });

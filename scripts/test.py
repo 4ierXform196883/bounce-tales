@@ -3,9 +3,6 @@ import numpy as np
 import os
 import sys
 
-# P.S. В комментариях я называю 1 и 4 точки главными, а 2 и 3 дополнительными
-# а ещё пишу кривая, хотя это сплайн :)
-
 # ================== Управление ==================
 # ЛКМ - добавить точку кривой
 # ПКМ - удалить точку кривой (если это главная точка и не первая)
@@ -40,6 +37,7 @@ if len(sys.argv) < 2:
     print(f"Usage: python {sys.argv[0]} <path_to_image>")
     sys.exit(1)
 
+grass_texture = cv2.imread("grass.png", cv2.IMREAD_UNCHANGED)  # keep alpha
 picture = cv2.imread(sys.argv[1], cv2.IMREAD_UNCHANGED)
 # Фикс для картинок с альфа-каналом
 picture[picture[:, :, 3] < 30] = [255, 255, 255, 255]
@@ -48,6 +46,31 @@ picture[picture[:, :, 3] < 30] = [255, 255, 255, 255]
 img = np.zeros((WINDOW_SIZE[1], WINDOW_SIZE[0], 3), np.uint8)
 windowName = 'Cubic Bezier Spline'
 cv2.namedWindow(windowName)
+
+def place_grass_along_curve(points, grass_tex):
+    if len(points) < 2:
+        return
+    h, w = grass_tex.shape[:2]
+    step = w // 2  # how close segments are placed
+
+    for i in range(0, len(points)-1, step):
+        p1 = np.array(points[i], dtype=np.float32)
+        p2 = np.array(points[min(i+1, len(points)-1)], dtype=np.float32)
+
+        # tangent vector
+        dx, dy = p2 - p1
+        angle = np.degrees(np.arctan2(dy, dx))
+
+        # rotate grass
+        M = cv2.getRotationMatrix2D((w/2, h), angle, 1.0)
+        rotated = cv2.warpAffine(grass_tex, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_TRANSPARENT)
+
+        # placement
+        x, y = int(p1[0]-w/2), int(p1[1]-h)
+        alpha = rotated[:,:,3] / 255.0
+        for c in range(3):
+            img[y:y+h, x:x+w, c] = (alpha * rotated[:,:,c] + (1-alpha) * img[y:y+h, x:x+w, c]).astype(np.uint8)
+
 
 def is_near_control_point(x1, y1):
     for i, (x2, y2) in enumerate(control_points):
@@ -104,16 +127,13 @@ def drag_point(i, x, y):
         control_points[i] = (x, y)
         return
     if i % 3 == 0:
-        # prev_delta = (control_points[i][0] - control_points[i-1][0],
-        #               control_points[i][1] - control_points[i-1][1])
-        # next_delta = (control_points[i+1][0] - control_points[i][0],
-        #               control_points[i+1][1] - control_points[i][1])
-        delta = (x - control_points[i][0], y - control_points[i][1])
-        control_points[i-1] = (control_points[i][0] + delta[0], control_points[i][1] + delta[1])
-        # control_points[i-1] = (x - prev_delta[0], y - prev_delta[1])
+        prev_delta = (control_points[i][0] - control_points[i-1][0],
+                      control_points[i][1] - control_points[i-1][1])
+        next_delta = (control_points[i+1][0] - control_points[i][0],
+                      control_points[i+1][1] - control_points[i][1])
+        control_points[i-1] = (x - prev_delta[0], y - prev_delta[1])
         control_points[i] = (x, y)
-        # control_points[i+1] = (x + next_delta[0], y + next_delta[1])
-        control_points[i+1] = (control_points[i][0] + delta[0], control_points[i][1] + delta[1])
+        control_points[i+1] = (x + next_delta[0], y + next_delta[1])
     elif i % 3 == 1:
         delta = (x - control_points[i-1][0], y - control_points[i-1][1])
         control_points[i] = (x, y)
@@ -155,6 +175,9 @@ def draw_control_points():
     for i in range(3, len(control_points), 3):
         points = [(x - offset[0], y - offset[1]) for x, y in control_points[i-3:i+1]]
         all_points += draw_bezier_curve(points)
+    if finished and len(all_points) > 0:
+        place_grass_along_curve(all_points, grass_texture)
+    
 
 def draw_picture():
     global picture, img, offset

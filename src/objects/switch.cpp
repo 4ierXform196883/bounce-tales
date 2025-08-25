@@ -9,9 +9,9 @@ Switch::Switch(const std::vector<std::shared_ptr<Door>> &doors)
     : GameObject("a_switch"), doors(doors)
 {
     auto &am = Game::getAssetManager();
-    const auto &texture = am.getTexture("switch");
+    const auto &texture = am->getTexture("switch");
     const auto tSize = texture.getSize();
-    const sf::IntRect &frame = am.getSpriteBounds("switch", "off");
+    const sf::IntRect &frame = am->getSpriteBounds("switch", "off");
     const sf::Vector2f hSize = sf::Vector2f(frame.width - 1, frame.height - 1);
     this->drawable = std::make_shared<PrimitiveSprite>(texture, frame);
     ConvexHitbox hitbox = ConvexHitbox{{{1, 1}, {hSize.x, 1}, hSize, {1, hSize.y}}};
@@ -32,7 +32,7 @@ void Switch::setState(bool state)
         (*it)->isOpened = this->isOn;
         ++it;
     }
-    const sf::IntRect &bounds = Game::getAssetManager().getSpriteBounds("switch", this->isOn ? "on": "off");
+    const sf::IntRect &bounds = Game::getAssetManager()->getSpriteBounds("switch", this->isOn ? "on": "off");
     std::dynamic_pointer_cast<PrimitiveSprite>(drawable)->setTextureRect(bounds);
 }
 
@@ -49,7 +49,7 @@ void Switch::switchState()
         (*it)->isOpened = !(*it)->isOpened;
         ++it;
     }
-    const sf::IntRect &bounds = Game::getAssetManager().getSpriteBounds("switch", this->isOn ? "on": "off");
+    const sf::IntRect &bounds = Game::getAssetManager()->getSpriteBounds("switch", this->isOn ? "on": "off");
     std::dynamic_pointer_cast<PrimitiveSprite>(drawable)->setTextureRect(bounds);
 }
 

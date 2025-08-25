@@ -12,10 +12,10 @@
 Background::Background(size_t islands, size_t clouds, float additional_distance)
     : GameObject("background")
 {
-    const AssetManager &assetManager = Game::getAssetManager();
-    const sf::Texture &texture = assetManager.getTexture("background");
+    auto &assetManager = Game::getAssetManager();
+    const sf::Texture &texture = assetManager->getTexture("background");
     sf::Vector2u tSize = texture.getSize();
-    const sf::Vector2f &cSize = Game::getObjectManager().getView().getSize();
+    const sf::Vector2f &cSize = Game::getObjectManager()->getView().getSize();
     drawable = std::make_shared<PrimitiveSprite>(texture, sf::IntRect(0, 0, cSize.x, tSize.y));
     this->setScale(1, cSize.y / tSize.y);
     this->setOrigin(cSize.x / 2, tSize.y / 2);

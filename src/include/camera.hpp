@@ -9,8 +9,10 @@ public:
     virtual ~Camera() = default;
 
     inline std::shared_ptr<GameObject> getFollowObject() const { return followObject; }
-    void setFollowObject(std::shared_ptr<GameObject> followObject);
+    inline void setFollowObject(std::shared_ptr<GameObject> followObject) { this->followObject = followObject; }
     inline const sf::View &getView() const { return view; }
+    void setZoom(float factor);
+    inline float getZoom() const { return zoom; }
 
 protected:
     virtual void update() override;
@@ -18,4 +20,5 @@ protected:
 
     std::shared_ptr<GameObject> followObject;
     sf::View view;
+    float zoom = 1.0f;
 };

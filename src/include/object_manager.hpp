@@ -21,15 +21,19 @@ public:
     inline std::shared_ptr<Camera> getCamera() const { return camera; }
     inline std::shared_ptr<Player> getPlayer() const { return player; }
 
-private:
+protected:
     void loadObject(std::shared_ptr<GameObject> obj, const nlohmann::json &data);
-    void load(const std::string &path);
-    void save(const std::string &path);
     void clear();
 
-    void updateAll();
-    void collideAll();
-    void drawAll(sf::RenderTarget &target);
+    virtual void load(const std::string &path);
+
+    virtual void handleEvent(const sf::Event &event) {};
+
+    virtual void updateAll();
+    virtual void collideAll();
+    virtual void drawAll(sf::RenderTarget &target);
+
+    virtual std::shared_ptr<GameObject> createObjectOfType(const std::string &type, const nlohmann::json &config);
 
     bool loaded = false;
     const sf::View defaultView;

@@ -8,7 +8,7 @@ Spikes::Spikes(size_t count)
     : GameObject("spikes")
 {
     auto &am = Game::getAssetManager();
-    const auto &texture = am.getTexture("spikes");
+    const auto &texture = am->getTexture("spikes");
     const auto tSize = texture.getSize();
     const sf::Vector2f size = {(float)tSize.x * count, (float)tSize.y};
     this->drawable = std::make_shared<PrimitiveSprite>(texture, sf::IntRect(0, 0, size.x, size.y));

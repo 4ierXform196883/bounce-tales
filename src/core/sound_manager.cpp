@@ -28,7 +28,7 @@ void SoundManager::setMusic(const std::string &name, float volume)
 
 void SoundManager::playSound(const std::string &name, float volume)
 {
-    this->sound->setBuffer(Game::getAssetManager().getSoundBuffer(name));
+    this->sound->setBuffer(Game::getAssetManager()->getSoundBuffer(name));
     this->sound->setVolume(volume);
     this->sound->play();
 }
@@ -42,7 +42,7 @@ void SoundManager::init()
 void SoundManager::switchMusic(const std::string &name, float volume)
 {
     music->stop();
-    music->openFromFile(Game::getSettings().music_path + "/" + name + ".ogg");
+    music->openFromFile(Game::getSettings()->music_path + "/" + name + ".ogg");
     music->setLoop(true);
     music->setVolume(0);
     music->play();

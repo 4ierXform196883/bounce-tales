@@ -20,7 +20,7 @@ public:
 
     void setSkin(Skin skin);
 
-        void onDeath();
+    void onDeath();
     void onWin();
 
     float control_force = 0.1;

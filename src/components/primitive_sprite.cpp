@@ -52,7 +52,7 @@ void PrimitiveSprite::setColor(const sf::Color &color)
     verts[3].color = color;
 }
 
-sf::Color PrimitiveSprite::getColor() const
+const sf::Color &PrimitiveSprite::getColor() const
 {
     return verts[0].color;
 }

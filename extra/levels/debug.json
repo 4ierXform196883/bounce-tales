@@ -135,15 +135,13 @@
             "scale": [ 0.2, 0.2 ]
         },
         {
-            "type": "player_set_skin",
-            "skin": "normal",
+            "type": "player_set_skin:normal",
             "texture": "ground_2",
             "pos": [ 105, 9 ],
             "scale": [ 5.55, 0.7 ]
         },
         {
-            "type": "player_set_skin",
-            "skin": "heavy",
+            "type": "player_set_skin:heavy",
             "size": [ 107, 13 ],
             "pos": [ 26, 154 ]
         }

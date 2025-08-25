@@ -3,17 +3,22 @@
 #include "game.hpp"
 #include "randomizer.hpp"
 #include "particle.hpp"
+#include "primitive_rectangle.hpp"
 
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
 Wind::Wind(const sf::Vector2f &size, const sf::Vector2f &direction)
     : GameObject("wind"), size(size), direction(direction)
 {
+    if (Game::isEditorMode())
+    {
+        this->drawable = std::make_shared<PrimitiveRectangle>(size, sf::Color(255, 255, 255, 0), 1.0f, sf::Color::Red);
+    }
     this->collidable = std::make_shared<Collidable>(ConvexHitbox{{{0, 0}, {size.x, 0}, size, {0, size.y}}}, 0, true);
     this->setOrigin(size.x / 2.f, size.y / 2.f);
     this->particleTimer = Timer::create(0.33, [this]()
                                         {
-        const AssetManager& am = Game::getAssetManager();
+        const auto& am = Game::getAssetManager();
         std::string particleNames[] = {"wind_hor_0", "wind_hor_1", "wind_hor_2", "wind_ver_0", "wind_ver_1", "wind_ver_2"};
         std::string pName;
         if (abs(this->direction.x) > abs(this->direction.y))

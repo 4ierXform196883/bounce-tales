@@ -11,7 +11,7 @@ Door::Door(const std::string &tag, const sf::Vector2f &startPos, float elevation
     : GameObject(tag), startPos(startPos), elevation(elevation)
 {
     auto &am = Game::getAssetManager();
-    const auto &texture = am.getTexture("door");
+    const auto &texture = am->getTexture("door");
     const auto tSize = texture.getSize();
     this->drawable = std::make_shared<PrimitiveSprite>(texture);
     this->collidable = std::make_shared<Collidable>(ConvexHitbox{{{4, 1}, {30, 1}, {33, 135}, {1, 135}}}, 0);

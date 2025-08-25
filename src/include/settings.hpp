@@ -18,6 +18,7 @@ public:
     const std::string textures_path = "assets/textures";
     const std::string sounds_path = "assets/sounds";
     const std::string music_path = "assets/music";
+    const std::string levels_path = "levels";
     const sf::Vector2f camera_size = {640, 360};
 
     void set(const std::string &section, const std::string &key, const std::string &value);

@@ -9,8 +9,8 @@
 Player::Player(const sf::Vector2f &spawnPos, float control_force)
     : GameObject("player"), spawnPos(spawnPos), control_force(control_force)
 {
-    const AssetManager &assetManager = Game::getAssetManager();
-    const sf::Texture &texture = assetManager.getTexture("redy");
+    auto &assetManager = Game::getAssetManager();
+    const sf::Texture &texture = assetManager->getTexture("redy");
     sf::Vector2u tSize = texture.getSize();
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin(tSize.x / 2, tSize.y / 2);
@@ -37,15 +37,15 @@ void Player::setSkin(Skin skin)
     default:
     case NORMAL:
         this->setRotation(0);
-        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager().getTexture("redy"));
+        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager()->getTexture("redy"));
         this->setMass(10);
         break;
     case HEAVY:
-        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager().getTexture("redy_heavy"));
+        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager()->getTexture("redy_heavy"));
         this->setMass(20);
         break;
     case LIGHT:
-        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager().getTexture("redy_light"));
+        std::dynamic_pointer_cast<PrimitiveSprite>(this->drawable)->setTexture(Game::getAssetManager()->getTexture("redy_light"));
         this->setMass(5);
         break;
     }
@@ -53,7 +53,7 @@ void Player::setSkin(Skin skin)
 
 void Player::onDeath()
 {
-    auto followObject = Game::getObjectManager().getCamera()->getFollowObject();
+    auto followObject = Game::getObjectManager()->getCamera()->getFollowObject();
     float control_force = this->control_force;
     respawnTimer = Timer::create(3, [this, followObject, control_force]()
                                  {
@@ -63,18 +63,18 @@ void Player::onDeath()
         this->setPosition(spawnPos);
         this->children.at("eyes_death")->setHidden(true);
         this->respawnTimer = nullptr;
-        Game::getObjectManager().getCamera()->setFollowObject(followObject);
-        float volume = (float)Game::getSettings().getDouble("Volume", "music", 50);
-        Game::getSoundManager().setMusic(Game::getSoundManager().getMusicName(), volume); }, false);
+        Game::getObjectManager()->getCamera()->setFollowObject(followObject);
+        float volume = (float)Game::getSettings()->getDouble("Volume", "music", 50);
+        Game::getSoundManager()->setMusic(Game::getSoundManager()->getMusicName(), volume); }, false);
     this->setRotation(0);
     this->physical->speed = {0.f, 0.f};
     this->addForce({0, -5});
     this->collidable->trigger = true;
     this->control_force = 0;
     this->children.at("eyes_death")->setHidden(false);
-    Game::getSoundManager().playSound("death", Game::getSettings().getDouble("Volume", "sounds", 100));
-    Game::getObjectManager().getCamera()->setFollowObject(nullptr);
-    Game::getSoundManager().stopMusic();
+    Game::getSoundManager()->playSound("death", Game::getSettings()->getDouble("Volume", "sounds", 100));
+    Game::getObjectManager()->getCamera()->setFollowObject(nullptr);
+    Game::getSoundManager()->stopMusic();
 }
 
 void Player::onWin()
@@ -89,9 +89,9 @@ void Player::onWin()
     this->physical->speed = {0.f, 0.f};
     this->control_force = 0;
     this->children.at("eyes_win")->setHidden(false);
-    Game::getSoundManager().playSound("win", Game::getSettings().getDouble("Volume", "sounds", 100));
-    Game::getObjectManager().getCamera()->setFollowObject(nullptr);
-    Game::getSoundManager().stopMusic();
+    Game::getSoundManager()->playSound("win", Game::getSettings()->getDouble("Volume", "sounds", 100));
+    Game::getObjectManager()->getCamera()->setFollowObject(nullptr);
+    Game::getSoundManager()->stopMusic();
     Particle::spawnScatter("particles", "conf_red", 10, this->getPosition(), 1, {5.f, 5.f}, 10);
     Particle::spawnScatter("particles", "conf_blue", 10, this->getPosition(), 2, {15.f, 15.f}, 10);
     Particle::spawnScatter("particles", "star", 10, this->getPosition(), 0.5, {10.f, 10.f}, 10);
