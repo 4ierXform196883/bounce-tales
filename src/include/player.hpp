@@ -29,6 +29,8 @@ protected:
     virtual void update() override;
     virtual void onCollision(std::shared_ptr<GameObject> other) override;
 
+    void saveNewRecord(float time, int eggs);
+
     sf::Vector2f spawnPos;
     float spawnTime;
     std::shared_ptr<Timer> respawnTimer;

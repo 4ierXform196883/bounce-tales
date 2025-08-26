@@ -44,36 +44,30 @@ void Game::reinitWindow(const sf::Vector2i &resolution, bool fullscreen)
 void Game::loadLevel(const std::string &name, bool editorMode)
 {
     objectManager->clear();
+    objectManager.reset();
     stats->reset();
     stats->currentLevelName = name;
+    if (Game::editorMode)
+        stats->loadTotalEggs();
     Game::editorMode = editorMode;
     if (name == "menu")
+    {
         guiManager->setUI(GuiManager::UI::MENU);
+        objectManager = std::make_unique<ObjectManager>();
+    }
+    else if (editorMode)
+    {
+        objectManager = std::make_unique<Editor>();
+        guiManager->setUI(GuiManager::UI::EDITOR);
+    }
     else
     {
-        if (editorMode)
-        {
-            objectManager = std::make_unique<Editor>();
-            guiManager->setUI(GuiManager::UI::EDITOR);
-        }
-        else
-        {
-            objectManager = std::make_unique<ObjectManager>();
-            guiManager->setUI(GuiManager::UI::LEVEL);
-        }
+        objectManager = std::make_unique<ObjectManager>();
+        guiManager->setUI(GuiManager::UI::LEVEL);
     }
+
     objectManager->load("levels/" + name + ".json");
     guiManager->gui->setTextSize(20 * settings->getInt("Screen", "width", 1280) / 1280.f);
-}
-
-void Game::saveStats()
-{
-    float newTime = Game::getClock().getElapsedTime().asSeconds() - stats->currentStartTime;
-    float bestTime = stats->get(stats->currentLevelName, "best_time");
-    int bestEggs = stats->get(stats->currentLevelName, "best_eggs");
-    stats->set(stats->currentLevelName, "best_time", newTime < bestTime || bestTime == 0 ? newTime : bestTime);
-    stats->set(stats->currentLevelName, "best_eggs", stats->currentEggs > bestEggs ? stats->currentEggs : bestEggs);
-    stats->set(stats->currentLevelName, "total_eggs", stats->currentTotalEggs);
 }
 
 void Game::init()
@@ -103,8 +97,8 @@ void Game::init()
 
 void Game::close()
 {
-    std::cout << "Closing game...\n";
     Timer::globalTimers.clear();
+    objectManager->clear();
     assetManager->unloadTextures();
     assetManager->unloadSounds();
     settings->save(settings->settings_path);
@@ -112,7 +106,7 @@ void Game::close()
     soundManager->stopMusic();
     guiManager->gui->removeAllWidgets();
     guiManager->groups.clear();
-    objectManager->clear();
+    guiManager->gui.release();
     window->close();
 }
 

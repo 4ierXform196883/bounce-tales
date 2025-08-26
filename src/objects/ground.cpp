@@ -17,7 +17,7 @@ Ground::Ground(const std::vector<sf::Vector2f> &verts, const std::string &textur
     std::vector<sf::Vector2f> evaluatedVerts;
     if (bezierVerts)
     {
-        Spline bezierSpline(verts, true);
+        Spline bezierSpline(verts);
         for (size_t i = 0; i < bezierSpline.getSplineCount(); ++i)
         {
             float xDelta = bezierSpline.getPoint((i + 1) * 3).x - bezierSpline.getPoint(i * 3).x;

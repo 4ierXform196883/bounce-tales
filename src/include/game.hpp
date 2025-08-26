@@ -31,7 +31,6 @@ public:
 
     static void reinitWindow(const sf::Vector2i &resolution, bool fullscreen);
     static void loadLevel(const std::string &name, bool editorMode = false);
-    static void saveStats();
     static void close();
 
     static bool paused;

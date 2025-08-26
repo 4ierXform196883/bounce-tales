@@ -8,12 +8,14 @@ class Spline : public Drawable, public sf::Transformable
 {
 public:
     Spline() = default;
-    Spline(const std::vector<sf::Vector2f> &controlPoints, bool finished);
+    Spline(const std::vector<sf::Vector2f> &controlPoints);
     ~Spline() = default;
 
     // Добавить точку: только главную (P0 и P3)
     // доп точки добавляются автоматически ради C1 непрерывности
     void addControlPoint(const sf::Vector2f &point);
+    void insertControlPoint(int nearIndex, const sf::Vector2f &point);
+    int removeControlPoint(int mainIndex);
 
     // Передвинуть точку
     void movePoint(int index, const sf::Vector2f &delta);

@@ -6,6 +6,7 @@ Button.button_respawn {
 
     Renderer {
         BackgroundColor = #00000010;
+        BackgroundColorDisabled = #00000050;
         BackgroundColorDown = #00000010;
         BackgroundColorDownFocused = #00000010;
         BackgroundColorDownHover = #00000010;

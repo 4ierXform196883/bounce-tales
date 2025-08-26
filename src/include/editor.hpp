@@ -34,6 +34,7 @@ protected:
         sf::Vector2f prevLeftPos;
         sf::Vector2f prevMiddlePos;
         bool prevLeftPressed = false;
+        bool prevRightPressed = false;
     };
 
     virtual void updateAll() override;
@@ -50,6 +51,7 @@ protected:
     void onLeftDown();
     void onLeftUp();
     void onLeftDrag();
+    void onRightDown();
     void onMiddleDrag();
     void handleKeyboard();
 
@@ -57,6 +59,8 @@ protected:
     nlohmann::json &getConfigForObject(const std::shared_ptr<GameObject> &object);
     const std::string &getObjectType(const std::shared_ptr<GameObject> &object);
     const nlohmann::json &getTemplateConfigForObjectType(const std::string &type);
+
+    void updateGroundShape();
 
     Selection selection;
     MouseState mouseState;

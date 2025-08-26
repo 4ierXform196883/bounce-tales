@@ -33,7 +33,6 @@ std::function<void(std::shared_ptr<GameObject> other)> TriggerObject::getCallbac
             this->alive = false;
             Game::getStats()->currentEggs += 1;
         };
-        Game::getStats()->currentTotalEggs += 1;
     }
     // player_set_skin:heavy, player_set_skin:light, player_set_skin:normal
     else if (callbackType.substr(0, 15) == "player_set_skin")

@@ -1,8 +1,8 @@
 #include "spline.hpp"
 #include <iostream>
 
-Spline::Spline(const std::vector<sf::Vector2f> &controlPoints, bool finished)
-    : controlPoints(controlPoints), finished(finished)
+Spline::Spline(const std::vector<sf::Vector2f> &controlPoints)
+    : controlPoints(controlPoints)
 {
     if (controlPoints.empty())
         return;
@@ -16,7 +16,9 @@ Spline::Spline(const std::vector<sf::Vector2f> &controlPoints, bool finished)
 
     auto &prelast = controlPoints[controlPoints.size() - 2];
     if (controlPoints.size() % 3 == 1 && first == last)
+    {
         this->finished = true;
+    }
     else if (controlPoints.size() % 3 == 1)
     {
         sf::Vector2f delta = last - prelast;
@@ -40,10 +42,50 @@ void Spline::addControlPoint(const sf::Vector2f &point)
     {
         auto &last = controlPoints.back();
         sf::Vector2f delta = point - last;
-        controlPoints.push_back(last + delta / 3.f);
+        controlPoints.push_back(point - delta / 3.f);
         controlPoints.push_back(point);
         controlPoints.push_back(point + delta / 3.f);
     }
+}
+
+void Spline::insertControlPoint(int nearIndex, const sf::Vector2f &point)
+{
+    if (!finished || controlPoints.size() < 4)
+        return;
+    // Найдём ближайшую главную точку
+    int mainIndex = nearIndex - (nearIndex % 3);
+    // if можно и по короче но так понятнее: не берем последнюю точку
+    if (finished && mainIndex == controlPoints.size() - 1 /*|| !finished && mainIndex == controlPoints.size() - 2*/)
+        mainIndex -= 3;
+    // Итого ставим после ближайшей (сзади) главной точки (но не последней)
+    // Наверное установим точку параллельно отрезку нужного сплайна
+    sf::Vector2f cpDelta = controlPoints[mainIndex + 3] - controlPoints[mainIndex];
+    sf::Vector2f newP0 = point;
+    sf::Vector2f newP1 = point - cpDelta / 3.f;
+    sf::Vector2f newP2 = point + cpDelta / 3.f;
+
+    controlPoints.insert(controlPoints.begin() + mainIndex + 2, newP2);
+    controlPoints.insert(controlPoints.begin() + mainIndex + 2, newP0);
+    controlPoints.insert(controlPoints.begin() + mainIndex + 2, newP1);
+}
+
+int Spline::removeControlPoint(int mainIndex)
+{
+    if (mainIndex % 3 != 0)
+        return 0;
+    if (finished && (mainIndex == 0 || mainIndex == controlPoints.size() - 1))
+        return 0;
+    if (mainIndex == 0)
+    {
+        controlPoints.erase(controlPoints.begin(), controlPoints.begin() + 3);
+        return 3;
+    }
+    else
+    {
+        controlPoints.erase(controlPoints.begin() + mainIndex - 1, controlPoints.begin() + mainIndex + 2);
+        return 3;
+    }
+    return 0;
 }
 
 void Spline::movePoint(int index, const sf::Vector2f &delta)
@@ -99,10 +141,9 @@ void Spline::movePoint(int index, const sf::Vector2f &delta)
 
 void Spline::setFinished(bool finished)
 {
-    if (controlPoints.size() <= 2)
+    if (controlPoints.size() <= 2 || finished == this->finished)
         return;
-    this->finished = finished;
-    if (!finished)
+    if (!this->finished)
     {
         sf::Vector2f delta = controlPoints[0] - controlPoints[1];
         controlPoints.push_back(controlPoints[0] + delta);
@@ -113,6 +154,7 @@ void Spline::setFinished(bool finished)
         controlPoints.pop_back();
         controlPoints.pop_back();
     }
+    this->finished = finished;
 }
 
 sf::Vector2f Spline::evaluate(int i, float t) const
@@ -171,7 +213,9 @@ sf::FloatRect Spline::getLocalBounds() const
 
 void Spline::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
+    // std::cout << "Drawing spline with " << getPointCount() << " points, finished: " << finished << ", spline count: " << getSplineCount() << "\n";
     sf::VertexArray splineDrawable(sf::PrimitiveType::LineStrip);
+    sf::CircleShape circle(3);
     states.transform *= getTransform();
     for (size_t i = 0; i < getSplineCount(); ++i)
     {
@@ -183,7 +227,7 @@ void Spline::draw(sf::RenderTarget &target, sf::RenderStates states) const
         }
         target.draw(splineDrawable, states);
         // Рисуем контрольные точки
-        sf::CircleShape circle(3);
+        circle.setRadius(3);
         circle.setOrigin(3, 3);
         circle.setFillColor(sf::Color::Red);
         circle.setPosition(controlPoints[i * 3]);
@@ -194,6 +238,20 @@ void Spline::draw(sf::RenderTarget &target, sf::RenderStates states) const
         circle.setPosition(controlPoints[i * 3 + 1]);
         target.draw(circle, states);
         circle.setPosition(controlPoints[i * 3 + 2]);
+        target.draw(circle, states);
+    }
+    if (!finished)
+    {
+        size_t i = getPointCount();
+        circle.setRadius(3);
+        circle.setOrigin(3, 3);
+        circle.setFillColor(sf::Color::Red);
+        circle.setPosition(controlPoints[i - 2]);
+        target.draw(circle, states);
+        circle.setRadius(2);
+        circle.setOrigin(2, 2);
+        circle.setFillColor(sf::Color::Blue);
+        circle.setPosition(controlPoints[i - 1]);
         target.draw(circle, states);
     }
 }

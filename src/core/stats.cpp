@@ -27,7 +27,7 @@ std::string Stats::getAsString(const std::string &level, const std::string &stat
         seconds = seconds.size() == 1 ? "0" + seconds : seconds;
         return minutes + ":" + seconds;
     }
-        
+
     else if (stat == "best_eggs" || stat == "total_eggs")
     {
         std::string bestEggs = std::to_string(this->get(level, "best_eggs"));
@@ -37,8 +37,33 @@ std::string Stats::getAsString(const std::string &level, const std::string &stat
     return "";
 }
 
+void Stats::loadTotalEggs()
+{
+    for (auto &entry : fs::directory_iterator(Game::getSettings()->levels_path))
+    {
+        if (!entry.is_regular_file() || entry.path().extension().generic_string() != ".json")
+            return;
+
+        std::ifstream file(entry.path().generic_string());
+        if (!file.is_open())
+        {
+            std::cerr << "[ERROR] (Stats::load) Couldn't open level file\n";
+            return;
+        }
+        nlohmann::json levelData;
+        file >> levelData;
+        file.close();
+        if (!levelData.contains("triggers"))
+            return;
+        int eggCount = std::count_if(levelData.at("triggers").begin(), levelData.at("triggers").end(), [](const nlohmann::json &item)
+                                     { return item.contains("type") && item["type"] == "egg"; });
+        data[entry.path().stem().generic_string()]["total_eggs"] = eggCount;
+    }
+}
+
 void Stats::load(const std::string &path)
 {
+    loadTotalEggs();
     std::ifstream file(path);
     if (!file.is_open())
     {
@@ -64,7 +89,6 @@ void Stats::save(const std::string &path)
 void Stats::reset()
 {
     currentEggs = 0;
-    currentTotalEggs = 0;
     currentStartTime = Game::getClock().getElapsedTime().asSeconds();
     currentLevelName = "menu";
 }

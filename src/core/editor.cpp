@@ -49,7 +49,6 @@ const nlohmann::json triggerWinConfigTemplate = {
 
 const nlohmann::json triggerEggConfigTemplate = {
     {"type", "egg"},
-    {"size", {50.0f, 50.0f}},
     {"texture", "egg"}};
 
 const nlohmann::json triggerSkinLightConfigTemplate = {
@@ -127,8 +126,8 @@ void Editor::load(const std::string &path)
     file >> data;
     file.close();
 
-    if (data.contains("level_name"))
-        levelName = data["level_name"];
+    if (data.contains("display_name"))
+        levelName = data["display_name"];
     levelPath = path;
 
     std::shared_ptr<GameObject> ptr;
@@ -269,9 +268,6 @@ void Editor::save(const std::string &path)
 
     data["music"] = Game::getSoundManager()->getMusicName();
     data["display_name"] = levelName;
-    data["stats"] = {
-        {"best_time", 0},
-        {"best_eggs", 0}};
 
     for (size_t i = 0; i < drawable.size(); ++i)
     {
@@ -333,6 +329,17 @@ void Editor::drawAll(sf::RenderTarget &target)
     target.draw(selection.visualRect);
     if (selection.selectedGroundSpline)
         target.draw(*selection.selectedGroundSpline);
+    if (selection.selectedSplinePoint != -1 && selection.selectedGroundSpline)
+    {
+        int size = selection.selectedSplinePoint % 3 == 0 ? 3 : 2;
+        sf::CircleShape circle(size);
+        circle.setOrigin(size, size);
+        circle.setFillColor(sf::Color::Green);
+        sf::Vector2f pos = selection.selectedGroundSpline->getPoint(selection.selectedSplinePoint);
+        pos += selection.selectedGroundSpline->getPosition();
+        circle.setPosition(pos);
+        target.draw(circle);
+    }
     if (newObject)
         GameObject::draw(newObject, target);
 }
@@ -393,6 +400,12 @@ void Editor::handleEvent(const sf::Event &event)
 
 void Editor::handleInput()
 {
+    // std::cout << "objs: " << selection.selectedObjects.size();
+    // std::cout << "; sel size: " << selection.visualRect.getSize().x << " " << selection.visualRect.getSize().y;
+    // std::cout << "; sel type: " << selection.selectedObjectType;
+    // std::cout << "; sel object: " << selection.selectedObject;
+    // std::cout << "; sel spline: " << selection.selectedGroundSpline;
+    // std::cout << "; sel point: " << selection.selectedSplinePoint << "\n";
     if (newObject)
         newObject->setPosition(Game::getMousePos());
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !mouseState.prevLeftPressed)
@@ -401,9 +414,12 @@ void Editor::handleInput()
         onLeftDrag();
     else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && mouseState.prevLeftPressed)
         onLeftUp();
+    else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && !mouseState.prevRightPressed)
+        onRightDown();
     else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Middle))
         onMiddleDrag();
     mouseState.prevLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    mouseState.prevRightPressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
     mouseState.prevMiddlePos = Game::getLocalMousePos();
     mouseState.prevLeftPos = Game::getMousePos();
     // std::cout << "Selected objects: " << selection.selectedObjects.size() << "\n";
@@ -415,15 +431,23 @@ void Editor::onLeftDown()
     {
         if (!newObject)
             return;
+        
+        std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
+        if (realType == "player" && player)
+            return;
+        else if (!player)
+            player = std::dynamic_pointer_cast<Player>(newObject);
         drawable.push_back(newObject);
-        configs.emplace_back(newObjectType, getTemplateConfigForObjectType(newObjectType));
-        newObject->setColor(sf::Color(255, 255, 255, 255));
-        auto config = getConfigForObject(newObject);
-        std::string key = (newObjectType == "player" ? "spawn_pos" : (newObjectType == "door" ? "start_pos" : "pos"));
+        configs.emplace_back(realType, getTemplateConfigForObjectType(newObjectType));
+        sf::Color oc = newObject->getColor();
+        newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a * 4));
+        auto& config = getConfigForObject(newObject);
+        std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
         config[key] = {newObject->getPosition().x, newObject->getPosition().y};
-        newObject = createObjectOfType(newObjectType, getTemplateConfigForObjectType(newObjectType));
+        newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
         newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
-        newObject->setColor(sf::Color(255, 255, 255, 100));
+        oc = newObject->getColor();
+        newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
         return;
     }
     mouseState.leftDownPos = Game::getMousePos();
@@ -433,7 +457,7 @@ void Editor::onLeftDown()
     // std::cout << (clickedObject ? getObjectType(clickedObject) : "null") << " " << clickedPoint << " " << selection.selectedObjects.size() << "\n";
 
     // Нажатие на точку сплайна (дальше случаи можно не рассматривать)
-    if (clickedPoint != -1)
+    if (selection.selectedGroundSpline && clickedPoint != -1)
     {
         // selectedObject не меняем так как существование спалайна => выделен Ground
         // по сути сплайн это инструмент для редактирования Ground
@@ -441,6 +465,17 @@ void Editor::onLeftDown()
         selection.selectedSplinePoint = clickedPoint;
         return;
     }
+    // Нажатие куда либо, но существует незаконченный сплайн
+    if (selection.selectedGroundSpline && !selection.selectedGroundSpline->isFinished())
+    {
+        sf::Vector2f pos = Game::getMousePos() - selection.selectedObject->getPosition() + selection.selectedObject->getOrigin();
+        selection.selectedGroundSpline->addControlPoint(pos);
+        selection.selectedSplinePoint = selection.selectedGroundSpline->getPointCount() - 2;
+        // selection.selectedSplinePoint = -1;
+        return;
+    }
+
+    // Без сплайна
 
     // Нажатие в пустоту
     if (!clickedObject)
@@ -449,6 +484,8 @@ void Editor::onLeftDown()
         selection.selectedObject = nullptr;
         selection.selectedObjects.clear();
         selection.visualRect.setPosition(mouseState.leftDownPos);
+        if (selection.selectedGroundSpline)
+            selection.selectedGroundSpline->setFinished(true);
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
         return;
@@ -459,6 +496,8 @@ void Editor::onLeftDown()
     // Нажатие с Ctrl'ом
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
     {
+        if (selection.selectedGroundSpline)
+            selection.selectedGroundSpline->setFinished(true);
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
         auto it = std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), clickedObject);
@@ -475,10 +514,12 @@ void Editor::onLeftDown()
         selection.selectedObjects.push_back(clickedObject);
         selection.selectedObjectType = getObjectType(clickedObject);
         selection.selectedObject = clickedObject;
+        if (selection.selectedGroundSpline)
+            selection.selectedGroundSpline->setFinished(true);
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
         auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject);
-        auto config = getConfigForObject(clickedObject);
+        auto& config = getConfigForObject(clickedObject);
         // Проверка - может, нажали на Ground?
         if (ptr && config.contains("bezierVerts") && config["bezierVerts"].get<bool>())
         {
@@ -487,11 +528,15 @@ void Editor::onLeftDown()
 
             for (const auto &point : config["verts"])
                 verts.emplace_back(sf::Vector2f(point[0], point[1]));
-            selection.selectedGroundSpline = std::make_shared<Spline>(verts, true);
+            selection.selectedGroundSpline = std::make_shared<Spline>(verts);
             selection.selectedGroundSpline->setPosition(clickedObject->getPosition());
         }
     }
-    // То есть нажатие по уже выделенному объекту без Ctrl ничего не делает
+    // Нажатие по уже выделенному объекту
+    else if (auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject) && selection.selectedGroundSpline)
+    {
+        selection.selectedSplinePoint = -1;
+    }
 }
 
 void Editor::onLeftDrag()
@@ -543,20 +588,9 @@ void Editor::onLeftUp()
     {
         // Двигали точку - меняли Ground
         auto ptr = std::dynamic_pointer_cast<Ground>(selection.selectedObject);
-        if (ptr && selection.selectedGroundSpline && selection.selectedSplinePoint != -1)
+        if (ptr && selection.selectedGroundSpline && selection.selectedGroundSpline->isFinished() && selection.selectedSplinePoint != -1)
         {
-            std::cout << "Updating ground config\n";
-            auto &config = getConfigForObject(selection.selectedObject);
-            config["verts"].clear();
-            for (size_t i = 0; i < selection.selectedGroundSpline->getPointCount(); ++i)
-            {
-                const auto &point = selection.selectedGroundSpline->getPoint(i);
-                config["verts"].push_back({point.x, point.y});
-            }
-            // replace Ground object in drawable with new one
-            int index = std::distance(drawable.begin(), std::find(drawable.begin(), drawable.end(), selection.selectedObject));
-            selection.selectedObject = createObjectOfType("ground", config);
-            drawable.at(index) = selection.selectedObject;
+            updateGroundShape();
             return;
         }
         for (auto &obj : selection.selectedObjects)
@@ -602,6 +636,24 @@ void Editor::onLeftUp()
     }
 }
 
+void Editor::onRightDown()
+{
+    auto clickedPoint = getClickedPoint();
+    std::cout << clickedPoint << "\n";
+    if (clickedPoint != -1 && selection.selectedGroundSpline)
+    {
+        int removedPoints = selection.selectedGroundSpline->removeControlPoint(clickedPoint);
+        if (selection.selectedGroundSpline->isFinished())
+            updateGroundShape();
+        if (abs(selection.selectedSplinePoint - clickedPoint) <= 1)
+            selection.selectedSplinePoint = -1;
+        else if (!selection.selectedGroundSpline->isFinished() && clickedPoint == 0 && selection.selectedSplinePoint <= 2)
+            selection.selectedSplinePoint = -1;
+        else if (selection.selectedSplinePoint > clickedPoint)
+            selection.selectedSplinePoint -= removedPoints;
+    }
+}
+
 void Editor::onMiddleDrag()
 {
     sf::Vector2f delta = Game::getLocalMousePos() - mouseState.prevMiddlePos;
@@ -626,9 +678,9 @@ void Editor::onMouseScroll(float delta)
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
         std::cout << "New object type: " << newObjectType << "\n";
-        std::cout << newObject << "\n";
         newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
-        newObject->setColor(sf::Color(255, 255, 255, 100));
+        sf::Color oc = newObject->getColor();
+        newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
     }
 }
 
@@ -642,9 +694,11 @@ void Editor::handleKeyboard()
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
     {
         mode = Create;
-        newObject = createObjectOfType(newObjectType, getTemplateConfigForObjectType(newObjectType));
+        std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
+        newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
         newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
-        newObject->setColor(sf::Color(255, 255, 255, 100));
+        sf::Color oc = newObject->getColor();
+        newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && selection.selectedObjects.size() > 0)
     {
@@ -653,6 +707,8 @@ void Editor::handleKeyboard()
             auto it = std::find(drawable.begin(), drawable.end(), obj);
             if (it != drawable.end())
             {
+                if ((*it) == player)
+                    player = nullptr;
                 size_t index = std::distance(drawable.begin(), it);
                 drawable.erase(it);
                 configs.erase(configs.begin() + index);
@@ -666,10 +722,18 @@ void Editor::handleKeyboard()
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && selection.selectedObjects.size() > 0)
     {
+        if (selection.selectedGroundSpline && selection.selectedSplinePoint != -1)
+        {
+            sf::Vector2f pos = Game::getMousePos() - selection.selectedGroundSpline->getPosition();
+            pos += selection.selectedGroundSpline->getOrigin();
+            selection.selectedGroundSpline->insertControlPoint(selection.selectedSplinePoint, pos);
+            updateGroundShape();
+            return;
+        }
         std::vector<std::shared_ptr<GameObject>> newSelectedObjects;
         for (auto &obj : selection.selectedObjects)
         {
-            auto config = getConfigForObject(obj);
+            auto& config = getConfigForObject(obj);
             std::string objType = getObjectType(obj);
             std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
             config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
@@ -688,6 +752,19 @@ void Editor::handleKeyboard()
     {
         this->save(levelPath);
         std::cout << "Level saved to " << levelPath << "\n";
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && selection.selectedGroundSpline)
+    {
+        bool newFinished = !selection.selectedGroundSpline->isFinished();
+        selection.selectedGroundSpline->setFinished(newFinished);
+        if (newFinished == true)
+        {
+            updateGroundShape();
+        }
+        else
+        {
+            selection.selectedSplinePoint = selection.selectedGroundSpline->getPointCount() - 2;
+        }
     }
 }
 
@@ -781,6 +858,32 @@ const nlohmann::json &Editor::getTemplateConfigForObjectType(const std::string &
     else if (type == "background")
         return backgroundConfigTemplate;
     throw std::runtime_error("Unknown object type: " + type);
+}
+
+void Editor::updateGroundShape()
+{
+    if (!selection.selectedGroundSpline || !selection.selectedObject)
+    {
+        std::cout << "no spline or object\n";
+        return; 
+    }
+    bool actualFinished = selection.selectedGroundSpline->isFinished();
+    if (!actualFinished)
+        selection.selectedGroundSpline->setFinished(true);
+    auto &config = getConfigForObject(selection.selectedObject);
+    config["verts"].clear();
+    for (size_t i = 0; i < selection.selectedGroundSpline->getPointCount(); ++i)
+    {
+        const auto &point = selection.selectedGroundSpline->getPoint(i);
+        config["verts"].push_back({point.x, point.y});
+    }
+    selection.selectedGroundSpline->setFinished(actualFinished);
+    // replace Ground object in drawable with new one
+    int dIndex = std::distance(drawable.begin(), std::find(drawable.begin(), drawable.end(), selection.selectedObject));
+    int sIndex = std::distance(selection.selectedObjects.begin(), std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), selection.selectedObject));
+    selection.selectedObject = createObjectOfType("ground", config);
+    drawable.at(dIndex) = selection.selectedObject;
+    selection.selectedObjects.at(sIndex) = selection.selectedObject;
 }
 
 // ЛКМ по объекту - select

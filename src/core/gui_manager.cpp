@@ -9,9 +9,14 @@ void GuiManager::init()
 {
     for (auto &entry : fs::directory_iterator(Game::getSettings()->levels_path))
     {
-        if (entry.is_regular_file() && entry.path().stem().generic_string() != "menu")
+        if (entry.is_regular_file() && entry.path().extension().generic_string() == ".json" && entry.path().stem().generic_string() != "menu")
         {
             std::ifstream file(entry.path().generic_string());
+            if (!file.is_open())
+            {
+                std::cerr << "[ERROR] (GuiManager::init) Couldn't open level file\n";
+                return;
+            }
             nlohmann::json data;
             file >> data;
             file.close();
@@ -55,6 +60,13 @@ void GuiManager::connectMenuCallbacks()
         Game::loadLevel(levelPaths.at(currentLevel));
     };
     gui->get<tgui::Button>("button_play")->onPress(playCallback);
+
+    // Edit button
+    auto editCallback = [this]
+    {
+        Game::loadLevel(levelPaths.at(currentLevel), true);
+    };
+    gui->get<tgui::Button>("button_edit")->onPress(editCallback);
 
     // Settings button
     groups.emplace("settings", tgui::Group::create());
@@ -139,12 +151,12 @@ void GuiManager::connectLevelCallbacks()
 
 void GuiManager::connectEditorCallbacks()
 {
-    // Pause group
     groups.emplace("pause", tgui::Group::create());
     groups.at("pause")->loadWidgetsFromFile(pause_ui_path);
     groups.at("pause")->setVisible(false);
     gui->add(groups.at("pause"));
     connectPauseGroupCallbacks();
+    gui->get<tgui::Button>("button_respawn")->setEnabled(false);
 }
 
 void GuiManager::connectSettingsGroupCallbacks()

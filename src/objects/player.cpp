@@ -82,7 +82,8 @@ void Player::onWin()
     if (hasWon)
         return;
     this->hasWon = true;
-    Game::saveStats();
+    float newTime = Game::getClock().getElapsedTime().asSeconds() - Game::getStats()->currentStartTime;
+    saveNewRecord(newTime, Game::getStats()->currentEggs);
     reloadTimer = Timer::create(3, []()
                                 { Game::loadLevel("menu"); }, false);
     this->setRotation(0);
@@ -139,4 +140,13 @@ void Player::onCollision(std::shared_ptr<GameObject> other)
 {
     auto otherCol = std::dynamic_pointer_cast<ICollidable>(other);
     onGround = otherCol && !otherCol->isTrigger() || onGround;
+}
+
+void Player::saveNewRecord(float time, int eggs)
+{
+    const auto& stats = Game::getStats();
+    float bestTime = stats->get(stats->currentLevelName, "best_time");
+    int bestEggs = stats->get(stats->currentLevelName, "best_eggs");
+    stats->set(stats->currentLevelName, "best_time", time < bestTime || bestTime == 0 ? time : bestTime);
+    stats->set(stats->currentLevelName, "best_eggs", eggs > bestEggs ? eggs : bestEggs);
 }

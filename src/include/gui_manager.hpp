@@ -33,7 +33,7 @@ private:
     void connectSettingsGroupCallbacks();
     void connectPauseGroupCallbacks();
 
-    std::shared_ptr<tgui::Gui> gui;
+    std::unique_ptr<tgui::Gui> gui;
     size_t currentLevel = 0;
     std::vector<std::string> levelNames;
     std::vector<std::string> levelPaths;

@@ -13,10 +13,11 @@ public:
     std::string getAsString(const std::string &level, const std::string &stat) const;
     
     float currentStartTime;
-    int currentTotalEggs, currentEggs;
+    int currentEggs;
     std::string currentLevelName;
 
 private:
+    void loadTotalEggs();
     void load(const std::string &path);
     void save(const std::string &path);
     void reset();
