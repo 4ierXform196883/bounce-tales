@@ -43,6 +43,7 @@ void Game::reinitWindow(const sf::Vector2i &resolution, bool fullscreen)
 
 void Game::loadLevel(const std::string &name, bool editorMode)
 {
+    Timer::globalTimers.clear();
     objectManager->clear();
     objectManager.reset();
     stats->reset();
@@ -52,6 +53,7 @@ void Game::loadLevel(const std::string &name, bool editorMode)
     Game::editorMode = editorMode;
     if (name == "menu")
     {
+        guiManager->init();
         guiManager->setUI(GuiManager::UI::MENU);
         objectManager = std::make_unique<ObjectManager>();
     }

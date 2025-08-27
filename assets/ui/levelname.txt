@@ -1,0 +1,99 @@
+Button.button_confirm {
+    Position = (60%, 68%);
+    Size = (10%, 5%);
+    Text = Confirm;
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = white;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.button_cancel {
+    Position = (75%, 68%);
+    Size = (10%, 5%);
+    Text = Cancel;
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #00000010;
+        BackgroundColorDown = #00000010;
+        BackgroundColorDownFocused = #00000010;
+        BackgroundColorDownHover = #00000010;
+        BackgroundColorFocused = #00000010;
+        BackgroundColorHover = #80FF8040;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Font = "andy.otf";
+        TextColor = white;
+        TextColorDown = white;
+        TextColorDownFocused = white;
+        TextColorDownHover = white;
+        TextColorFocused = white;
+        TextColorHover = #80FF80;
+        TextOutlineColor = black;
+        TextOutlineThickness = 1;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+EditBox.editbox_level {
+    DefaultText = "Enter level name";
+    InputValidator = "^[A-Za-z0-9_ ]+$";
+    MaximumCharacters = 30;
+    Position = (60%, 61.25%);
+    Size = (25%, 5%);
+    TextSize = 20;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        CaretColor = black;
+        CaretWidth = 1;
+        DefaultTextColor = #A0A0A0;
+        Font = "andy.otf";
+        Padding = (0, 0, 0, 0);
+        SelectedTextBackgroundColor = #006EFF;
+        SelectedTextColor = white;
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        Texture = None;
+        TextureDisabled = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}

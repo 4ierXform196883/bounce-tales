@@ -6,6 +6,7 @@ Button.button_play {
 
     Renderer {
         BackgroundColor = #00000010;
+        BackgroundColorDisabled = #00000050;
         BackgroundColorDown = #00000010;
         BackgroundColorDownFocused = #00000010;
         BackgroundColorDownHover = #00000010;
@@ -70,6 +71,7 @@ Button.button_level_prev {
 
     Renderer {
         BackgroundColor = #00000010;
+        BackgroundColorDisabled = #00000050;
         BackgroundColorDown = #00000010;
         BackgroundColorDownFocused = #00000010;
         BackgroundColorDownHover = #00000010;
@@ -104,6 +106,7 @@ Button.button_level_next {
 
     Renderer {
         BackgroundColor = #00000010;
+        BackgroundColorDisabled = #00000050;
         BackgroundColorDown = #00000010;
         BackgroundColorDownFocused = #00000010;
         BackgroundColorDownHover = #00000010;

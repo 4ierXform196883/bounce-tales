@@ -21,7 +21,7 @@ void GuiManager::init()
             file >> data;
             file.close();
             levelNames.push_back(data["display_name"]);
-            levelPaths.push_back(entry.path().stem().generic_string());
+            levelFilenames.push_back(entry.path().stem().generic_string());
         }
     }
 }
@@ -57,16 +57,16 @@ void GuiManager::connectMenuCallbacks()
     // Play button
     auto playCallback = [this]
     {
-        Game::loadLevel(levelPaths.at(currentLevel));
+        Game::loadLevel(levelFilenames.at(currentLevel));
     };
     gui->get<tgui::Button>("button_play")->onPress(playCallback);
 
-    // Edit button
-    auto editCallback = [this]
-    {
-        Game::loadLevel(levelPaths.at(currentLevel), true);
-    };
-    gui->get<tgui::Button>("button_edit")->onPress(editCallback);
+    // Levelname group
+    groups.emplace("levelname", tgui::Group::create());
+    groups.at("levelname")->loadWidgetsFromFile(levelname_ui_path);
+    groups.at("levelname")->setVisible(false);
+    gui->add(groups.at("levelname"));
+    connectLevelnameGroupCallbacks();
 
     // Settings button
     groups.emplace("settings", tgui::Group::create());
@@ -79,6 +79,23 @@ void GuiManager::connectMenuCallbacks()
     };
     gui->get<tgui::Button>("button_settings")->onPress(settingsCallback);
     connectSettingsGroupCallbacks();
+
+    // Edit button
+    auto editCallback = [this]
+    {
+        if (levelFilenames.at(currentLevel) == "new_template")
+        {
+            groups.at("settings")->setVisible(false);
+            groups.at("levelname")->setVisible(true);
+            gui->get<tgui::Button>("button_level_prev")->setEnabled(false);
+            gui->get<tgui::Button>("button_level_next")->setEnabled(false);
+            gui->get<tgui::Button>("button_settings")->setEnabled(false);
+            Game::paused = true;
+            return;
+        }
+        Game::loadLevel(levelFilenames.at(currentLevel), true);
+    };
+    gui->get<tgui::Button>("button_edit")->onPress(editCallback);
 
     // Exit button
     auto exitCallback = [this]
@@ -96,8 +113,9 @@ void GuiManager::connectMenuCallbacks()
     {
         currentLevel = currentLevel == 0 ? levelNames.size() - 1 : currentLevel - 1;
         gui->get<tgui::Label>("label_level")->setText(levelNames.at(currentLevel));
-        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
-        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_time"));
+        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Button>("button_play")->setEnabled(levelFilenames.at(currentLevel) != "new_template");
     };
     gui->get<tgui::Button>("button_level_prev")->onPress(prevLevelCallback);
 
@@ -106,14 +124,15 @@ void GuiManager::connectMenuCallbacks()
     {
         currentLevel = (currentLevel + 1) % levelNames.size();
         gui->get<tgui::Label>("label_level")->setText(levelNames.at(currentLevel));
-        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
-        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_time"));
+        gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_eggs"));
+        gui->get<tgui::Button>("button_play")->setEnabled(levelFilenames.at(currentLevel) != "new_template");
     };
     gui->get<tgui::Button>("button_level_next")->onPress(nextLevelCallback);
 
     // Stats
-    gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_time"));
-    gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelPaths.at(currentLevel), "best_eggs"));
+    gui->get<tgui::Label>("label_time")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_time"));
+    gui->get<tgui::Label>("label_eggs")->setText(Game::getStats()->getAsString(levelFilenames.at(currentLevel), "best_eggs"));
 }
 
 void GuiManager::connectLevelCallbacks()
@@ -142,7 +161,7 @@ void GuiManager::connectLevelCallbacks()
     auto eggUpdateCallback = [this]
     {
         std::string currentEggs = std::to_string(Game::getStats()->currentEggs);
-        std::string totalEggs = std::to_string(Game::getStats()->get(levelPaths.at(currentLevel), "total_eggs"));
+        std::string totalEggs = std::to_string(Game::getStats()->get(levelFilenames.at(currentLevel), "total_eggs"));
         gui->get<tgui::Label>("label_eggs")->setText(currentEggs + "/" + totalEggs);
     };
     auto eggUpdateTimer = Timer::create(0.05, eggUpdateCallback);
@@ -250,4 +269,46 @@ void GuiManager::connectPauseGroupCallbacks()
         Game::running = false;
     };
     gui->get<tgui::Button>("button_exit")->onPress(exitCallback);
+}
+
+void GuiManager::connectLevelnameGroupCallbacks()
+{
+    if (currentUI != MENU)
+        return;
+
+    // Confirm button
+    auto confirmCallback = [this]
+    {
+        std::string levelName = groups.at("levelname")->get<tgui::EditBox>("editbox_level")->getText().toStdString();
+        std::string levelFilename = levelName;
+        std::transform(levelFilename.begin(), levelFilename.end(), levelFilename.begin(), [](unsigned char c)
+                       { return std::tolower(c); });
+        std::replace(levelFilename.begin(), levelFilename.end(), ' ', '_');
+        std::ofstream file("levels/" + levelFilename + ".json");
+        nlohmann::json data;
+        data["display_name"] = levelName;
+        if (!file.is_open())
+        {
+            std::cerr << "[ERROR] (GuiManager::confirmCallback) Couldn't open file for writing\n";
+            return;
+        }
+        file << std::setw(4) << data << std::endl;
+        file.close();
+        Game::paused = false;
+        std::cout << levelFilename;
+        Game::loadLevel(levelFilename, true);
+    };
+    gui->get<tgui::Button>("button_confirm")->onPress(confirmCallback);
+
+    // Cancel button
+    auto cancelCallback = [this]
+    {
+        groups.at("levelname")->setVisible(false);
+        gui->get<tgui::Button>("button_level_prev")->setEnabled(true);
+        gui->get<tgui::Button>("button_level_next")->setEnabled(true);
+        gui->get<tgui::Button>("button_settings")->setEnabled(true);
+        groups.at("levelname")->get<tgui::EditBox>("editbox_level")->setText("");
+        Game::paused = false;
+    };
+    gui->get<tgui::Button>("button_cancel")->onPress(cancelCallback);
 }

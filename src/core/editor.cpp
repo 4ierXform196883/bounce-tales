@@ -672,9 +672,9 @@ void Editor::onMouseScroll(float delta)
     if (mode == Create)
     {
         if (delta > 0)
-            newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 11, newObjectType) - newObjectTypes + 1) % 11];
+            newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 15, newObjectType) - newObjectTypes + 1) % 15];
         else
-            newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 11, newObjectType) - newObjectTypes + 10) % 11];
+            newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 15, newObjectType) - newObjectTypes + 14) % 15];
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
         std::cout << "New object type: " << newObjectType << "\n";

@@ -22,6 +22,7 @@ public:
     const std::string level_ui_path = "assets/ui/level.txt";
     const std::string editor_ui_path = "assets/ui/editor.txt";
     const std::string pause_ui_path = "assets/ui/pause.txt";
+    const std::string levelname_ui_path = "assets/ui/levelname.txt";
 
 private:
     void init();
@@ -32,11 +33,12 @@ private:
     void connectEditorCallbacks();
     void connectSettingsGroupCallbacks();
     void connectPauseGroupCallbacks();
+    void connectLevelnameGroupCallbacks();
 
     std::unique_ptr<tgui::Gui> gui;
     size_t currentLevel = 0;
     std::vector<std::string> levelNames;
-    std::vector<std::string> levelPaths;
+    std::vector<std::string> levelFilenames;
     std::map<std::string, tgui::Group::Ptr> groups;
     GuiManager::UI currentUI;
 };

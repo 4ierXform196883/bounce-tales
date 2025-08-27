@@ -65,8 +65,8 @@ protected:
     Selection selection;
     MouseState mouseState;
     Mode mode = Edit;
-    std::string levelName = "New Level";
-    std::string levelPath = Game::getSettings()->levels_path + "/new_level.json";
+    std::string levelName;
+    std::string levelPath;
 
     std::string newObjectType = "player";
     std::shared_ptr<GameObject> newObject;
