@@ -4,6 +4,7 @@
 #include <TGUI/TGUI.hpp>
 #include <TGUI/AllWidgets.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#include <nlohmann/json.hpp>
 
 class GuiManager
 {
@@ -24,7 +25,16 @@ public:
     const std::string pause_ui_path = "assets/ui/pause.txt";
     const std::string levelname_ui_path = "assets/ui/levelname.txt";
 
+    void setConfig(const std::string& type, nlohmann::json *config);
+
 private:
+    struct EditorData
+    {
+        nlohmann::json *backgroundConfig;
+        nlohmann::json *cameraConfig;
+        nlohmann::json *objectConfig;
+    };
+
     void init();
 
     void setUI(GuiManager::UI ui);
@@ -34,6 +44,7 @@ private:
     void connectSettingsGroupCallbacks();
     void connectPauseGroupCallbacks();
     void connectLevelnameGroupCallbacks();
+    void connectObjectGroupCallbacks();
 
     std::unique_ptr<tgui::Gui> gui;
     size_t currentLevel = 0;
@@ -41,4 +52,5 @@ private:
     std::vector<std::string> levelFilenames;
     std::map<std::string, tgui::Group::Ptr> groups;
     GuiManager::UI currentUI;
+    EditorData editorData;
 };

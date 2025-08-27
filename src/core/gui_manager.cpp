@@ -5,6 +5,33 @@
 
 #include "game.hpp"
 
+nlohmann::json editorConfigValues = nlohmann::json{
+    {"pos", {{"type", "hide"}}},
+    {"scale", {{"type", "float array"}, {"size", 2}}},
+    {"origin", {{"type", "hide"}}},
+    {"rotation", {"type", "float"}},
+    {"mass", {"type", "float"}},
+    {"air_resistance", {"type", "float"}},
+    {"islands", {"type", "int"}},
+    {"clouds", {"type", "int"}},
+    {"additional_distance", {"type", "float"}},
+    {"spawn_pos", {{"type", "hide"}}},
+    {"control_force", {"type", "float"}},
+    {"size", {{"type", "float array"}, {"size", 2}}},
+    {"size", {{"type", "float array"}, {"size", 2}}},
+    {"type", {{"type", "string carray"}, {"values", {"a", "b", "c"}}}}
+};
+
+void GuiManager::setConfig(const std::string &type, nlohmann::json *config)
+{
+    if (type == "camera")
+        editorData.cameraConfig = config;
+    else if (type == "background")
+        editorData.backgroundConfig = config;
+    else if (type == "object")
+        editorData.objectConfig = config;
+}
+
 void GuiManager::init()
 {
     for (auto &entry : fs::directory_iterator(Game::getSettings()->levels_path))
@@ -311,4 +338,8 @@ void GuiManager::connectLevelnameGroupCallbacks()
         Game::paused = false;
     };
     gui->get<tgui::Button>("button_cancel")->onPress(cancelCallback);
+}
+
+void GuiManager::connectObjectGroupCallbacks()
+{
 }

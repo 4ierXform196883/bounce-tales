@@ -98,7 +98,7 @@ const nlohmann::json waterConfigTemplate = {
     {"size", {100.0f, 100.0f}}};
 
 const nlohmann::json groundConfigTemplate = {
-    {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {50.0f, 0.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
+    {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {0.0f, 50.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
     {"bezierVerts", true},
     {"texture", "ground_0"}};
 
@@ -445,7 +445,7 @@ void Editor::onLeftDown()
         std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
         config[key] = {newObject->getPosition().x, newObject->getPosition().y};
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
-        newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
+        // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
         return;
@@ -678,7 +678,7 @@ void Editor::onMouseScroll(float delta)
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
         std::cout << "New object type: " << newObjectType << "\n";
-        newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
+        // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
     }
@@ -693,10 +693,12 @@ void Editor::handleKeyboard()
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
     {
+        if (selection.selectedObject || selection.selectedGroundSpline)
+            return;
         mode = Create;
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
-        newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
+        // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
     }
