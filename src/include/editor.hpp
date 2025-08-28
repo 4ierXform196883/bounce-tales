@@ -16,6 +16,9 @@ public:
 
     virtual void load(const std::string &path) override;
     void save(const std::string &path);
+    void recreateSelectedObject();
+    inline void recreateCamera() { camera = std::dynamic_pointer_cast<Camera>(createObjectOfType("camera", cameraConfig)); camera->setFollowObject(nullptr); }
+    inline void recreateBackground() { background = std::dynamic_pointer_cast<Background>(createObjectOfType("background", backgroundConfig)); }
 
 protected:
     struct Selection

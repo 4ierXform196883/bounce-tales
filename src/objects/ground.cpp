@@ -31,9 +31,7 @@ Ground::Ground(const std::vector<sf::Vector2f> &verts, const std::string &textur
             }
         }
     }
-    // std::cout << "Aboba\n";
     auto [shape, hitbox] = mapbox::earcutShapeAndHitbox(bezierVerts ? evaluatedVerts : verts);
     drawable = std::make_shared<CurvedShape>(texture, shape);
     collidable = std::make_shared<Collidable>(hitbox, 0.1);
-    // std::cout << "Abobak\n";
 }

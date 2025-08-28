@@ -186,7 +186,7 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
         for (const auto &point : config["verts"])
             verts.emplace_back(sf::Vector2f(point[0], point[1]));
 
-        auto ptr = std::make_shared<Ground>(std::move(verts), config["texture"], config.contains("bezierVerts") ? (bool)config["bezierVerts"] : false);
+        auto ptr = std::make_shared<Ground>(std::move(verts), config["texture"], config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
         loadObject(ptr, config);
         return ptr;
     }

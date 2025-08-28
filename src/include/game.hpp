@@ -25,6 +25,7 @@ public:
     inline static std::unique_ptr<AssetManager> &getAssetManager() { return assetManager; }
     inline static std::unique_ptr<ObjectManager> &getObjectManager() { return objectManager; }
     inline static std::unique_ptr<SoundManager> &getSoundManager() { return soundManager; }
+    inline static std::unique_ptr<GuiManager> &getGuiManager() { return guiManager; }
     inline static std::unique_ptr<Settings> &getSettings() { return settings; }
     inline static std::unique_ptr<Stats> &getStats() { return stats; }
     inline static bool isEditorMode() { return editorMode; }

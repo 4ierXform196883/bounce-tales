@@ -3,33 +3,93 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#define round(x, n) (::round(x * pow(10.0f, n)) / pow(10.0f, n))
+
 #include "game.hpp"
+#include "editor.hpp"
+
+std::string to_string3(float value)
+{
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(3) << value;
+    return out.str();
+}
 
 nlohmann::json editorConfigValues = nlohmann::json{
     {"pos", {{"type", "hide"}}},
-    {"scale", {{"type", "float array"}, {"size", 2}}},
+    {"scale", {{"type", "vector"}}},
     {"origin", {{"type", "hide"}}},
-    {"rotation", {"type", "float"}},
-    {"mass", {"type", "float"}},
-    {"air_resistance", {"type", "float"}},
-    {"islands", {"type", "int"}},
-    {"clouds", {"type", "int"}},
-    {"additional_distance", {"type", "float"}},
+    {"rotation", {{"type", "float"}}},
+    {"mass", {{"type", "float"}}},
+    {"air_resistance", {{"type", "float"}}},
+    {"islands", {{"type", "uint"}}},
+    {"clouds", {{"type", "uint"}}},
+    {"additional_distance", {{"type", "float"}}},
     {"spawn_pos", {{"type", "hide"}}},
-    {"control_force", {"type", "float"}},
-    {"size", {{"type", "float array"}, {"size", 2}}},
-    {"size", {{"type", "float array"}, {"size", 2}}},
-    {"type", {{"type", "string carray"}, {"values", {"a", "b", "c"}}}}
+    {"control_force", {{"type", "float"}}},
+    {"type", {{"type", "hide"} /*, {"values", {"death_zone", "win_zone", "egg", "change_skin:light", "change_skin:normal", "change_skin:heavy"}}*/}},
+    {"size", {{"type", "vector"}}},
+    {"texture", {{"type", "hide"}}},
+    {"subtexture", {{"type", "hide"}}},
+    {"animation", {{"type", "hide"}}},
+    {"tag", {{"type", "string"}}},
+    {"verts", {{"type", "hide"}}},
+    {"path", {{"type", "hide"}}},
+    {"speed_mult", {{"type", "float"}}},
+    {"power", {{"type", "float"}}},
+    {"count", {{"type", "int"}}},
+    {"elevation", {{"type", "float"}}},
+    {"doors", {{"type", "array"}}},
+    {"is_on", {{"type", "bool"}}},
+    {"direction", {{"type", "vector"}}},
+    {"bezier_verts", {{"type", "hide"}}},
+    {"follow", {{"type", "string"}}},
 };
 
 void GuiManager::setConfig(const std::string &type, nlohmann::json *config)
 {
     if (type == "camera")
+    {
         editorData.cameraConfig = config;
+        connectCameraConfigGroupCallbacks();
+    }   
     else if (type == "background")
+    {
         editorData.backgroundConfig = config;
+        connectBackgroundConfigGroupCallbacks();
+    }
     else if (type == "object")
+    {
         editorData.objectConfig = config;
+        connectObjectConfigGroupCallbacks();
+    }
+}
+
+void GuiManager::setEditorInfo(const std::string &info)
+{
+    if (currentUI != UI::EDITOR)
+        return;
+    gui->get<tgui::Label>("label_info")->setText(info);
+    auto resetTimerCallback = [this]
+    {
+        if (currentUI == UI::EDITOR)
+            gui->get<tgui::Label>("label_info")->setText("");
+    };
+    editorData.infoResetTimer = Timer::create(3, resetTimerCallback, false);
+}
+
+void GuiManager::toggleEditorInstructionsVisibility()
+{
+    if (currentUI != UI::EDITOR)
+        return;
+
+    for (const auto &widget : gui->getWidgets())
+    {
+        if (widget->getWidgetName().find("label_instructions") != tgui::String::npos)
+        {
+            widget->setVisible(!widget->isVisible());
+        }
+    }
 }
 
 void GuiManager::init()
@@ -55,6 +115,7 @@ void GuiManager::init()
 
 void GuiManager::setUI(GuiManager::UI ui)
 {
+    groups.clear();
     currentUI = ui;
     switch (ui)
     {
@@ -69,8 +130,7 @@ void GuiManager::setUI(GuiManager::UI ui)
         break;
 
     case EDITOR:
-        gui->removeAllWidgets();
-        // gui->loadWidgetsFromFile(editor_ui_path);
+        gui->loadWidgetsFromFile(editor_ui_path);
         connectEditorCallbacks();
         break;
 
@@ -203,6 +263,8 @@ void GuiManager::connectEditorCallbacks()
     gui->add(groups.at("pause"));
     connectPauseGroupCallbacks();
     gui->get<tgui::Button>("button_respawn")->setEnabled(false);
+    groups.emplace("object", tgui::Group::create());
+    gui->add(groups.at("object"));
 }
 
 void GuiManager::connectSettingsGroupCallbacks()
@@ -285,7 +347,6 @@ void GuiManager::connectPauseGroupCallbacks()
     auto menuCallback = [this]
     {
         Game::loadLevel("menu");
-        groups.at("pause")->setVisible(false);
         Game::paused = false;
     };
     gui->get<tgui::Button>("button_menu")->onPress(menuCallback);
@@ -340,6 +401,235 @@ void GuiManager::connectLevelnameGroupCallbacks()
     gui->get<tgui::Button>("button_cancel")->onPress(cancelCallback);
 }
 
-void GuiManager::connectObjectGroupCallbacks()
+void GuiManager::connectBackgroundConfigGroupCallbacks()
 {
+    // Background clouds
+    gui->get<tgui::EditBox>("editbox_bg_clouds")->setText(std::to_string(static_cast<int>(this->editorData.backgroundConfig->at("clouds"))));
+    auto cloudsCallback = [this]
+    {
+        if (!this->editorData.backgroundConfig)
+            return;
+        this->editorData.backgroundConfig->at("clouds") = gui->get<tgui::EditBox>("editbox_bg_clouds")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateBackground();
+    };
+    gui->get<tgui::EditBox>("editbox_bg_clouds")->onTextChange(cloudsCallback);
+
+    // Background islands
+    gui->get<tgui::EditBox>("editbox_bg_islands")->setText(std::to_string(static_cast<int>(this->editorData.backgroundConfig->at("islands"))));
+    auto islandsCallback = [this]
+    {
+        if (!this->editorData.backgroundConfig)
+            return;
+        this->editorData.backgroundConfig->at("islands") = gui->get<tgui::EditBox>("editbox_bg_islands")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateBackground();
+    };
+    gui->get<tgui::EditBox>("editbox_bg_islands")->onTextChange(islandsCallback);
+
+    // Background distance
+    gui->get<tgui::EditBox>("editbox_bg_distance")->setText(std::to_string(static_cast<int>(this->editorData.backgroundConfig->at("additional_distance"))));
+    auto distanceCallback = [this]
+    {
+        if (!this->editorData.backgroundConfig)
+            return;
+        this->editorData.backgroundConfig->at("additional_distance") = gui->get<tgui::EditBox>("editbox_bg_distance")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateBackground();
+    };
+    gui->get<tgui::EditBox>("editbox_bg_distance")->onTextChange(distanceCallback);
+}
+
+void GuiManager::connectCameraConfigGroupCallbacks()
+{
+    // Camera follow
+    gui->get<tgui::EditBox>("editbox_camera_follow")->setText(static_cast<std::string>(this->editorData.cameraConfig->at("follow")));
+    auto followCallback = [this]
+    {
+        if (!this->editorData.cameraConfig)
+            return;
+        this->editorData.cameraConfig->at("follow") = gui->get<tgui::EditBox>("editbox_camera_follow")->getText();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateCamera();
+    };
+    gui->get<tgui::EditBox>("editbox_camera_follow")->onTextChange(followCallback);
+
+    if (!editorData.cameraConfig->contains("pos"))
+        (*editorData.cameraConfig)["pos"] = {0.0f, 0.0f};
+
+    // Camera Position X
+    gui->get<tgui::EditBox>("editbox_camera_pos_x")->setText(std::to_string(static_cast<int>(this->editorData.cameraConfig->at("pos").at(0))));
+    auto posXCallback = [this]
+    {
+        if (!this->editorData.cameraConfig)
+            return;
+        this->editorData.cameraConfig->at("pos").at(0) = gui->get<tgui::EditBox>("editbox_camera_pos_x")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateCamera();
+    };
+    gui->get<tgui::EditBox>("editbox_camera_pos_x")->onTextChange(posXCallback);
+
+    // Camera Position Y
+    gui->get<tgui::EditBox>("editbox_camera_pos_y")->setText(std::to_string(static_cast<int>(this->editorData.cameraConfig->at("pos").at(1))));
+    auto posYCallback = [this]
+    {
+        if (!this->editorData.cameraConfig)
+            return;
+        this->editorData.cameraConfig->at("pos").at(1) = gui->get<tgui::EditBox>("editbox_camera_pos_y")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateCamera();
+    };
+    gui->get<tgui::EditBox>("editbox_camera_pos_y")->onTextChange(posYCallback);
+
+    // Camera Size X
+    gui->get<tgui::EditBox>("editbox_camera_size_x")->setText(std::to_string(static_cast<int>(this->editorData.cameraConfig->at("size").at(0))));
+    auto sizeXCallback = [this]
+    {
+        if (!this->editorData.cameraConfig)
+            return;
+        this->editorData.cameraConfig->at("size").at(0) = gui->get<tgui::EditBox>("editbox_camera_size_x")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateCamera();
+    };
+    gui->get<tgui::EditBox>("editbox_camera_size_x")->onTextChange(sizeXCallback);
+
+    // Camera Size Y
+    gui->get<tgui::EditBox>("editbox_camera_size_y")->setText(std::to_string(static_cast<int>(this->editorData.cameraConfig->at("size").at(1))));
+    auto sizeYCallback = [this]
+    {
+        if (!this->editorData.cameraConfig)
+            return;
+        this->editorData.cameraConfig->at("size").at(1) = gui->get<tgui::EditBox>("editbox_camera_size_y")->getText().toInt();
+        dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateCamera();
+    };
+    gui->get<tgui::EditBox>("editbox_camera_size_y")->onTextChange(sizeYCallback);
+}
+
+void GuiManager::connectObjectConfigGroupCallbacks()
+{
+    if (groups.find("object") == groups.end())
+        return;
+    groups.at("object")->removeAllWidgets();
+    // Если nullptr - удаляем и всё
+    if (!editorData.objectConfig)
+        return;
+
+    if (!editorData.objectConfig->contains("scale") && !editorData.objectConfig->contains("verts"))
+        (*editorData.objectConfig)["scale"] = {1.0f, 1.0f};
+
+    // Считаем количество полей
+    auto predicate = [](const auto &json)
+    {
+        const std::string &key = json.key();
+        if (editorConfigValues.contains(key))
+        {
+            const auto &typeField = editorConfigValues[key]["type"];
+            return typeField != "hide";
+        }
+        return false;
+    };
+    size_t fields = std::count_if(editorData.objectConfig->items().begin(), editorData.objectConfig->items().end(), predicate);
+    if (fields == 0)
+        return;
+
+    // Создаём задний фон
+    auto bg = tgui::Label::create()->copy(gui->get<tgui::Label>("label_bg_temp"));
+    std::string layoutStr = std::to_string(4 + 4 * fields) + "%";
+    bg->setSize(bg->getSize().x, layoutStr.c_str());
+    layoutStr = std::to_string(100 - (3 + 4 + 4 * fields)) + "%";
+    bg->setPosition(bg->getPosition().x, layoutStr.c_str());
+    bg->setVisible(true);
+    groups.at("object")->add(bg);
+
+    // Добавляем поля
+    size_t i = 0;
+    for (const auto &it : editorData.objectConfig->items())
+    {
+        const auto &typeField = editorConfigValues[it.key()]["type"];
+        if (typeField == "hide")
+            continue;
+        // 3% from bottom of the screen
+        // 2% from top and bottom of background (so 4%)
+        // 4% - label height
+        // 3.5% editbox height (so +0.25% from label pos)
+        std::string labelPosString = std::to_string(100 - (3 + 4 + 4 * fields) + 2 + 4 * i) + "%";
+        std::string editboxPosString = std::to_string(100 - (3 + 4 + 4 * fields) + 2 + 4 * i) + ".25%";
+
+        // Создаём Label
+        auto label = tgui::Label::create()->copy(gui->get<tgui::Label>("label_temp"));
+        label->setWidgetName("label_object_" + it.key());
+        label->setText(it.key());
+        label->setPosition(label->getPosition().x, labelPosString.c_str());
+        label->setVisible(true);
+        groups.at("object")->add(label);
+        // std::cout << it.key() << " " << labelPosString << " " << editboxPosString << " " << typeField << "\n";
+
+        // Создаём editbox
+        if (typeField == "vector")
+        {
+            auto editboxX = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_vector_x"));
+            auto editboxY = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_vector_y"));
+            editboxX->setWidgetName("editbox_object_" + it.key() + "_x");
+            editboxY->setWidgetName("editbox_object_" + it.key() + "_y");
+            editboxX->setPosition(editboxX->getPosition().x, editboxPosString.c_str());
+            editboxY->setPosition(editboxY->getPosition().x, editboxPosString.c_str());
+            editboxX->setVisible(true);
+            editboxY->setVisible(true);
+            std::string key = it.key();
+            editboxX->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key).at(0))));
+            editboxY->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key).at(1))));
+            auto changeXCallback = [this, key, editboxX]
+            {
+                editorData.objectConfig->at(key).at(0) = editboxX->getText().toFloat();
+                dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateSelectedObject();
+                std::cout << key << " changed to " << editorData.objectConfig->at(key).at(0) << "\n";
+            };
+            auto changeYCallback = [this, key, editboxY]
+            {
+                editorData.objectConfig->at(key).at(1) = editboxY->getText().toFloat();
+                dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateSelectedObject();
+            };
+            editboxX->onTextChange(changeXCallback);
+            editboxY->onTextChange(changeYCallback);
+            groups.at("object")->add(editboxX);
+            groups.at("object")->add(editboxY);
+        }
+        else if (typeField == "bool")
+        {
+            auto checkbox = tgui::CheckBox::create()->copy(gui->get<tgui::CheckBox>("checkbox_temp"));
+            checkbox->setWidgetName("checkbox_object_" + it.key());
+            checkbox->setPosition(checkbox->getPosition().x, editboxPosString.c_str());
+            checkbox->setVisible(true);
+            std::string key = it.key();
+            checkbox->setChecked(static_cast<bool>(editorData.objectConfig->at(key)));
+            auto changeCallback = [this, key, checkbox, typeField]
+            {
+                editorData.objectConfig->at(key) = checkbox->isChecked();
+                dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateSelectedObject();
+            };
+            checkbox->onChange(changeCallback);
+            groups.at("object")->add(checkbox);
+        }
+        else
+        {
+            auto editbox = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_" + static_cast<std::string>(typeField)));
+            editbox->setWidgetName("editbox_object_" + it.key());
+            editbox->setPosition(editbox->getPosition().x, editboxPosString.c_str());
+            editbox->setVisible(true);
+            std::string key = it.key();
+            if (typeField == "float")
+                editbox->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key))));
+            else if (typeField == "int" || typeField == "uint")
+                editbox->setText(std::to_string(static_cast<int>(editorData.objectConfig->at(key))));
+            else if (typeField == "string")
+                editbox->setText(static_cast<std::string>(editorData.objectConfig->at(key)));
+            auto changeCallback = [this, key, editbox, typeField]
+            {
+                if (typeField == "float")
+                    editorData.objectConfig->at(key) = editbox->getText().toFloat();
+                else if (typeField == "int" || typeField == "uint")
+                    editorData.objectConfig->at(key) = editbox->getText().toInt();
+                else if (typeField == "string")
+                    editorData.objectConfig->at(key) = editbox->getText().toStdString();
+                dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateSelectedObject();
+            };
+            editbox->onTextChange(changeCallback);
+            groups.at("object")->add(editbox);
+        }
+
+        ++i;
+    }
 }

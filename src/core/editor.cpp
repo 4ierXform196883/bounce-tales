@@ -99,7 +99,7 @@ const nlohmann::json waterConfigTemplate = {
 
 const nlohmann::json groundConfigTemplate = {
     {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {0.0f, 50.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
-    {"bezierVerts", true},
+    {"bezier_verts", true},
     {"texture", "ground_0"}};
 
 const nlohmann::json cameraConfigTemplate = {
@@ -136,6 +136,7 @@ void Editor::load(const std::string &path)
     ptr = createObjectOfType("background", data.contains("background") ? data["background"] : backgroundConfigTemplate);
     backgroundConfig = data.contains("background") && ptr ? data["background"] : backgroundConfigTemplate;
     background = std::dynamic_pointer_cast<Background>(ptr ? ptr : createObjectOfType("background", backgroundConfigTemplate));
+    Game::getGuiManager()->setConfig("background", &backgroundConfig);
 
     // Player
     ptr = createObjectOfType("player", data.contains("player") ? data["player"] : playerConfigTemplate);
@@ -254,6 +255,7 @@ void Editor::load(const std::string &path)
     cameraConfig = data.contains("camera") && ptr ? data["camera"] : cameraConfigTemplate;
     camera = std::dynamic_pointer_cast<Camera>(ptr ? ptr : createObjectOfType("camera", cameraConfigTemplate));
     camera->setFollowObject(nullptr);
+    Game::getGuiManager()->setConfig("camera", &cameraConfig);
 }
 
 void Editor::save(const std::string &path)
@@ -306,6 +308,17 @@ void Editor::save(const std::string &path)
     file.close();
 }
 
+void Editor::recreateSelectedObject()
+{
+    if (!selection.selectedObject)
+        return;
+    auto &config = getConfigForObject(selection.selectedObject);
+    std::string type = getObjectType(selection.selectedObject);
+    int dIndex = std::distance(drawable.begin(), std::find(drawable.begin(), drawable.end(), selection.selectedObject));
+    selection.selectedObject = createObjectOfType(type, config);
+    drawable.at(dIndex) = selection.selectedObject;
+}
+
 void Editor::updateAll()
 {
     GameObject::update(camera);
@@ -320,7 +333,6 @@ void Editor::updateAll()
         GameObject::update((*it));
         ++it;
     }
-    handleInput();
 }
 
 void Editor::drawAll(sf::RenderTarget &target)
@@ -384,6 +396,7 @@ std::shared_ptr<GameObject> Editor::getClickedObject()
 
 void Editor::handleEvent(const sf::Event &event)
 {
+    handleInput();
     switch (event.type)
     {
     case sf::Event::MouseWheelScrolled:
@@ -431,7 +444,7 @@ void Editor::onLeftDown()
     {
         if (!newObject)
             return;
-        
+
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         if (realType == "player" && player)
             return;
@@ -441,7 +454,7 @@ void Editor::onLeftDown()
         configs.emplace_back(realType, getTemplateConfigForObjectType(newObjectType));
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a * 4));
-        auto& config = getConfigForObject(newObject);
+        auto &config = getConfigForObject(newObject);
         std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
         config[key] = {newObject->getPosition().x, newObject->getPosition().y};
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
@@ -482,6 +495,7 @@ void Editor::onLeftDown()
     {
         selection.selectedObjectType = "";
         selection.selectedObject = nullptr;
+        Game::getGuiManager()->setConfig("object", nullptr);
         selection.selectedObjects.clear();
         selection.visualRect.setPosition(mouseState.leftDownPos);
         if (selection.selectedGroundSpline)
@@ -498,6 +512,8 @@ void Editor::onLeftDown()
     {
         if (selection.selectedGroundSpline)
             selection.selectedGroundSpline->setFinished(true);
+        selection.selectedObject = nullptr;
+        Game::getGuiManager()->setConfig("object", nullptr);
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
         auto it = std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), clickedObject);
@@ -505,6 +521,7 @@ void Editor::onLeftDown()
             selection.selectedObjects.erase(it);
         else
             selection.selectedObjects.push_back(clickedObject);
+        Game::getGuiManager()->setEditorInfo("Selected " + std::to_string(selection.selectedObjects.size()) + " objects");
     }
 
     // Нажатие по новому (не выделенному ранее) объекту (надо сбросить выделение)
@@ -519,9 +536,14 @@ void Editor::onLeftDown()
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
         auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject);
-        auto& config = getConfigForObject(clickedObject);
+        auto &config = getConfigForObject(clickedObject);
+        Game::getGuiManager()->setConfig("object", &config);
+        if (config.contains("type"))
+            Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType + ":" + static_cast<std::string>(config.at("type")));
+        else
+            Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType);
         // Проверка - может, нажали на Ground?
-        if (ptr && config.contains("bezierVerts") && config["bezierVerts"].get<bool>())
+        if (ptr && config.contains("bezier_verts") && config["bezier_verts"].get<bool>())
         {
             std::vector<sf::Vector2f> verts;
             verts.reserve(config["verts"].size());
@@ -634,12 +656,13 @@ void Editor::onLeftUp()
                 selection.selectedObjects.push_back(obj);
         }
     }
+    Game::getGuiManager()->setEditorInfo("Selected " + std::to_string(selection.selectedObjects.size()) + " objects");
 }
 
 void Editor::onRightDown()
 {
     auto clickedPoint = getClickedPoint();
-    std::cout << clickedPoint << "\n";
+    // std::cout << clickedPoint << "\n";
     if (clickedPoint != -1 && selection.selectedGroundSpline)
     {
         int removedPoints = selection.selectedGroundSpline->removeControlPoint(clickedPoint);
@@ -677,7 +700,8 @@ void Editor::onMouseScroll(float delta)
             newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 15, newObjectType) - newObjectTypes + 14) % 15];
         std::string realType = (newObjectType.find("trigger:") != std::string::npos) ? "trigger" : newObjectType;
         newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
-        std::cout << "New object type: " << newObjectType << "\n";
+        Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
+        // std::cout << "New object type: " << newObjectType << "\n";
         // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
@@ -701,6 +725,7 @@ void Editor::handleKeyboard()
         // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+        Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && selection.selectedObjects.size() > 0)
     {
@@ -716,8 +741,10 @@ void Editor::handleKeyboard()
                 configs.erase(configs.begin() + index);
             }
         }
+        Game::getGuiManager()->setEditorInfo("Deleted " + std::to_string(selection.selectedObjects.size()) + " objects");
         selection.selectedObjects.clear();
         selection.selectedObject = nullptr;
+        Game::getGuiManager()->setConfig("object", nullptr);
         selection.selectedObjectType = "";
         selection.selectedGroundSpline = nullptr;
         selection.selectedSplinePoint = -1;
@@ -735,8 +762,10 @@ void Editor::handleKeyboard()
         std::vector<std::shared_ptr<GameObject>> newSelectedObjects;
         for (auto &obj : selection.selectedObjects)
         {
-            auto& config = getConfigForObject(obj);
+            auto &config = getConfigForObject(obj);
             std::string objType = getObjectType(obj);
+            if (objType == "player")
+                continue;
             std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
             config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
             auto newObj = createObjectOfType(objType, config);
@@ -747,13 +776,15 @@ void Editor::handleKeyboard()
                 newSelectedObjects.push_back(newObj);
             }
         }
+        Game::getGuiManager()->setEditorInfo("Duplicated " + std::to_string(selection.selectedObjects.size()) + " objects");
         selection.selectedObjects = newSelectedObjects;
     }
     // ctrl + S - save
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)))
     {
         this->save(levelPath);
-        std::cout << "Level saved to " << levelPath << "\n";
+        Game::getGuiManager()->setEditorInfo("Level saved to \"" + levelPath + "\"");
+        // std::cout << "Level saved to " << levelPath << "\n";
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && selection.selectedGroundSpline)
     {
@@ -767,6 +798,10 @@ void Editor::handleKeyboard()
         {
             selection.selectedSplinePoint = selection.selectedGroundSpline->getPointCount() - 2;
         }
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H))
+    {
+        Game::getGuiManager()->toggleEditorInstructionsVisibility();
     }
 }
 
@@ -867,7 +902,7 @@ void Editor::updateGroundShape()
     if (!selection.selectedGroundSpline || !selection.selectedObject)
     {
         std::cout << "no spline or object\n";
-        return; 
+        return;
     }
     bool actualFinished = selection.selectedGroundSpline->isFinished();
     if (!actualFinished)
@@ -880,7 +915,6 @@ void Editor::updateGroundShape()
         config["verts"].push_back({point.x, point.y});
     }
     selection.selectedGroundSpline->setFinished(actualFinished);
-    // replace Ground object in drawable with new one
     int dIndex = std::distance(drawable.begin(), std::find(drawable.begin(), drawable.end(), selection.selectedObject));
     int sIndex = std::distance(selection.selectedObjects.begin(), std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), selection.selectedObject));
     selection.selectedObject = createObjectOfType("ground", config);

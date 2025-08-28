@@ -5,6 +5,7 @@
 #include <TGUI/AllWidgets.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <nlohmann/json.hpp>
+#include "timer.hpp"
 
 class GuiManager
 {
@@ -26,6 +27,8 @@ public:
     const std::string levelname_ui_path = "assets/ui/levelname.txt";
 
     void setConfig(const std::string& type, nlohmann::json *config);
+    void setEditorInfo(const std::string &info);
+    void toggleEditorInstructionsVisibility();
 
 private:
     struct EditorData
@@ -33,6 +36,7 @@ private:
         nlohmann::json *backgroundConfig;
         nlohmann::json *cameraConfig;
         nlohmann::json *objectConfig;
+        std::shared_ptr<Timer> infoResetTimer;
     };
 
     void init();
@@ -44,7 +48,10 @@ private:
     void connectSettingsGroupCallbacks();
     void connectPauseGroupCallbacks();
     void connectLevelnameGroupCallbacks();
-    void connectObjectGroupCallbacks();
+
+    void connectBackgroundConfigGroupCallbacks();
+    void connectCameraConfigGroupCallbacks();
+    void connectObjectConfigGroupCallbacks();
 
     std::unique_ptr<tgui::Gui> gui;
     size_t currentLevel = 0;

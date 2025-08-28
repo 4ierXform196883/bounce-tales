@@ -106,8 +106,6 @@ void Game::close()
     settings->save(settings->settings_path);
     stats->save(settings->stats_path);
     soundManager->stopMusic();
-    guiManager->gui->removeAllWidgets();
-    guiManager->groups.clear();
     guiManager->gui.release();
     window->close();
 }
@@ -130,8 +128,8 @@ void Game::processEvents()
 {
     for (auto event = sf::Event{}; window->pollEvent(event);)
     {
-        guiManager->gui->handleEvent(event);
-        objectManager->handleEvent(event);
+        if (!guiManager->gui->handleEvent(event))
+            objectManager->handleEvent(event);
         switch (event.type)
         {
         case sf::Event::Closed:
