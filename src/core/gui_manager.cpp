@@ -185,13 +185,13 @@ void GuiManager::connectMenuCallbacks()
     gui->get<tgui::Button>("button_edit")->onPress(editCallback);
 
     // Exit button
-    auto exitCallback = [this]
+    auto exitCallback = []
     {
         Game::running = false;
     };
     gui->get<tgui::Button>("button_exit")->onPress(exitCallback);
 
-    if (levelNames.size() == 0)
+    if (levelNames.empty())
         return;
     gui->get<tgui::Label>("label_level")->setText(levelNames.at(currentLevel));
 
@@ -526,7 +526,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
         return;
 
     // Создаём задний фон
-    auto bg = tgui::Label::create()->copy(gui->get<tgui::Label>("label_bg_temp"));
+    auto bg = tgui::Label::copy(gui->get<tgui::Label>("label_bg_temp"));
     std::string layoutStr = std::to_string(4 + 4 * fields) + "%";
     bg->setSize(bg->getSize().x, layoutStr.c_str());
     layoutStr = std::to_string(100 - (3 + 4 + 4 * fields)) + "%";
@@ -549,7 +549,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
         std::string editboxPosString = std::to_string(100 - (3 + 4 + 4 * fields) + 2 + 4 * i) + ".25%";
 
         // Создаём Label
-        auto label = tgui::Label::create()->copy(gui->get<tgui::Label>("label_temp"));
+        auto label = tgui::Label::copy(gui->get<tgui::Label>("label_temp"));
         label->setWidgetName("label_object_" + it.key());
         label->setText(it.key());
         label->setPosition(label->getPosition().x, labelPosString.c_str());
@@ -560,15 +560,15 @@ void GuiManager::connectObjectConfigGroupCallbacks()
         // Создаём editbox
         if (typeField == "vector")
         {
-            auto editboxX = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_vector_x"));
-            auto editboxY = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_vector_y"));
+            auto editboxX = tgui::EditBox::copy(gui->get<tgui::EditBox>("editbox_temp_vector_x"));
+            auto editboxY = tgui::EditBox::copy(gui->get<tgui::EditBox>("editbox_temp_vector_y"));
             editboxX->setWidgetName("editbox_object_" + it.key() + "_x");
             editboxY->setWidgetName("editbox_object_" + it.key() + "_y");
             editboxX->setPosition(editboxX->getPosition().x, editboxPosString.c_str());
             editboxY->setPosition(editboxY->getPosition().x, editboxPosString.c_str());
             editboxX->setVisible(true);
             editboxY->setVisible(true);
-            std::string key = it.key();
+            const std::string& key = it.key();
             editboxX->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key).at(0))));
             editboxY->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key).at(1))));
             auto changeXCallback = [this, key, editboxX]
@@ -589,11 +589,11 @@ void GuiManager::connectObjectConfigGroupCallbacks()
         }
         else if (typeField == "bool")
         {
-            auto checkbox = tgui::CheckBox::create()->copy(gui->get<tgui::CheckBox>("checkbox_temp"));
+            auto checkbox = tgui::CheckBox::copy(gui->get<tgui::CheckBox>("checkbox_temp"));
             checkbox->setWidgetName("checkbox_object_" + it.key());
             checkbox->setPosition(checkbox->getPosition().x, editboxPosString.c_str());
             checkbox->setVisible(true);
-            std::string key = it.key();
+            const std::string& key = it.key();
             checkbox->setChecked(static_cast<bool>(editorData.objectConfig->at(key)));
             auto changeCallback = [this, key, checkbox, typeField]
             {
@@ -605,11 +605,11 @@ void GuiManager::connectObjectConfigGroupCallbacks()
         }
         else
         {
-            auto editbox = tgui::EditBox::create()->copy(gui->get<tgui::EditBox>("editbox_temp_" + static_cast<std::string>(typeField)));
+            auto editbox = tgui::EditBox::copy(gui->get<tgui::EditBox>("editbox_temp_" + static_cast<std::string>(typeField)));
             editbox->setWidgetName("editbox_object_" + it.key());
             editbox->setPosition(editbox->getPosition().x, editboxPosString.c_str());
             editbox->setVisible(true);
-            std::string key = it.key();
+            const std::string& key = it.key();
             if (typeField == "float")
                 editbox->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key))));
             else if (typeField == "int" || typeField == "uint")
