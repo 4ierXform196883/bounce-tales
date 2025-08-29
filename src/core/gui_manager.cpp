@@ -1,6 +1,7 @@
 #include "gui_manager.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 #define round(x, n) (::round(x * pow(10.0f, n)) / pow(10.0f, n))
@@ -52,7 +53,7 @@ void GuiManager::setConfig(const std::string &type, nlohmann::json *config)
     {
         editorData.cameraConfig = config;
         connectCameraConfigGroupCallbacks();
-    }   
+    }
     else if (type == "background")
     {
         editorData.backgroundConfig = config;

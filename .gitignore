@@ -1,10 +1,13 @@
 
 # Directories
 build
+deps
 .idea
 .cache
 .vscode
 .mypy_cache
+
+CMakePresets.json
 
 # Prerequisites
 *.d
