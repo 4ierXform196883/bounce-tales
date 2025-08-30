@@ -353,7 +353,7 @@ EditBox.editbox_bg_distance {
 }
 
 EditBox.editbox_camera_follow {
-    InputValidator = "[A-Za-z0-9_ ]+";
+    InputValidator = "[A-Za-z0-9_]+";
     Position = (84.5%, 17.25%);
     Size = (12%, 3.5%);
     TextSize = 18;
@@ -979,7 +979,7 @@ EditBox.editbox_temp_float {
 }
 
 EditBox.editbox_temp_string {
-    InputValidator = "[A-Za-z0-9_ ]+";
+    InputValidator = "[A-Za-z0-9_]+";
     Position = (84.5%, 46.8%);
     Size = (12%, 3.5%);
     TextSize = 18;
@@ -1011,7 +1011,7 @@ EditBox.editbox_temp_string {
 }
 
 EditBox.editbox_temp_array {
-    InputValidator = "[A-Za-z0-9_ ;]+";
+    InputValidator = "[A-Za-z0-9_;]+";
     Position = (84.5%, 50.96%);
     Size = (12%, 3.5%);
     TextSize = 18;

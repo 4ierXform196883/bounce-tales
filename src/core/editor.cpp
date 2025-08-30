@@ -705,6 +705,7 @@ void Editor::onMouseScroll(float delta)
         // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+        newObject->setPosition(Game::getMousePos());
     }
 }
 
@@ -725,6 +726,7 @@ void Editor::handleKeyboard()
         // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
         sf::Color oc = newObject->getColor();
         newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+        newObject->setPosition(Game::getMousePos());
         Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && selection.selectedObjects.size() > 0)
