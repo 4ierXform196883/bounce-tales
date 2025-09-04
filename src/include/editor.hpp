@@ -42,7 +42,7 @@ protected:
 
     virtual void updateAll() override;
     inline virtual void collideAll() override {};
-    virtual void drawAll(sf::RenderTarget &target);
+    virtual void drawAll(sf::RenderTarget &target) override;
 
     int getClickedPoint();
     std::shared_ptr<GameObject> getClickedObject();
@@ -73,10 +73,11 @@ protected:
 
     std::string newObjectType = "player";
     std::shared_ptr<GameObject> newObject;
-    std::string newObjectTypes[15] = {"player", "simple", "jump_pad", "spikes",
+    std::string newObjectTypes[19] = {"player", "jump_pad", "spikes",
                                       "door", "switch", "wind", "water",
                                       "trigger:death_zone", "trigger:egg",
-                                      "trigger:win_zone", "trigger:player_set_skin:light",
+                                      "simple:flower_white", "simple:flower_blue", "simple:flower_red", "simple:bush",
+                                      "trigger:win_zone0", "trigger:win_zone1", "trigger:player_set_skin:light",
                                       "trigger:player_set_skin:normal", "trigger:player_set_skin:heavy",
                                       "ground"};
 
