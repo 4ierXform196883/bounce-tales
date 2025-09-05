@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "drawable.hpp"
 
-class PrimitiveSprite : public Drawable
+class PrimitiveSprite : public IDrawable
 {
 public:
     PrimitiveSprite() = default;

@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "drawable.hpp"
 
-class CurvedShape : public Drawable
+class CurvedShape : public IDrawable
 {
 public:
     CurvedShape() = default;

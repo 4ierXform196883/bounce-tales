@@ -4,7 +4,7 @@
 #include "drawable.hpp"
 
 // С1 непрерывный сплайн из кривых Безье 3-го порядка
-class Spline : public Drawable, public sf::Transformable
+class Spline : public IDrawable, public sf::Transformable
 {
 public:
     Spline() = default;

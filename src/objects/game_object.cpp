@@ -78,7 +78,7 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
         return;
     }
     // на всякий случай
-    if (norm(penetration) > 20)
+    if (norm(penetration) > 40)
         return;
     float firstMass = first->physical ? first->physical->mass : -1;
     float secondMass = second->physical ? second->physical->mass : -1;
@@ -89,12 +89,12 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
         first->physical->speed += (1 - coef) * penetration;
         second->move(-coef * penetration);
         second->physical->speed -= coef * penetration;
-        if (first->collidable->prevColliding.find(second->tag) == first->collidable->prevColliding.end())
-        {
-            sf::Vector2f newVel = coef * first->physical->speed + (1 - coef) * second->physical->speed;
-            first->physical->speed = newVel;
-            second->physical->speed = newVel;
-        }
+        // if (first->collidable->prevColliding.find(second->tag) == first->collidable->prevColliding.end())
+        // {
+        //     sf::Vector2f newVel = coef * first->physical->speed + (1 - coef) * second->physical->speed;
+        //     first->physical->speed = newVel;
+        //     second->physical->speed = newVel;
+        // }
     }
     else if (firstMass != -1)
     {

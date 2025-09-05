@@ -2,7 +2,7 @@
 
 #include "drawable.hpp"
 
-class PrimitiveRectangle : public Drawable
+class PrimitiveRectangle : public IDrawable
 {
 public:
     PrimitiveRectangle();

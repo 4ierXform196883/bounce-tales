@@ -26,7 +26,7 @@
     inline virtual void setAirResistance(float value) override { physical->setAirResistance(value); }                                                                                                \
     inline virtual float getAirResistance() const override { return physical->getAirResistance(); }
 
-class GameObject : public ITransformable, public Drawable
+class GameObject : public ITransformable, public IDrawable
 {
 public:
     static void calculateCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second, bool notify = true);
@@ -78,7 +78,7 @@ protected:
     std::string tag;
     std::map<std::string, std::shared_ptr<GameObject>> children;
 
-    std::shared_ptr<Drawable> drawable;
+    std::shared_ptr<IDrawable> drawable;
     std::shared_ptr<sf::Transformable> transformable;
     std::shared_ptr<Collidable> collidable;
     std::shared_ptr<Physical> physical;

@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-class Drawable : public sf::Drawable
+class IDrawable : public sf::Drawable
 {
 public:
     virtual const sf::Color& getColor() const = 0;
