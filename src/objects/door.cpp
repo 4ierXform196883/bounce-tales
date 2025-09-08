@@ -19,37 +19,37 @@ Door::Door(const std::string &tag, const sf::Vector2f &startPos, float elevation
     this->setPosition(startPos);
     auto ptr = std::make_shared<SimpleObject>("rope", "rope");
     ptr->setOrigin(0, 2);
-    children.emplace(ptr->getTag(), ptr);
-    ptr = std::make_shared<SimpleObject>("zzz_another_door_to_hide_the_rope", "door");
+    children.push_back(ptr);
+    ptr = std::make_shared<SimpleObject>("another_door_to_hide_the_rope", "door");
     ptr->setOrigin(tSize.x / 2.f, tSize.y / 2.f);
-    children.emplace(ptr->getTag(), ptr);
+    children.push_back(ptr);
 }
 
 void Door::setScale(float factorX, float factorY)
 {
     GameObject::setScale(factorX, factorY);
-    for (auto [tag, child] : children)
+    for (auto child : children)
         child->setScale(factorX, factorY);
 }
 
 void Door::setScale(const sf::Vector2f &factors)
 {
     GameObject::setScale(factors);
-    for (auto [tag, child] : children)
+    for (auto child : children)
         child->setScale(factors);
 }
 
 void Door::scale(float factorX, float factorY)
 {
     GameObject::scale(factorX, factorY);
-    for (auto [tag, child] : children)
+    for (auto child : children)
         child->scale(factorX, factorY);
 }
 
 void Door::scale(const sf::Vector2f &factors)
 {
     GameObject::scale(factors);
-    for (auto [tag, child] : children)
+    for (auto child : children)
         child->scale(factors);
 }
 
@@ -58,7 +58,10 @@ void Door::update()
     double phi = M_PI * (this->getRotation() + 90) / 180;
     sf::Vector2f endPos = startPos - sf::Vector2f(elevation * std::cos(phi), elevation * sin(phi));
     sf::Vector2f endDiff = endPos - this->getPosition();
-    this->children.at("rope")->setScale(1, norm(endDiff) / 2.f);
+    auto ropeChild = std::find_if(children.begin(), children.end(), 
+        [](std::shared_ptr<GameObject> obj){ return obj->getTag() == "rope"; });
+    if (ropeChild != children.end())
+        (*ropeChild)->setScale(1, norm(endDiff) / 2.f);
     sf::Vector2f startDiff = startPos - this->getPosition();
     if (isOpened && norm(endDiff) > 2)
         this->move(normalized(endDiff));

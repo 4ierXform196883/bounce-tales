@@ -17,15 +17,15 @@ Player::Player(const sf::Vector2f &spawnPos, float control_force)
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f - 2, {tSize.x / 2.0f, tSize.x / 2.0f}});
     physical = std::make_shared<Physical>(10, 0.001);
     auto ptr = std::make_shared<SimpleObject>("dots", "redy_dots");
-    children.emplace(ptr->getTag(), ptr);
+    children.push_back(ptr);
     ptr = std::make_shared<SimpleObject>("eyes_death", "redy_emotions", "eyes_ouch");
     ptr->move({0.f, 25.f});
     ptr->setHidden(true);
-    children.emplace(ptr->getTag(), ptr);
+    children.push_back(ptr);
     ptr = std::make_shared<SimpleObject>("eyes_win", "redy_emotions", "eyes_happy");
     ptr->move({0.f, 25.f});
     ptr->setHidden(true);
-    children.emplace(ptr->getTag(), ptr);
+    children.push_back(ptr);
     spawnTime = Game::getClock().getElapsedTime().asSeconds();
     this->setPosition(spawnPos);
 }
@@ -55,23 +55,31 @@ void Player::onDeath()
 {
     auto followObject = Game::getObjectManager()->getCamera()->getFollowObject();
     float control_force = this->control_force;
-    respawnTimer = Timer::create(3, [this, followObject, control_force]()
-                                 {
+    auto respawnFunc = [this, followObject, control_force]()
+    {
         this->control_force = control_force;
         this->collidable->trigger = false;
-        this->physical->speed = {0.f ,0.f};
+        this->physical->speed = {0.f, 0.f};
         this->setPosition(spawnPos);
-        this->children.at("eyes_death")->setHidden(true);
+        auto child = std::find_if(children.begin(), children.end(),
+            [](std::shared_ptr<GameObject> obj) { return obj->getTag() == "eyes_death"; });
+        if (child != children.end())
+            (*child)->setHidden(true);
         this->respawnTimer = nullptr;
         Game::getObjectManager()->getCamera()->setFollowObject(followObject);
         float volume = (float)Game::getSettings()->getDouble("Volume", "music", 50);
-        Game::getSoundManager()->setMusic(Game::getSoundManager()->getMusicName(), volume); }, false);
+        Game::getSoundManager()->setMusic(Game::getSoundManager()->getMusicName(), volume);
+    };
+    respawnTimer = Timer::create(3, respawnFunc, false);
     this->setRotation(0);
     this->physical->speed = {0.f, 0.f};
     this->addForce({0, -5});
     this->collidable->trigger = true;
     this->control_force = 0;
-    this->children.at("eyes_death")->setHidden(false);
+    auto child = std::find_if(children.begin(), children.end(),
+        [](std::shared_ptr<GameObject> obj) { return obj->getTag() == "eyes_death"; });
+    if (child != children.end())
+        (*child)->setHidden(false);
     Game::getSoundManager()->playSound("death", Game::getSettings()->getDouble("Volume", "sounds", 100));
     Game::getObjectManager()->getCamera()->setFollowObject(nullptr);
     Game::getSoundManager()->stopMusic();
@@ -89,7 +97,10 @@ void Player::onWin()
     this->setRotation(0);
     this->physical->speed = {0.f, 0.f};
     this->control_force = 0;
-    this->children.at("eyes_win")->setHidden(false);
+    auto child = std::find_if(children.begin(), children.end(),
+        [](std::shared_ptr<GameObject> obj) { return obj->getTag() == "eyes_win"; });
+    if (child != children.end())
+        (*child)->setHidden(false);
     Game::getSoundManager()->playSound("win", Game::getSettings()->getDouble("Volume", "sounds", 100));
     Game::getObjectManager()->getCamera()->setFollowObject(nullptr);
     Game::getSoundManager()->stopMusic();
@@ -101,7 +112,10 @@ void Player::onWin()
 void Player::update()
 {
     float curTime = Game::getClock().getElapsedTime().asSeconds();
-    this->children.at("dots")->rotate(this->physical->speed.x * 3);
+    auto child = std::find_if(children.begin(), children.end(),
+        [](std::shared_ptr<GameObject> obj) { return obj->getTag() == "dots"; });
+    if (child != children.end())
+        (*child)->rotate(this->physical->speed.x * 3);
     if (this->physical->mass != 10)
         this->rotate(this->physical->speed.x * 3);
     if (hasWon && onGround && onGround && curTime - lastJumpTime > 0.25)
@@ -144,7 +158,7 @@ void Player::onCollision(std::shared_ptr<GameObject> other)
 
 void Player::saveNewRecord(float time, int eggs)
 {
-    const auto& stats = Game::getStats();
+    const auto &stats = Game::getStats();
     float bestTime = stats->get(stats->currentLevelName, "best_time");
     int bestEggs = stats->get(stats->currentLevelName, "best_eggs");
     stats->set(stats->currentLevelName, "best_time", time < bestTime || bestTime == 0 ? time : bestTime);

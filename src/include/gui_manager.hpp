@@ -26,6 +26,7 @@ public:
     const std::string pause_ui_path = "assets/ui/pause.txt";
     const std::string levelname_ui_path = "assets/ui/levelname.txt";
 
+    // для редактора
     void setConfig(const std::string& type, nlohmann::json *config);
     void setEditorInfo(const std::string &info);
     void toggleEditorInstructionsVisibility();

@@ -425,24 +425,24 @@ void ObjectManager::updateAll()
 
 void ObjectManager::collideAll()
 {
-  for (auto it = physical.begin(); it != physical.end();)
+  for (auto obj1 = physical.begin(); obj1 != physical.end();)
   {
-    if (!(*it)->alive)
+    if (!(*obj1)->alive)
     {
-      it = physical.erase(it);
+      obj1 = physical.erase(obj1);
       continue;
     }
-    for (auto itt = collidable.begin(); itt != collidable.end();)
+    for (auto obj2 = collidable.begin(); obj2 != collidable.end();)
     {
-      if (!(*itt)->alive)
+      if (!(*obj2)->alive)
       {
-        itt = collidable.erase(itt);
+        obj2 = collidable.erase(obj2);
         continue;
       }
-      GameObject::calculateCollision((*it), (*itt));
-      ++itt;
+      GameObject::calculateCollision((*obj1), (*obj2));
+      ++obj2;
     }
-    ++it;
+    ++obj1;
   }
 }
 
@@ -485,31 +485,3 @@ sf::View ObjectManager::getView() const
     return camera->getView();
   return defaultView;
 }
-
-// void ObjectManager::recurDatasiveCollision(std::shared_ptr<GameObject> first, std::shared_ptr<GameObject> second)
-// {
-// std::queue<std::shared_ptr<GameObject>> firstObjects;
-// firstObjects.push(first);
-// while (firstObjects.size() != 0)
-// {
-//     std::shared_ptr<GameObject> firstCur = firstObjects.front();
-
-//     // Another BFS
-//     std::queue<std::shared_ptr<GameObject>> secondObjects;
-//     secondObjects.push(second);
-//     while (secondObjects.size() != 0)
-//     {
-//         std::shared_ptr<GameObject> secondCur = secondObjects.front();
-//         if (firstCur->getCollidable() && secondCur->getCollidable() && !(firstCur->getCollidable()->isTrigger() && secondCur->getCollidable()->isTrigger()))
-//             calculateCollision(firstCur, secondCur);
-//         for (auto secondChild : secondCur->getChildren())
-//             secondObjects.push(secondChild);
-//         secondObjects.pop();
-//     }
-//     // ==========================
-
-//     for (auto firstChild : firstCur->getChildren())
-//         firstObjects.push(firstChild);
-//     firstObjects.pop();
-// }
-// }

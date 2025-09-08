@@ -137,7 +137,7 @@ void GameObject::update(std::shared_ptr<GameObject> obj)
             cur->collidable->colliding.clear();
         }
 
-        for (auto [tag, object] : cur->children)
+        for (auto object : cur->children)
             objects.push(object);
         objects.pop();
     }
@@ -157,7 +157,7 @@ void GameObject::draw(std::shared_ptr<GameObject> obj, sf::RenderTarget &target)
         std::shared_ptr<GameObject> cur = objects.front();
         if (cur->drawable && !cur->hidden)
             target.draw(*cur->drawable, identity.translate(positions.front()).rotate(rotations.front()) * cur->getTransform());
-        for (auto [tag, object] : cur->children)
+        for (auto object : cur->children)
         {
             objects.push(object);
             positions.push(positions.front() + cur->getPosition());

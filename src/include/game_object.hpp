@@ -76,7 +76,7 @@ protected:
 
     bool hidden = false;
     std::string tag;
-    std::map<std::string, std::shared_ptr<GameObject>> children;
+    std::vector<std::shared_ptr<GameObject>> children;
 
     std::shared_ptr<IDrawable> drawable;
     std::shared_ptr<sf::Transformable> transformable;

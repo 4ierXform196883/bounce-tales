@@ -136,6 +136,7 @@ void Game::processEvents()
             Game::running = false;
             break;
         case sf::Event::KeyPressed:
+            // если не меню - включаем паузу и показываем gui паузы
             if (event.key.code == sf::Keyboard::Escape && guiManager->currentUI != GuiManager::UI::MENU)
             {
                 guiManager->groups.at("pause")->setVisible(!guiManager->groups.at("pause")->isVisible());
