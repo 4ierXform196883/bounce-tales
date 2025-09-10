@@ -505,7 +505,7 @@ EditBox.editbox_camera_pos_y {
 Label.label_instructions1 {
     Position = (1.56%, 3.61%);
     ScrollbarPolicy = Never;
-    Size = (10.7%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "C - Create mode";
     TextSize = 20;
     UserData = "";
@@ -543,7 +543,7 @@ Label.label_instructions1 {
 Label.label_instructions2 {
     Position = (1.56%, 7.78%);
     ScrollbarPolicy = Never;
-    Size = (9.38%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "E - Edit mode";
     TextSize = 20;
     UserData = "";
@@ -581,7 +581,7 @@ Label.label_instructions2 {
 Label.label_instructions3 {
     Position = (1.56%, 11.95%);
     ScrollbarPolicy = Never;
-    Size = (13.12%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "Ctrl + Scroll - Zoom";
     TextSize = 20;
     UserData = "";
@@ -619,7 +619,7 @@ Label.label_instructions3 {
 Label.label_instructions4 {
     Position = (1.56%, 16.12%);
     ScrollbarPolicy = Never;
-    Size = (19.53%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "[Create] Scroll - Change object";
     TextSize = 20;
     UserData = "";
@@ -657,7 +657,7 @@ Label.label_instructions4 {
 Label.label_instructions5 {
     Position = (1.56%, 20.28%);
     ScrollbarPolicy = Never;
-    Size = (12.81%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "Del - Delete selected";
     TextSize = 20;
     UserData = "";
@@ -695,7 +695,7 @@ Label.label_instructions5 {
 Label.label_instructions6 {
     Position = (25%, 3.61%);
     ScrollbarPolicy = Never;
-    Size = (10%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "Ctrl + S - Save";
     TextSize = 20;
     UserData = "";
@@ -733,7 +733,7 @@ Label.label_instructions6 {
 Label.label_instructions7 {
     Position = (25%, 7.78%);
     ScrollbarPolicy = Never;
-    Size = (12.34%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "Ctrl + D - Duplicate";
     TextSize = 20;
     UserData = "";
@@ -771,7 +771,7 @@ Label.label_instructions7 {
 Label.label_instructions8 {
     Position = (25%, 11.95%);
     ScrollbarPolicy = Never;
-    Size = (13.75%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "X - Open/Close spline";
     TextSize = 20;
     UserData = "";
@@ -809,7 +809,7 @@ Label.label_instructions8 {
 Label.label_instructions9 {
     Position = (25%, 16.12%);
     ScrollbarPolicy = Never;
-    Size = (11.02%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "H - Hide this info";
     TextSize = 20;
     UserData = "";
@@ -845,9 +845,10 @@ Label.label_instructions9 {
 }
 
 Label.label_instructions10 {
+    MaximumTextWidth = 9999;
     Position = (25%, 20.29%);
     ScrollbarPolicy = Never;
-    Size = (13.59%, 3.75%);
+    Size = (30%, 3.75%);
     Text = "[Beware] No autosave";
     TextSize = 20;
     UserData = "";
@@ -1043,7 +1044,7 @@ EditBox.editbox_temp_array {
 }
 
 EditBox.editbox_temp_vector_x {
-    InputValidator = "[0-9]*\\.?[0-9]*";
+    InputValidator = Float;
     Position = (84.5%, 55.68%);
     Size = (5.5%, 3.5%);
     TextSize = 18;
@@ -1146,7 +1147,7 @@ Label.label_temp {
 }
 
 EditBox.editbox_temp_vector_y {
-    InputValidator = "[0-9]*\\.?[0-9]*";
+    InputValidator = Float;
     Position = (91%, 55.68%);
     Size = (5.5%, 3.5%);
     TextSize = 18;
@@ -1208,9 +1209,9 @@ Label.label_bg_temp {
 }
 
 Label.label_info {
-    Position = (1.56%, 646.016);
+    Position = (1.56%, 90%);
     ScrollbarPolicy = Never;
-    Size = (40%, 3.75%);
+    Size = (60%, 3.75%);
     TextSize = 20;
     UserData = info;
 
@@ -1241,5 +1242,37 @@ Label.label_info {
             ThumbColorHover = #E6E6E6;
             TrackColor = #F5F5F5;
         }
+    }
+}
+
+EditBox.editbox_temp_ufloat {
+    InputValidator = "[0-9]*\\.?[0-9]*";
+    Position = (84.5%, 42.63%);
+    Size = (12%, 3.5%);
+    TextSize = 18;
+    UserData = template;
+    Visible = false;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        CaretColor = black;
+        CaretWidth = 1;
+        DefaultTextColor = #A0A0A0;
+        Font = "andy.otf";
+        Padding = (0, 0, 0, 0);
+        SelectedTextBackgroundColor = #006EFF;
+        SelectedTextColor = white;
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        Texture = None;
+        TextureDisabled = None;
+        TextureFocused = None;
+        TextureHover = None;
     }
 }

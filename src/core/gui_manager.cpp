@@ -42,14 +42,14 @@ nlohmann::json editorConfigValues = nlohmann::json{
     {"scale", {{"type", "vector"}}},
     {"origin", {{"type", "hide"}}},
     {"rotation", {{"type", "float"}}},
-    {"mass", {{"type", "float"}}},
-    {"air_resistance", {{"type", "float"}}},
+    {"mass", {{"type", "ufloat"}}},
+    {"air_resistance", {{"type", "ufloat"}}},
     {"islands", {{"type", "uint"}}},
     {"clouds", {{"type", "uint"}}},
-    {"additional_distance", {{"type", "float"}}},
+    {"additional_distance", {{"type", "ufloat"}}},
     {"start_pos", {{"type", "hide"}}},
     {"spawn_pos", {{"type", "hide"}}},
-    {"control_force", {{"type", "float"}}},
+    {"control_force", {{"type", "ufloat"}}},
     {"type", {{"type", "hide"} /*, {"values", {"death_zone", "win_zone", "egg", "change_skin:light", "change_skin:normal", "change_skin:heavy"}}*/}},
     {"size", {{"type", "vector"}}},
     {"texture", {{"type", "hide"}}},
@@ -58,10 +58,10 @@ nlohmann::json editorConfigValues = nlohmann::json{
     {"tag", {{"type", "string"}}},
     {"verts", {{"type", "hide"}}},
     {"path", {{"type", "hide"}}},
-    {"speed_mult", {{"type", "float"}}},
-    {"power", {{"type", "float"}}},
+    {"speed_mult", {{"type", "ufloat"}}},
+    {"power", {{"type", "ufloat"}}},
     {"count", {{"type", "int"}}},
-    {"elevation", {{"type", "float"}}},
+    {"elevation", {{"type", "ufloat"}}},
     {"doors", {{"type", "array"}}},
     {"is_on", {{"type", "bool"}}},
     {"direction", {{"type", "vector"}}},
@@ -532,6 +532,8 @@ void GuiManager::connectObjectConfigGroupCallbacks()
 
   if (!editorData.objectConfig->contains("scale") && !editorData.objectConfig->contains("verts"))
     (*editorData.objectConfig)["scale"] = {1.0f, 1.0f};
+  if (!editorData.objectConfig->contains("rotation"))
+    (*editorData.objectConfig)["rotation"] = 0.0f;
 
   // Считаем количество полей
   auto predicate = [](const auto &json)
@@ -598,7 +600,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
       {
         editorData.objectConfig->at(key).at(0) = editboxX->getText().toFloat();
         dynamic_cast<Editor *>(Game::getObjectManager().get())->recreateSelectedObject();
-        std::cout << key << " changed to " << editorData.objectConfig->at(key).at(0) << "\n";
+        // std::cout << key << " changed to " << editorData.objectConfig->at(key).at(0) << "\n";
       };
       auto changeYCallback = [this, key, editboxY]
       {
@@ -634,7 +636,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
       editbox->setWidgetName("editbox_object_" + it.key());
       editbox->setPosition(editbox->getPosition().x, editboxPosString.c_str());
       editbox->setVisible(true);
-      if (typeField == "float")
+      if (typeField == "float" || typeField == "ufloat")
         editbox->setText(to_string3(static_cast<float>(editorData.objectConfig->at(key))));
       else if (typeField == "int" || typeField == "uint")
         editbox->setText(std::to_string(static_cast<int>(editorData.objectConfig->at(key))));
@@ -647,7 +649,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
       }
       auto changeCallback = [this, key, editbox, typeField]
       {
-        if (typeField == "float")
+        if (typeField == "float" || typeField == "ufloat")
           editorData.objectConfig->at(key) = editbox->getText().toFloat();
         else if (typeField == "int" || typeField == "uint")
           editorData.objectConfig->at(key) = editbox->getText().toInt();

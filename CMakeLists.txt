@@ -31,7 +31,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 add_custom_command(
-  TARGET ${PROJECT_NAME} POST_BUILD
+  TARGET ${PROJECT_NAME} PRE_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
   ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
   COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different

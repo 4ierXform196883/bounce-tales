@@ -31,138 +31,137 @@ const sf::Clock Game::globalClock;
 
 void Game::reinitWindow(const sf::Vector2i &resolution, bool fullscreen)
 {
-    sf::ContextSettings windowSettings = window->getSettings();
-    window->close();
-    auto style = fullscreen ? sf::Style::Fullscreen : sf::Style::Default;
-    window->create(sf::VideoMode(resolution.x, resolution.y), settings->title, style, windowSettings);
-    window->setFramerateLimit(60);
-    window->setVerticalSyncEnabled(true);
-    guiManager->gui->setTextSize(20 * resolution.x / 1280.f);
-    guiManager->gui->setWindow(*window);
+  sf::ContextSettings windowSettings = window->getSettings();
+  window->close();
+  auto style = fullscreen ? sf::Style::Fullscreen : sf::Style::Default;
+  window->create(sf::VideoMode(resolution.x, resolution.y), settings->title, style, windowSettings);
+  window->setFramerateLimit(60);
+  window->setVerticalSyncEnabled(true);
+  guiManager->gui->setTextSize(20 * resolution.x / 1280.f);
+  guiManager->gui->setWindow(*window);
 }
 
 void Game::loadLevel(const std::string &name, bool editorMode)
 {
-    Timer::globalTimers.clear();
-    objectManager->clear();
-    objectManager.reset();
-    stats->reset();
-    stats->currentLevelName = name;
-    if (Game::editorMode)
-        stats->loadTotalEggs();
-    Game::editorMode = editorMode;
-    if (name == "menu")
-    {
-        guiManager->init();
-        guiManager->setUI(GuiManager::UI::MENU);
-        objectManager = std::make_unique<ObjectManager>();
-    }
-    else if (editorMode)
-    {
-        objectManager = std::make_unique<Editor>();
-        guiManager->setUI(GuiManager::UI::EDITOR);
-    }
-    else
-    {
-        objectManager = std::make_unique<ObjectManager>();
-        guiManager->setUI(GuiManager::UI::LEVEL);
-    }
+  Timer::globalTimers.clear();
+  objectManager->clear();
+  objectManager.reset();
+  stats->reset();
+  stats->currentLevelName = name;
+  stats->loadTotalEggs();
+  Game::editorMode = editorMode;
+  if (name == "menu")
+  {
+    guiManager->init();
+    guiManager->setUI(GuiManager::UI::MENU);
+    objectManager = std::make_unique<ObjectManager>();
+  }
+  else if (editorMode)
+  {
+    objectManager = std::make_unique<Editor>();
+    guiManager->setUI(GuiManager::UI::EDITOR);
+  }
+  else
+  {
+    objectManager = std::make_unique<ObjectManager>();
+    guiManager->setUI(GuiManager::UI::LEVEL);
+  }
 
-    objectManager->load("levels/" + name + ".json");
-    guiManager->gui->setTextSize(20 * settings->getInt("Screen", "width", 1280) / 1280.f);
+  objectManager->load("levels/" + name + ".json");
+  guiManager->gui->setTextSize(20 * settings->getInt("Screen", "width", 1280) / 1280.f);
 }
 
 void Game::init()
 {
-    assetManager = std::make_unique<AssetManager>();
-    guiManager = std::make_unique<GuiManager>();
-    objectManager = std::make_unique<ObjectManager>();
-    soundManager = std::make_unique<SoundManager>();
-    settings = std::make_unique<Settings>();
-    stats = std::make_unique<Stats>();
+  assetManager = std::make_unique<AssetManager>();
+  guiManager = std::make_unique<GuiManager>();
+  objectManager = std::make_unique<ObjectManager>();
+  soundManager = std::make_unique<SoundManager>();
+  settings = std::make_unique<Settings>();
+  stats = std::make_unique<Stats>();
 
-    settings->load(settings->settings_path);
-    stats->load(settings->stats_path);
-    assetManager->loadTextures(settings->textures_path);
-    assetManager->loadSounds(settings->sounds_path);
-    soundManager->init();
-    sf::Vector2i windowSize = {settings->getInt("Screen", "width", 1280), settings->getInt("Screen", "height", 720)};
-    auto fullscreen = settings->getBool("Screen", "fullscreen", false) ? sf::Style::Fullscreen : sf::Style::Default;
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings->title, fullscreen);
-    window->setFramerateLimit(60);
-    window->setVerticalSyncEnabled(true);
-    guiManager->gui = std::make_unique<tgui::Gui>(*window);
-    guiManager->init();
+  settings->load(settings->settings_path);
+  stats->load(settings->stats_path);
+  assetManager->loadTextures(settings->textures_path);
+  assetManager->loadSounds(settings->sounds_path);
+  soundManager->init();
+  sf::Vector2i windowSize = {settings->getInt("Screen", "width", 1280), settings->getInt("Screen", "height", 720)};
+  auto fullscreen = settings->getBool("Screen", "fullscreen", false) ? sf::Style::Fullscreen : sf::Style::Default;
+  window = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), settings->title, fullscreen);
+  window->setFramerateLimit(60);
+  window->setVerticalSyncEnabled(true);
+  guiManager->gui = std::make_unique<tgui::Gui>(*window);
+  guiManager->init();
 
-    Game::loadLevel("menu");
+  Game::loadLevel("menu");
 }
 
 void Game::close()
 {
-    Timer::globalTimers.clear();
-    objectManager->clear();
-    assetManager->unloadTextures();
-    assetManager->unloadSounds();
-    settings->save(settings->settings_path);
-    stats->save(settings->stats_path);
-    soundManager->stopMusic();
-    guiManager->gui.release();
-    window->close();
+  Timer::globalTimers.clear();
+  objectManager->clear();
+  assetManager->unloadTextures();
+  assetManager->unloadSounds();
+  settings->save(settings->settings_path);
+  stats->save(settings->stats_path);
+  soundManager->stopMusic();
+  guiManager->gui.release();
+  window->close();
 }
 
 void Game::tick()
 {
-    Game::processEvents();
-    if (!objectManager->loaded)
-        return;
-    if (!paused)
-    {
-        objectManager->collideAll();
-        Timer::updateAll();
-        objectManager->updateAll();
-    }
-    Game::render();
+  Game::processEvents();
+  if (!objectManager->loaded)
+    return;
+  if (!paused)
+  {
+    objectManager->collideAll();
+    Timer::updateAll();
+    objectManager->updateAll();
+  }
+  Game::render();
 }
 
 void Game::processEvents()
 {
-    for (auto event = sf::Event{}; window->pollEvent(event);)
+  for (auto event = sf::Event{}; window->pollEvent(event);)
+  {
+    if (!guiManager->gui->handleEvent(event))
+      objectManager->handleEvent(event);
+    switch (event.type)
     {
-        if (!guiManager->gui->handleEvent(event))
-            objectManager->handleEvent(event);
-        switch (event.type)
+      case sf::Event::Closed:
+        Game::running = false;
+        break;
+      case sf::Event::KeyPressed:
+        // если не меню - включаем паузу и показываем gui паузы
+        if (event.key.code == sf::Keyboard::Escape && guiManager->currentUI != GuiManager::UI::MENU)
         {
-        case sf::Event::Closed:
-            Game::running = false;
-            break;
-        case sf::Event::KeyPressed:
-            // если не меню - включаем паузу и показываем gui паузы
-            if (event.key.code == sf::Keyboard::Escape && guiManager->currentUI != GuiManager::UI::MENU)
-            {
-                guiManager->groups.at("pause")->setVisible(!guiManager->groups.at("pause")->isVisible());
-                paused = !paused;
-            }
-            break;
-
-        default:
-            break;
+          guiManager->groups.at("pause")->setVisible(!guiManager->groups.at("pause")->isVisible());
+          paused = !paused;
         }
+        break;
+
+      default:
+        break;
     }
+  }
 }
 
 void Game::render()
 {
-    window->clear(sf::Color::Black);
-    objectManager->drawAll(*window);
-    guiManager->gui->draw();
-    window->display();
+  window->clear(sf::Color::Black);
+  objectManager->drawAll(*window);
+  guiManager->gui->draw();
+  window->display();
 }
 
 int main()
 {
-    Game::init();
-    while (Game::running)
-        Game::tick();
-    Game::close();
-    return 0;
+  Game::init();
+  while (Game::running)
+    Game::tick();
+  Game::close();
+  return 0;
 }
