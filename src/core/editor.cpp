@@ -90,6 +90,54 @@ const nlohmann::json simpleBushObjectConfigTemplate = {
   {"subtexture", ""},
   {"texture", "bush"}};
 
+const nlohmann::json simpleGrass1ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "1"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass2ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "2"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass3ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "3"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass4ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "4"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass5ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "5"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass6ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "6"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass7ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "7"},
+  {"texture", "grass"}};
+
+const nlohmann::json simpleGrass8ObjectConfigTemplate = {
+  {"tag", ""},
+  {"animation", ""},
+  {"subtexture", "8"},
+  {"texture", "grass"}};
+
 const nlohmann::json platformConfigTemplate = {
   {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {50.0f, 0.0f}}},
   {"path", {{0.0f, 0.0f}, {100.0f, 100.0f}}},
@@ -719,9 +767,9 @@ void Editor::onMouseScroll(float delta)
   if (mode == Create)
   {
     if (delta > 0)
-      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 19, newObjectType) - newObjectTypes + 1) % 19];
+      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 27, newObjectType) - newObjectTypes + 1) % 27];
     else
-      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 19, newObjectType) - newObjectTypes + 18) % 19];
+      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 27, newObjectType) - newObjectTypes + 26) % 27];
     std::string realType = newObjectType.substr(0, newObjectType.find(':'));
     newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
     Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
@@ -908,6 +956,22 @@ const nlohmann::json &Editor::getTemplateConfigForObjectType(const std::string &
     return simpleFlowerBlueObjectConfigTemplate;
   else if (type == "simple:flower_white")
     return simpleFlowerWhiteObjectConfigTemplate;
+  else if (type == "simple:grass1")
+    return simpleGrass1ObjectConfigTemplate;
+  else if (type == "simple:grass2")
+    return simpleGrass2ObjectConfigTemplate;
+  else if (type == "simple:grass3")
+    return simpleGrass3ObjectConfigTemplate;
+  else if (type == "simple:grass4")
+    return simpleGrass4ObjectConfigTemplate;
+  else if (type == "simple:grass5")
+    return simpleGrass5ObjectConfigTemplate;
+  else if (type == "simple:grass6")
+    return simpleGrass6ObjectConfigTemplate;
+  else if (type == "simple:grass7")
+    return simpleGrass7ObjectConfigTemplate;
+  else if (type == "simple:grass8")
+    return simpleGrass8ObjectConfigTemplate;
   else if (type == "simple:bush")
     return simpleBushObjectConfigTemplate;
   else if (type == "platform")

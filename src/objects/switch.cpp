@@ -16,7 +16,7 @@ Switch::Switch(const std::vector<std::shared_ptr<Door>> &doors)
     this->drawable = std::make_shared<PrimitiveSprite>(texture, frame);
     ConvexHitbox hitbox = ConvexHitbox{{{1, 1}, {hSize.x, 1}, hSize, {1, hSize.y}}};
     this->collidable = std::make_shared<Collidable>(hitbox, 0, true);
-    this->setOrigin(tSize.x / 2.f, tSize.y / 2.f);
+    this->setOrigin(frame.width / 2.f, frame.height / 2.f);
 }
 
 void Switch::setState(bool state)
