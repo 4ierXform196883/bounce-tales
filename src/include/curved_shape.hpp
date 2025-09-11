@@ -7,6 +7,7 @@ class CurvedShape : public IDrawable
 {
 public:
     CurvedShape() = default;
+    CurvedShape(const std::vector<sf::Vector2f> &vertices);
     CurvedShape(const sf::Texture &texture, const std::vector<sf::Vector2f> &vertices);
     virtual ~CurvedShape() = default;
 
@@ -22,5 +23,5 @@ protected:
 
     sf::VertexArray verts;
     sf::Color color = sf::Color::White;
-    const sf::Texture *texture;
+    const sf::Texture *texture = nullptr;
 };

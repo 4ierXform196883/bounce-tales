@@ -178,15 +178,24 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
   }
   else if (type == "ground")
   {
-    if (!config.contains("verts") || !config.contains("texture"))
+    if (!config.contains("verts"))
       return nullptr;
     std::vector<sf::Vector2f> verts;
     verts.reserve(config["verts"].size());
 
     for (const auto &point : config["verts"])
       verts.emplace_back(sf::Vector2f(point[0], point[1]));
-
-    auto ptr = std::make_shared<Ground>(std::move(verts), config["texture"], config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
+    std::shared_ptr<Ground> ptr;
+    if (config.contains("texture"))
+      ptr = std::make_shared<Ground>(std::move(verts), config["texture"], config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
+    else if (config.contains("color"))
+    {
+      std::string colorStr = config["color"];
+      uint32_t ground_color = std::stoi(colorStr.substr(1), nullptr, 16);
+      ptr = std::make_shared<Ground>(std::move(verts), sf::Color(ground_color), config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
+    }
+    else
+      return nullptr;
     loadObject(ptr, config);
     return ptr;
   }

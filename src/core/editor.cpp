@@ -94,6 +94,7 @@ const nlohmann::json platformConfigTemplate = {
   {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {50.0f, 0.0f}}},
   {"path", {{0.0f, 0.0f}, {100.0f, 100.0f}}},
   {"texture", "ground_1"},
+  // {"color", "#00AA00"},
   {"speed_mult", 1.0f}};
 
 const nlohmann::json jumpPadConfigTemplate = {
@@ -120,8 +121,10 @@ const nlohmann::json waterConfigTemplate = {
 
 const nlohmann::json groundConfigTemplate = {
   {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {0.0f, 50.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
-  {"bezier_verts", true},
-  {"texture", "ground_0"}};
+  {"color", "#426500FF"},
+  // {"texture", "ground_0"},
+  {"bezier_verts", true}};
+
 
 const nlohmann::json cameraConfigTemplate = {
   {"size", {800.0f, 600.0f}},

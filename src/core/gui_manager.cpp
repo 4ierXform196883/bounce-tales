@@ -532,7 +532,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
 
   if (!editorData.objectConfig->contains("scale") && !editorData.objectConfig->contains("verts"))
     (*editorData.objectConfig)["scale"] = {1.0f, 1.0f};
-  if (!editorData.objectConfig->contains("rotation"))
+  if (!editorData.objectConfig->contains("rotation") && !editorData.objectConfig->contains("verts"))
     (*editorData.objectConfig)["rotation"] = 0.0f;
 
   // Считаем количество полей
