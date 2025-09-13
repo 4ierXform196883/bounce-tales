@@ -15,15 +15,15 @@ Player::Player(const sf::Vector2f &spawnPos, float control_force)
     drawable = std::make_shared<PrimitiveSprite>(texture);
     this->setOrigin(tSize.x / 2, tSize.y / 2);
     collidable = std::make_shared<Collidable>(CircleHitbox{tSize.x / 2.0f - 2, {tSize.x / 2.0f, tSize.x / 2.0f}});
-    physical = std::make_shared<Physical>(10, 0.001);
+    physical = std::make_shared<Physical>(10, 0.003);
     auto ptr = std::make_shared<SimpleObject>("dots", "redy_dots");
     children.push_back(ptr);
     ptr = std::make_shared<SimpleObject>("eyes_death", "redy_emotions", "eyes_ouch");
-    ptr->move({0.f, 25.f});
+    // ptr->move({0.f, 0.f});
     ptr->setHidden(true);
     children.push_back(ptr);
     ptr = std::make_shared<SimpleObject>("eyes_win", "redy_emotions", "eyes_happy");
-    ptr->move({0.f, 25.f});
+    // ptr->move({0.f, 0.f});
     ptr->setHidden(true);
     children.push_back(ptr);
     spawnTime = Game::getClock().getElapsedTime().asSeconds();
@@ -142,7 +142,7 @@ void Player::update()
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && onGround && curTime - lastJumpTime > 1)
         {
-            this->addForce({0, -control_force * 50});
+            this->addForce({0, -5});
             lastJumpTime = curTime;
             // Particle::spawnScatter("egg", this->getPosition(), 1, sf::Vector2f(50, 50), 30);
         }

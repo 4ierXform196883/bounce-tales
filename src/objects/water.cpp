@@ -21,7 +21,7 @@ Water::Water(const sf::Vector2f &size)
                                         {
         const auto& am = Game::getAssetManager();
         size_t amount = randomizer::getRandInt(2, 5);
-        Particle::spawnScatter("particles", "bubble", this->getPosition(), 0.1f, 0.4f * this->size, amount);
+        Particle::spawnScatterDirected("particles", "bubble", this->getPosition(), 0.1f, 0.4f * this->size, sf::Vector2f(0, -1), amount);
         this->particleTimer->duration = randomizer::getRandFloat(0.1f, 0.9f); });
 }
 

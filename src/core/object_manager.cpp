@@ -76,22 +76,6 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "simple")
-  {
-    if (!config.contains("tag") || !config.contains("texture"))
-      return nullptr;
-    std::shared_ptr<SimpleObject> ptr;
-    if (config.contains("subtexture") && config["subtexture"] != "" && config.contains("texture") && config["texture"] != "")
-      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["subtexture"]);
-    else if (config.contains("animation") && config["animation"] != "" && config.contains("texture") && config["texture"] != "")
-      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["animation"], config["fps"]);
-    else if (config.contains("texture") && config["texture"] != "")
-      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"]);
-    else
-      return nullptr;
-    loadObject(ptr, config);
-    return ptr;
-  }
   else if (type == "platform")
   {
     if (!config.contains("texture") || config["texture"] == "" || !config.contains("verts") || !config.contains("path") || !config.contains("speed_mult"))
@@ -199,6 +183,22 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
     loadObject(ptr, config);
     return ptr;
   }
+  else if (type == "simple")
+  {
+    if (!config.contains("tag") || !config.contains("texture"))
+      return nullptr;
+    std::shared_ptr<SimpleObject> ptr;
+    if (config.contains("subtexture") && config["subtexture"] != "" && config.contains("texture") && config["texture"] != "")
+      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["subtexture"]);
+    else if (config.contains("animation") && config["animation"] != "" && config.contains("texture") && config["texture"] != "")
+      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["animation"], config["fps"]);
+    else if (config.contains("texture") && config["texture"] != "")
+      ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"]);
+    else
+      return nullptr;
+    loadObject(ptr, config);
+    return ptr;
+  }
   else if (type == "camera")
   {
     if (!config.contains("size"))
@@ -289,15 +289,6 @@ void ObjectManager::load(const std::string &path)
     collidable.push_back(ptr);
   }
 
-  // Simple objects
-  for (const auto &part : data["simple"])
-  {
-    ptr = createObjectOfType("simple", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-  }
-
   // Platforms
   for (const auto &part : data["platforms"])
   {
@@ -385,6 +376,15 @@ void ObjectManager::load(const std::string &path)
     drawable.push_back(ptr);
     updatable.push_back(ptr);
     collidable.push_back(ptr);
+  }
+
+  // Simple objects
+  for (const auto &part : data["simple"])
+  {
+    ptr = createObjectOfType("simple", part);
+    if (!ptr)
+      continue;
+    drawable.push_back(ptr);
   }
 
   // Camera

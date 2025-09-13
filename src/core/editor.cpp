@@ -232,16 +232,6 @@ void Editor::load(const std::string &path)
     configs.emplace_back("trigger", part);
   }
 
-  // Simple objects
-  for (const auto &part : data["simple"])
-  {
-    ptr = createObjectOfType("simple", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("simple", part);
-  }
-
   // Platforms
   for (const auto &part : data["platforms"])
   {
@@ -320,6 +310,16 @@ void Editor::load(const std::string &path)
       continue;
     drawable.push_back(ptr);
     configs.emplace_back("ground", part);
+  }
+
+  // Simple objects
+  for (const auto &part : data["simple"])
+  {
+    ptr = createObjectOfType("simple", part);
+    if (!ptr)
+      continue;
+    drawable.push_back(ptr);
+    configs.emplace_back("simple", part);
   }
 
   // Camera
@@ -448,8 +448,9 @@ int Editor::getClickedPoint()
 std::shared_ptr<GameObject> Editor::getClickedObject()
 {
   auto mousePos = Game::getMousePos();
-  for (const auto &obj : drawable)
+  for (auto it = drawable.rbegin(); it != drawable.rend(); ++it)
   {
+    const auto& obj = *it;
     if (auto particle = std::dynamic_pointer_cast<Particle>(obj))
       continue;
     auto ptr = std::dynamic_pointer_cast<Ground>(obj);
@@ -763,6 +764,7 @@ void Editor::onMouseScroll(float delta)
     float factor = objectManager->getCamera()->getZoom() * (delta > 0 ? 0.9f : 1.1f);
     factor = std::clamp(factor, 0.1f, 10.0f);
     objectManager->getCamera()->setZoom(factor);
+    return;
   }
   if (mode == Create)
   {
@@ -876,6 +878,41 @@ void Editor::handleKeyboard()
   else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H))
   {
     Game::getGuiManager()->toggleEditorInstructionsVisibility();
+  }
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::B) && !selection.selectedObjects.empty())
+  {
+    // Collect indices of selected objects
+    std::vector<size_t> indices;
+    for (auto &obj : selection.selectedObjects)
+    {
+      auto it = std::find(drawable.begin(), drawable.end(), obj);
+      if (it != drawable.end())
+      {
+        indices.push_back(std::distance(drawable.begin(), it));
+      }
+    }
+
+    // Sort indices so we remove from back to front (avoids invalidation issues)
+    std::sort(indices.rbegin(), indices.rend());
+
+    std::vector<std::shared_ptr<GameObject>> movedObjects;
+    std::vector<std::pair<std::string, nlohmann::json>> movedConfigs;
+
+    // Extract selected objects/configs
+    for (auto i : indices)
+    {
+      movedObjects.push_back(drawable[i]);
+      movedConfigs.push_back(configs[i]);
+
+      drawable.erase(drawable.begin() + i);
+      configs.erase(configs.begin() + i);
+    }
+
+    // Insert them at the beginning in the same order as selection
+    drawable.insert(drawable.begin() + drawable.size() - 1, movedObjects.begin(), movedObjects.end());
+    configs.insert(configs.begin() + configs.size() - 1, movedConfigs.begin(), movedConfigs.end());
+
+    Game::getGuiManager()->setEditorInfo("Moved " + std::to_string(movedObjects.size()) + " objects to the front");
   }
 }
 
