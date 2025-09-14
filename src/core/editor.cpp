@@ -22,161 +22,175 @@
 #include "particle.hpp"
 
 const nlohmann::json objectConfigTemplate = {
-  {"pos", {0.0f, 0.0f}},
-  {"scale", {1.0f, 1.0f}},
-  {"origin", {0.0f, 0.0f}},
-  {"rotation", 0.0f},
-  {"mass", 1.0f},
-  {"air_resistance", 0.1f}};
+    {"pos", {0.0f, 0.0f}},
+    {"scale", {1.0f, 1.0f}},
+    {"origin", {0.0f, 0.0f}},
+    {"rotation", 0.0f},
+    {"mass", 1.0f},
+    {"air_resistance", 0.1f}};
 
 const nlohmann::json backgroundConfigTemplate = {
-  {"islands", 60},
-  {"clouds", 40},
-  {"additional_distance", 4.0f}};
+    {"islands", 60},
+    {"clouds", 40},
+    {"additional_distance", 4.0f}};
 
 const nlohmann::json playerConfigTemplate = {
-  {"spawn_pos", {0.0f, 0.0f}},
-  {"control_force", 0.1f}};
+    {"spawn_pos", {0.0f, 0.0f}},
+    {"control_force", 0.1f}};
 
 const nlohmann::json triggerDeathConfigTemplate = {
-  {"type", "death_zone"},
-  {"size", {50.0f, 50.0f}}};
+    {"type", "death_zone"},
+    {"size", {50.0f, 50.0f}}};
+
+const nlohmann::json rockConfigTemplate = {
+    {"mass", 2}};
 
 const nlohmann::json triggerWin0ConfigTemplate = {
-  {"type", "win_zone"},
-  {"texture", "exit_0"}};
+    {"type", "win_zone"},
+    {"texture", "exit_0"}};
 
 const nlohmann::json triggerWin1ConfigTemplate = {
-  {"type", "win_zone"},
-  {"texture", "exit_1"}};
+    {"type", "win_zone"},
+    {"texture", "exit_1"}};
 
 const nlohmann::json triggerEggConfigTemplate = {
-  {"type", "egg"},
-  {"texture", "egg"}};
+    {"type", "egg"},
+    {"texture", "egg"}};
 
 const nlohmann::json triggerSkinLightConfigTemplate = {
-  {"type", "player_set_skin:light"},
-  {"size", {50.0f, 50.0f}}};
+    {"type", "player_set_skin:light"},
+    {"size", {50.0f, 50.0f}}};
 
 const nlohmann::json triggerSkinNormalConfigTemplate = {
-  {"type", "player_set_skin:normal"},
-  {"size", {50.0f, 50.0f}}};
+    {"type", "player_set_skin:normal"},
+    {"size", {50.0f, 50.0f}}};
 
 const nlohmann::json triggerSkinHeavyConfigTemplate = {
-  {"type", "player_set_skin:heavy"},
-  {"size", {50.0f, 50.0f}}};
+    {"type", "player_set_skin:heavy"},
+    {"size", {50.0f, 50.0f}}};
 
 const nlohmann::json simpleFlowerRedObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", ""},
-  {"texture", "flower_red"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", ""},
+    {"texture", "flower_red"}};
 
 const nlohmann::json simpleFlowerBlueObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", ""},
-  {"texture", "flower_blue"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", ""},
+    {"texture", "flower_blue"}};
 
 const nlohmann::json simpleFlowerWhiteObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", ""},
-  {"texture", "flower_white"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", ""},
+    {"texture", "flower_white"}};
 
 const nlohmann::json simpleBushObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", ""},
-  {"texture", "bush"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", ""},
+    {"texture", "bush"}};
 
 const nlohmann::json simpleGrass1ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "1"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "1"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass2ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "2"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "2"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass3ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "3"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "3"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass4ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "4"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "4"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass5ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "5"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "5"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass6ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "6"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "6"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass7ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "7"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "7"},
+    {"texture", "grass"}};
 
 const nlohmann::json simpleGrass8ObjectConfigTemplate = {
-  {"tag", ""},
-  {"animation", ""},
-  {"subtexture", "8"},
-  {"texture", "grass"}};
+    {"tag", ""},
+    {"animation", ""},
+    {"fps", 1},
+    {"subtexture", "8"},
+    {"texture", "grass"}};
 
 const nlohmann::json platformConfigTemplate = {
-  {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {50.0f, 0.0f}}},
-  {"path", {{0.0f, 0.0f}, {100.0f, 100.0f}}},
-  {"texture", "ground_1"},
-  // {"color", "#00AA00"},
-  {"speed_mult", 1.0f}};
+    {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {50.0f, 0.0f}}},
+    {"path", {{0.0f, 0.0f}, {100.0f, 100.0f}}},
+    {"texture", "ground_1"},
+    // {"color", "#00AA00"},
+    {"speed_mult", 1.0f}};
 
 const nlohmann::json jumpPadConfigTemplate = {
-  {"power", 10.0f}};
+    {"power", 10.0f}};
 
 const nlohmann::json spikesConfigTemplate = {
-  {"count", 5}};
+    {"count", 5}};
 
 const nlohmann::json doorConfigTemplate = {
-  {"tag", ""},
-  {"start_pos", {0.0f, 0.0f}},
-  {"elevation", 50.0f}};
+    {"tag", ""},
+    {"start_pos", {0.0f, 0.0f}},
+    {"elevation", 50.0f}};
 
 const nlohmann::json switchConfigTemplate = {
-  {"doors", {}},
-  {"is_on", false}};
+    {"doors", {}},
+    {"is_on", false}};
 
 const nlohmann::json windConfigTemplate = {
-  {"size", {100.0f, 100.0f}},
-  {"direction", {1.0f, 0.0f}}};
+    {"size", {100.0f, 100.0f}},
+    {"direction", {1.0f, 0.0f}}};
 
 const nlohmann::json waterConfigTemplate = {
-  {"size", {100.0f, 100.0f}}};
+    {"size", {100.0f, 100.0f}}};
 
 const nlohmann::json groundConfigTemplate = {
-  {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {0.0f, 50.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
-  {"color", "#426500FF"},
-  // {"texture", "ground_0"},
-  {"bezier_verts", true}};
-
+    {"verts", {{0.0f, 0.0f}, {50.0f, 0.0f}, {50.0f, 50.0f}, {0.0f, 50.0f}, {-50.0f, 50.0f}, {-50.0f, 0.0f}, {0.0f, 0.0f}}},
+    {"color", "#426500FF"},
+    // {"texture", "ground_0"},
+    {"bezier_verts", true}};
 
 const nlohmann::json cameraConfigTemplate = {
-  {"size", {800.0f, 600.0f}},
-  {"follow", "player"}};
+    {"size", {800.0f, 600.0f}},
+    {"follow", "player"}};
 
 void Editor::load(const std::string &path)
 {
@@ -186,148 +200,96 @@ void Editor::load(const std::string &path)
   this->loaded = true;
   const_cast<sf::View &>(defaultView) = sf::View({0, 0}, Game::getSettings()->camera_size);
 
-  // Opening json
+  // Opening JSON
   std::ifstream file(path);
   if (!file.is_open())
   {
-    std::cerr << "[ERROR] (Editor::load) Couldn't open file\n";
+    std::cerr << "[ERROR] (Editor::load) Couldn't open file: " << path << "\n";
     Game::loadLevel("menu");
     return;
   }
+
   nlohmann::json data;
-  file >> data;
+  try
+  {
+    file >> data;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "[ERROR] (Editor::load) Failed to parse JSON: " << e.what() << "\n";
+    Game::loadLevel("menu");
+    return;
+  }
   file.close();
 
-  if (data.contains("display_name"))
-    levelName = data["display_name"];
+  if (data.contains("display_name") && data["display_name"].is_string())
+    levelName = data["display_name"].get<std::string>();
   levelPath = path;
 
   std::shared_ptr<GameObject> ptr;
 
   // Background
   ptr = createObjectOfType("background", data.contains("background") ? data["background"] : backgroundConfigTemplate);
-  backgroundConfig = data.contains("background") && ptr ? data["background"] : backgroundConfigTemplate;
-  background = std::dynamic_pointer_cast<Background>(ptr ? ptr : createObjectOfType("background", backgroundConfigTemplate));
-  Game::getGuiManager()->setConfig("background", &backgroundConfig);
+  backgroundConfig = (data.contains("background") && ptr) ? data["background"] : backgroundConfigTemplate;
+  if (!ptr)
+    ptr = createObjectOfType("background", backgroundConfigTemplate);
+  background = std::dynamic_pointer_cast<Background>(ptr);
+  if (background)
+    Game::getGuiManager()->setConfig("background", &backgroundConfig);
 
   // Player
   ptr = createObjectOfType("player", data.contains("player") ? data["player"] : playerConfigTemplate);
-  configs.push_back({"player", data.contains("player") && ptr ? data["player"] : playerConfigTemplate});
-  player = std::dynamic_pointer_cast<Player>(ptr ? ptr : createObjectOfType("player", playerConfigTemplate));
-  drawable.push_back(player);
+  configs.push_back({"player", (data.contains("player") && ptr) ? data["player"] : playerConfigTemplate});
+  if (!ptr)
+    ptr = createObjectOfType("player", playerConfigTemplate);
+  player = std::dynamic_pointer_cast<Player>(ptr);
+  if (player)
+    drawable.push_back(player);
 
   // Music
-  if (data.contains("music"))
+  if (data.contains("music") && data["music"].is_string())
     Game::getSoundManager()->setMusic(data["music"], Game::getSettings()->getDouble("Volume", "music", 50));
   else
     Game::getSoundManager()->setMusic("level", Game::getSettings()->getDouble("Volume", "music", 50));
 
-  // Triggers
-  for (const auto &part : data["triggers"])
+  auto loadArray = [&](const std::string &key, const std::string &type)
   {
-    ptr = createObjectOfType("trigger", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("trigger", part);
-  }
+    if (data.contains(key) && data[key].is_array())
+    {
+      for (const auto &part : data[key])
+      {
+        auto obj = createObjectOfType(type, part);
+        if (!obj)
+          continue;
+        drawable.push_back(obj);
+        configs.emplace_back(type, part);
+      }
+    }
+  };
 
-  // Platforms
-  for (const auto &part : data["platforms"])
-  {
-    ptr = createObjectOfType("platform", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("platform", part);
-  }
-
-  // Jump pads
-  for (const auto &part : data["jump_pads"])
-  {
-    ptr = createObjectOfType("jump_pad", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("jump_pad", part);
-  }
-
-  // Spikes
-  for (const auto &part : data["spikes"])
-  {
-    ptr = createObjectOfType("spikes", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("spikes", part);
-  }
-
-  // Doors
-  for (const auto &part : data["doors"])
-  {
-    ptr = createObjectOfType("door", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("door", part);
-  }
-
-  // Switches
-  for (const auto &part : data["switches"])
-  {
-    ptr = createObjectOfType("switch", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("switch", part);
-  }
-
-  // Wind
-  for (const auto &part : data["wind"])
-  {
-    ptr = createObjectOfType("wind", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("wind", part);
-  }
-
-  // Water
-  for (const auto &part : data["water"])
-  {
-    ptr = createObjectOfType("water", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("water", part);
-  }
-
-  // Ground
-  for (const auto &part : data["ground"])
-  {
-    ptr = createObjectOfType("ground", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("ground", part);
-  }
-
-  // Simple objects
-  for (const auto &part : data["simple"])
-  {
-    ptr = createObjectOfType("simple", part);
-    if (!ptr)
-      continue;
-    drawable.push_back(ptr);
-    configs.emplace_back("simple", part);
-  }
+  loadArray("triggers", "trigger");
+  loadArray("platforms", "platform");
+  loadArray("jump_pads", "jump_pad");
+  loadArray("spikes", "spikes");
+  loadArray("doors", "door");
+  loadArray("switches", "switch");
+  loadArray("wind", "wind");
+  loadArray("water", "water");
+  loadArray("ground", "ground");
+  loadArray("simple", "simple");
+  loadArray("rocks", "rock");
 
   // Camera
   ptr = createObjectOfType("camera", data.contains("camera") ? data["camera"] : cameraConfigTemplate);
-  cameraConfig = data.contains("camera") && ptr ? data["camera"] : cameraConfigTemplate;
-  camera = std::dynamic_pointer_cast<Camera>(ptr ? ptr : createObjectOfType("camera", cameraConfigTemplate));
-  camera->setFollowObject(nullptr);
-  Game::getGuiManager()->setConfig("camera", &cameraConfig);
+  cameraConfig = (data.contains("camera") && ptr) ? data["camera"] : cameraConfigTemplate;
+  if (!ptr)
+    ptr = createObjectOfType("camera", cameraConfigTemplate);
+  camera = std::dynamic_pointer_cast<Camera>(ptr);
+  if (camera)
+  {
+    camera->setFollowObject(nullptr);
+    Game::getGuiManager()->setConfig("camera", &cameraConfig);
+  }
 }
 
 void Editor::save(const std::string &path)
@@ -368,6 +330,8 @@ void Editor::save(const std::string &path)
       data["water"].push_back(configs.at(i).second);
     else if (type == "ground")
       data["ground"].push_back(configs.at(i).second);
+    else if (type == "rock")
+      data["rocks"].push_back(configs.at(i).second);
   }
 
   std::ofstream file(path);
@@ -384,25 +348,43 @@ void Editor::recreateSelectedObject()
 {
   if (!selection.selectedObject)
     return;
+
   auto &config = getConfigForObject(selection.selectedObject);
   std::string type = getObjectType(selection.selectedObject);
-  int dIndex = std::distance(drawable.begin(), std::find(drawable.begin(), drawable.end(), selection.selectedObject));
-  selection.selectedObject = createObjectOfType(type, config);
-  drawable.at(dIndex) = selection.selectedObject;
+
+  auto it = std::find(drawable.begin(), drawable.end(), selection.selectedObject);
+  if (it == drawable.end())
+    return;
+
+  int dIndex = std::distance(drawable.begin(), it);
+
+  auto newObj = createObjectOfType(type, config);
+  if (!newObj)
+    return;
+
+  selection.selectedObject = newObj;
+
+  if (dIndex >= 0 && dIndex < static_cast<int>(drawable.size()))
+    drawable.at(dIndex) = selection.selectedObject;
 }
 
 void Editor::updateAll()
 {
-  GameObject::update(camera);
-  GameObject::update(background);
+  if (camera)
+    GameObject::update(camera);
+
+  if (background)
+    GameObject::update(background);
+
   for (auto it = updatable.begin(); it != updatable.end();)
   {
-    if (!(*it)->alive)
+    auto &obj = *it;
+    if (!obj || !obj->alive)
     {
       it = updatable.erase(it);
       continue;
     }
-    GameObject::update((*it));
+    GameObject::update(obj);
     ++it;
   }
 }
@@ -411,24 +393,30 @@ void Editor::drawAll(sf::RenderTarget &target)
 {
   ObjectManager::drawAll(target);
   target.draw(selection.visualRect);
+
   if (selection.selectedGroundSpline)
     target.draw(*selection.selectedGroundSpline);
-  if (selection.selectedSplinePoint != -1 && selection.selectedGroundSpline)
+
+  if (selection.selectedGroundSpline && selection.selectedSplinePoint != -1)
   {
-    int size = selection.selectedSplinePoint % 3 == 0 ? 3 : 2;
+    int size = (selection.selectedSplinePoint % 3 == 0) ? 3 : 2;
     sf::CircleShape circle(size);
     circle.setOrigin(size, size);
     circle.setFillColor(sf::Color::Green);
-    sf::Vector2f pos = selection.selectedGroundSpline->getPoint(selection.selectedSplinePoint);
-    pos += selection.selectedGroundSpline->getPosition();
-    circle.setPosition(pos);
-    target.draw(circle);
+
+    if (selection.selectedSplinePoint < selection.selectedGroundSpline->getPointCount())
+    {
+      sf::Vector2f pos = selection.selectedGroundSpline->getPoint(selection.selectedSplinePoint);
+      pos += selection.selectedGroundSpline->getPosition();
+      circle.setPosition(pos);
+      target.draw(circle);
+    }
   }
+
   if (newObject)
     GameObject::draw(newObject, target);
 }
 
-// is not a GameObject
 int Editor::getClickedPoint()
 {
   if (!selection.selectedGroundSpline)
@@ -450,7 +438,7 @@ std::shared_ptr<GameObject> Editor::getClickedObject()
   auto mousePos = Game::getMousePos();
   for (auto it = drawable.rbegin(); it != drawable.rend(); ++it)
   {
-    const auto& obj = *it;
+    const auto &obj = *it;
     if (auto particle = std::dynamic_pointer_cast<Particle>(obj))
       continue;
     auto ptr = std::dynamic_pointer_cast<Ground>(obj);
@@ -472,26 +460,20 @@ void Editor::handleEvent(const sf::Event &event)
   handleInput();
   switch (event.type)
   {
-    case sf::Event::MouseWheelScrolled:
-      if (event.mouseWheelScroll.wheel == sf::Mouse::Wheel::VerticalWheel)
-        onMouseScroll(event.mouseWheelScroll.delta);
-      break;
-    case sf::Event::KeyPressed:
-      handleKeyboard();
-      break;
-    default:
-      break;
+  case sf::Event::MouseWheelScrolled:
+    if (event.mouseWheelScroll.wheel == sf::Mouse::Wheel::VerticalWheel)
+      onMouseScroll(event.mouseWheelScroll.delta);
+    break;
+  case sf::Event::KeyPressed:
+    handleKeyboard();
+    break;
+  default:
+    break;
   }
 }
 
 void Editor::handleInput()
 {
-  // std::cout << "objs: " << selection.selectedObjects.size();
-  // std::cout << "; sel size: " << selection.visualRect.getSize().x << " " << selection.visualRect.getSize().y;
-  // std::cout << "; sel type: " << selection.selectedObjectType;
-  // std::cout << "; sel object: " << selection.selectedObject;
-  // std::cout << "; sel spline: " << selection.selectedGroundSpline;
-  // std::cout << "; sel point: " << selection.selectedSplinePoint << "\n";
   if (newObject)
     newObject->setPosition(Game::getMousePos());
   if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !mouseState.prevLeftPressed)
@@ -508,7 +490,6 @@ void Editor::handleInput()
   mouseState.prevRightPressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
   mouseState.prevMiddlePos = Game::getLocalMousePos();
   mouseState.prevLeftPos = Game::getMousePos();
-  // std::cout << "Selected objects: " << selection.selectedObjects.size() << "\n";
 }
 
 void Editor::onLeftDown()
@@ -518,52 +499,73 @@ void Editor::onLeftDown()
     if (!newObject)
       return;
 
-    std::string realType = newObjectType.substr(0, newObjectType.find(':'));
+    std::string realType;
+    auto posSep = newObjectType.find(':');
+    if (posSep == std::string::npos)
+      realType = newObjectType;
+    else
+      realType = newObjectType.substr(0, posSep);
+
     if (realType == "player" && player)
       return;
-    else if (!player)
-      player = std::dynamic_pointer_cast<Player>(newObject);
+
+    if (realType == "player" && !player)
+    {
+      if (auto p = std::dynamic_pointer_cast<Player>(newObject))
+        player = p;
+    }
+
     drawable.push_back(newObject);
     configs.emplace_back(realType, getTemplateConfigForObjectType(newObjectType));
+
     sf::Color oc = newObject->getColor();
-    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a * 4));
-    auto &config = getConfigForObject(newObject);
-    std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
-    config[key] = {newObject->getPosition().x, newObject->getPosition().y};
+    int newAlpha = std::min(255, static_cast<int>(oc.a) * 4);
+    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, static_cast<sf::Uint8>(newAlpha)));
+
+    try
+    {
+      auto &config = getConfigForObject(newObject);
+      if (!config.is_object())
+        config = nlohmann::json::object();
+      std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
+      config[key] = {newObject->getPosition().x, newObject->getPosition().y};
+    }
+    catch (...)
+    {
+    }
+
     newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
-    // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
+    if (!newObject)
+      return;
+
     oc = newObject->getColor();
-    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+    int smallAlpha = static_cast<int>(oc.a) / 4;
+    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, static_cast<sf::Uint8>(smallAlpha)));
     return;
   }
+
   mouseState.leftDownPos = Game::getMousePos();
 
   auto clickedObject = getClickedObject();
   auto clickedPoint = getClickedPoint();
-  // std::cout << (clickedObject ? getObjectType(clickedObject) : "null") << " " << clickedPoint << " " << selection.selectedObjects.size() << "\n";
 
-  // Нажатие на точку сплайна (дальше случаи можно не рассматривать)
   if (selection.selectedGroundSpline && clickedPoint != -1)
   {
-    // selectedObject не меняем так как существование спалайна => выделен Ground
-    // по сути сплайн это инструмент для редактирования Ground
-    // остальные поля (не verts) планируется менять через UI'шку
     selection.selectedSplinePoint = clickedPoint;
     return;
   }
-  // Нажатие куда либо, но существует незаконченный сплайн
+
   if (selection.selectedGroundSpline && !selection.selectedGroundSpline->isFinished())
   {
-    sf::Vector2f pos = Game::getMousePos() - selection.selectedObject->getPosition() + selection.selectedObject->getOrigin();
-    selection.selectedGroundSpline->addControlPoint(pos);
-    selection.selectedSplinePoint = selection.selectedGroundSpline->getPointCount() - 2;
-    // selection.selectedSplinePoint = -1;
+    if (selection.selectedObject)
+    {
+      sf::Vector2f pos = Game::getMousePos() - selection.selectedObject->getPosition() + selection.selectedObject->getOrigin();
+      selection.selectedGroundSpline->addControlPoint(pos);
+      selection.selectedSplinePoint = static_cast<int>(selection.selectedGroundSpline->getPointCount()) - 2;
+    }
     return;
   }
 
-  // Без сплайна
-
-  // Нажатие в пустоту
   if (!clickedObject)
   {
     selection.selectedObjectType = "";
@@ -578,9 +580,6 @@ void Editor::onLeftDown()
     return;
   }
 
-  // Нажатие не в пустоту
-
-  // Нажатие с Ctrl'ом
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
   {
     if (selection.selectedGroundSpline)
@@ -595,10 +594,10 @@ void Editor::onLeftDown()
     else
       selection.selectedObjects.push_back(clickedObject);
     Game::getGuiManager()->setEditorInfo("Selected " + std::to_string(selection.selectedObjects.size()) + " objects");
+    return;
   }
 
-  // Нажатие по новому (не выделенному ранее) объекту (надо сбросить выделение)
-  else if (std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), clickedObject) == selection.selectedObjects.end())
+  if (std::find(selection.selectedObjects.begin(), selection.selectedObjects.end(), clickedObject) == selection.selectedObjects.end())
   {
     selection.selectedObjects.clear();
     selection.selectedObjects.push_back(clickedObject);
@@ -609,26 +608,37 @@ void Editor::onLeftDown()
     selection.selectedGroundSpline = nullptr;
     selection.selectedSplinePoint = -1;
     auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject);
-    auto &config = getConfigForObject(clickedObject);
-    Game::getGuiManager()->setConfig("object", &config);
-    if (config.contains("type"))
-      Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType + ":" + static_cast<std::string>(config.at("type")));
-    else
-      Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType);
-    // Проверка - может, нажали на Ground?
-    if (ptr && config.contains("bezier_verts") && config["bezier_verts"].get<bool>())
+    try
     {
-      std::vector<sf::Vector2f> verts;
-      verts.reserve(config["verts"].size());
-
-      for (const auto &point : config["verts"])
-        verts.emplace_back(sf::Vector2f(point[0], point[1]));
-      selection.selectedGroundSpline = std::make_shared<Spline>(verts);
-      selection.selectedGroundSpline->setPosition(clickedObject->getPosition());
+      auto &config = getConfigForObject(clickedObject);
+      if (!config.is_object())
+        config = nlohmann::json::object();
+      Game::getGuiManager()->setConfig("object", &config);
+      if (config.contains("type") && config["type"].is_string())
+        Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType + ":" + config["type"].get<std::string>());
+      else
+        Game::getGuiManager()->setEditorInfo("Selected " + selection.selectedObjectType);
+      if (ptr && config.contains("bezier_verts") && config["bezier_verts"].is_boolean() && config["bezier_verts"].get<bool>() && config.contains("verts") && config["verts"].is_array())
+      {
+        std::vector<sf::Vector2f> verts;
+        verts.reserve(config["verts"].size());
+        for (const auto &point : config["verts"])
+        {
+          if (point.is_array() && point.size() >= 2 && point[0].is_number() && point[1].is_number())
+            verts.emplace_back(sf::Vector2f(point[0].get<float>(), point[1].get<float>()));
+        }
+        selection.selectedGroundSpline = std::make_shared<Spline>(verts);
+        selection.selectedGroundSpline->setPosition(clickedObject->getPosition());
+      }
     }
+    catch (...)
+    {
+      Game::getGuiManager()->setConfig("object", nullptr);
+    }
+    return;
   }
-  // Нажатие по уже выделенному объекту
-  else if (auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject) && selection.selectedGroundSpline)
+
+  if (auto ptr = std::dynamic_pointer_cast<Ground>(clickedObject); ptr && selection.selectedGroundSpline)
   {
     selection.selectedSplinePoint = -1;
   }
@@ -638,71 +648,93 @@ void Editor::onLeftDrag()
 {
   if (mode == Create)
     return;
+
   auto mousePos = Game::getMousePos();
   auto delta = mousePos - mouseState.prevLeftPos;
-  // Если выделения нет, меняем рамку
-  if (selection.selectedObjects.size() == 0)
+
+  if (selection.selectedObjects.empty())
   {
     selection.visualRect.setSize(mousePos - mouseState.leftDownPos);
     return;
   }
 
-  // Выделена точка, двигаем её
   if (selection.selectedSplinePoint != -1)
   {
-    auto &spline = selection.selectedGroundSpline;
-    int pointIndex = selection.selectedSplinePoint;
-    spline->movePoint(pointIndex, delta);
+    if (selection.selectedGroundSpline)
+    {
+      int pointIndex = selection.selectedSplinePoint;
+      if (pointIndex >= 0 && pointIndex < static_cast<int>(selection.selectedGroundSpline->getPointCount()))
+      {
+        selection.selectedGroundSpline->movePoint(pointIndex, delta);
+      }
+    }
     return;
   }
 
-  // Особый случай - выделен Ground, двигаем его и все точки сплайна
-  if (auto ptr = std::dynamic_pointer_cast<Ground>(selection.selectedObject))
+  if (selection.selectedObject)
   {
-    ptr->move(delta);
-    if (!selection.selectedGroundSpline)
+    if (auto ptr = std::dynamic_pointer_cast<Ground>(selection.selectedObject))
+    {
+      ptr->move(delta);
+      if (selection.selectedGroundSpline)
+        selection.selectedGroundSpline->move(delta);
       return;
-    selection.selectedGroundSpline->move(delta);
+    }
   }
-  // Выделены объекты, двигаем их
-  else if (selection.selectedObjects.size() >= 1)
+
+  if (!selection.selectedObjects.empty())
   {
     for (auto &obj : selection.selectedObjects)
-      obj->move(delta);
+    {
+      if (obj)
+        obj->move(delta);
+    }
   }
 }
 
 void Editor::onLeftUp()
 {
-  // Не тот режим
   if (mode == Create)
     return;
 
-  // Выделение уже было
-  if (selection.selectedObjects.size() != 0)
+  if (!selection.selectedObjects.empty())
   {
-    // Двигали точку - меняли Ground
-    auto ptr = std::dynamic_pointer_cast<Ground>(selection.selectedObject);
-    if (ptr && selection.selectedGroundSpline && selection.selectedGroundSpline->isFinished() && selection.selectedSplinePoint != -1)
+    if (selection.selectedObject)
     {
-      updateGroundShape();
-      return;
+      if (auto ptr = std::dynamic_pointer_cast<Ground>(selection.selectedObject))
+      {
+        if (selection.selectedGroundSpline && selection.selectedGroundSpline->isFinished() && selection.selectedSplinePoint != -1)
+        {
+          updateGroundShape();
+          return;
+        }
+      }
     }
+
     for (auto &obj : selection.selectedObjects)
     {
-      auto &config = getConfigForObject(obj);
-      std::string objType = getObjectType(obj);
-      std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
-      config[key] = {obj->getPosition().x, obj->getPosition().y};
+      if (!obj)
+        continue;
+      try
+      {
+        auto &config = getConfigForObject(obj);
+        if (!config.is_object())
+          config = nlohmann::json::object();
+        std::string objType = getObjectType(obj);
+        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
+        config[key] = {obj->getPosition().x, obj->getPosition().y};
+      }
+      catch (...)
+      {
+      }
     }
     return;
   }
 
-  // Делаем новое выделение
   auto mousePos = Game::getMousePos();
-  selection.visualRect.setSize({0, 0});
+  selection.visualRect.setSize({0.f, 0.f});
 
-  if (abs((mousePos - mouseState.leftDownPos).x) < 5 && abs((mousePos - mouseState.leftDownPos).y) < 5)
+  if (std::abs((mousePos - mouseState.leftDownPos).x) < 5.f && std::abs((mousePos - mouseState.leftDownPos).y) < 5.f)
     return;
 
   sf::FloatRect selectionRect(
@@ -710,23 +742,38 @@ void Editor::onLeftUp()
       std::min(mouseState.leftDownPos.y, mousePos.y),
       std::abs(mousePos.x - mouseState.leftDownPos.x),
       std::abs(mousePos.y - mouseState.leftDownPos.y));
-  const Hitbox &selectionHitbox = ConvexHitbox{.points = {sf::Vector2f(selectionRect.left, selectionRect.top),
-    sf::Vector2f(selectionRect.left + selectionRect.width, selectionRect.top),
-    sf::Vector2f(selectionRect.left + selectionRect.width, selectionRect.top + selectionRect.height),
-    sf::Vector2f(selectionRect.left, selectionRect.top + selectionRect.height)}};
+
+  ConvexHitbox selectionHitbox{.points = {sf::Vector2f(selectionRect.left, selectionRect.top),
+                                          sf::Vector2f(selectionRect.left + selectionRect.width, selectionRect.top),
+                                          sf::Vector2f(selectionRect.left + selectionRect.width, selectionRect.top + selectionRect.height),
+                                          sf::Vector2f(selectionRect.left, selectionRect.top + selectionRect.height)}};
   selection.selectedObjects.clear();
   for (const auto &obj : drawable)
   {
-    auto ptr = std::dynamic_pointer_cast<Ground>(obj);
-    // Не Ground воспринимает как квадраты
-    if (!ptr && selectionRect.intersects(obj->getGlobalBounds()))
-      selection.selectedObjects.push_back(obj);
-    // С Ground просчитываем коллизию
-    else if (ptr)
+    if (!obj)
+      continue;
+    if (auto ptr = std::dynamic_pointer_cast<Ground>(obj); !ptr)
     {
-      const Hitbox &secondHitbox = ptr->getHitbox();
-      if (collide(selectionHitbox, secondHitbox))
-        selection.selectedObjects.push_back(obj);
+      try
+      {
+        if (selectionRect.intersects(obj->getGlobalBounds()))
+          selection.selectedObjects.push_back(obj);
+      }
+      catch (...)
+      {
+      }
+    }
+    else
+    {
+      try
+      {
+        const Hitbox &secondHitbox = ptr->getHitbox();
+        if (collide(selectionHitbox, secondHitbox))
+          selection.selectedObjects.push_back(obj);
+      }
+      catch (...)
+      {
+      }
     }
   }
   Game::getGuiManager()->setEditorInfo("Selected " + std::to_string(selection.selectedObjects.size()) + " objects");
@@ -735,50 +782,82 @@ void Editor::onLeftUp()
 void Editor::onRightDown()
 {
   auto clickedPoint = getClickedPoint();
-  // std::cout << clickedPoint << "\n";
   if (clickedPoint != -1 && selection.selectedGroundSpline)
   {
-    int removedPoints = selection.selectedGroundSpline->removeControlPoint(clickedPoint);
+    int removedPoints = 0;
+    try
+    {
+      removedPoints = selection.selectedGroundSpline->removeControlPoint(clickedPoint);
+    }
+    catch (...)
+    {
+      return;
+    }
+
     if (selection.selectedGroundSpline->isFinished())
       updateGroundShape();
-    if (abs(selection.selectedSplinePoint - clickedPoint) <= 1)
+
+    if (std::abs(selection.selectedSplinePoint - clickedPoint) <= 1)
       selection.selectedSplinePoint = -1;
     else if (!selection.selectedGroundSpline->isFinished() && clickedPoint == 0 && selection.selectedSplinePoint <= 2)
       selection.selectedSplinePoint = -1;
     else if (selection.selectedSplinePoint > clickedPoint)
-      selection.selectedSplinePoint -= removedPoints;
+      selection.selectedSplinePoint = std::max(-1, selection.selectedSplinePoint - removedPoints);
   }
 }
 
 void Editor::onMiddleDrag()
 {
-  sf::Vector2f delta = Game::getLocalMousePos() - mouseState.prevMiddlePos;
-  camera->move(-delta * camera->getZoom());
+  auto localMouse = Game::getLocalMousePos();
+  sf::Vector2f delta = localMouse - mouseState.prevMiddlePos;
+  if (camera)
+    camera->move(-delta * camera->getZoom());
 }
 
 void Editor::onMouseScroll(float delta)
 {
   auto &objectManager = Game::getObjectManager();
+  if (!objectManager)
+    return;
+
+  auto cam = objectManager->getCamera();
+  if (!cam)
+    return;
+
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
   {
-    float factor = objectManager->getCamera()->getZoom() * (delta > 0 ? 0.9f : 1.1f);
+    float factor = cam->getZoom() * (delta > 0 ? 0.9f : 1.1f);
     factor = std::clamp(factor, 0.1f, 10.0f);
-    objectManager->getCamera()->setZoom(factor);
+    cam->setZoom(factor);
     return;
   }
+
   if (mode == Create)
   {
+    size_t n = static_cast<size_t>(std::distance(std::begin(newObjectTypes), std::end(newObjectTypes)));
+    auto it = std::find(std::begin(newObjectTypes), std::end(newObjectTypes), newObjectType);
+    size_t idx = (it == std::end(newObjectTypes)) ? 0 : static_cast<size_t>(std::distance(std::begin(newObjectTypes), it));
     if (delta > 0)
-      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 27, newObjectType) - newObjectTypes + 1) % 27];
+      idx = (idx + 1) % n;
     else
-      newObjectType = newObjectTypes[(std::find(newObjectTypes, newObjectTypes + 27, newObjectType) - newObjectTypes + 26) % 27];
-    std::string realType = newObjectType.substr(0, newObjectType.find(':'));
-    newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
+      idx = (idx + n - 1) % n;
+    newObjectType = newObjectTypes[idx];
+
+    std::string realType;
+    auto posSep = newObjectType.find(':');
+    if (posSep == std::string::npos)
+      realType = newObjectType;
+    else
+      realType = newObjectType.substr(0, posSep);
+
+    auto newObj = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
+    if (!newObj)
+      return;
+
+    newObject = newObj;
     Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
-    // std::cout << "New object type: " << newObjectType << "\n";
-    // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
     sf::Color oc = newObject->getColor();
-    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, static_cast<sf::Uint8>(oc.a / 4)));
     newObject->setPosition(Game::getMousePos());
   }
 }
@@ -795,26 +874,37 @@ void Editor::handleKeyboard()
     if (selection.selectedObject || selection.selectedGroundSpline)
       return;
     mode = Create;
-    std::string realType = newObjectType.substr(0, newObjectType.find(':'));
-    newObject = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
-    // newObject->setOrigin(newObject->getLocalBounds().width / 2, newObject->getLocalBounds().height / 2);
+    std::string realType;
+    auto posSep = newObjectType.find(':');
+    if (posSep == std::string::npos)
+      realType = newObjectType;
+    else
+      realType = newObjectType.substr(0, posSep);
+
+    auto newObj = createObjectOfType(realType, getTemplateConfigForObjectType(newObjectType));
+    if (!newObj)
+      return;
+    newObject = newObj;
     sf::Color oc = newObject->getColor();
-    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, oc.a / 4));
+    newObject->setColor(sf::Color(oc.r, oc.g, oc.b, static_cast<sf::Uint8>(oc.a / 4)));
     newObject->setPosition(Game::getMousePos());
     Game::getGuiManager()->setEditorInfo("New object type:    " + newObjectType);
   }
-  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && selection.selectedObjects.size() > 0)
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && !selection.selectedObjects.empty())
   {
     for (auto &obj : selection.selectedObjects)
     {
+      if (!obj)
+        continue;
       auto it = std::find(drawable.begin(), drawable.end(), obj);
       if (it != drawable.end())
       {
         if ((*it) == player)
           player = nullptr;
-        size_t index = std::distance(drawable.begin(), it);
+        size_t index = static_cast<size_t>(std::distance(drawable.begin(), it));
         drawable.erase(it);
-        configs.erase(configs.begin() + index);
+        if (index < configs.size())
+          configs.erase(configs.begin() + static_cast<ptrdiff_t>(index));
       }
     }
     Game::getGuiManager()->setEditorInfo("Deleted " + std::to_string(selection.selectedObjects.size()) + " objects");
@@ -825,7 +915,9 @@ void Editor::handleKeyboard()
     selection.selectedGroundSpline = nullptr;
     selection.selectedSplinePoint = -1;
   }
-  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && selection.selectedObjects.size() > 0)
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
+           (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) &&
+           !selection.selectedObjects.empty())
   {
     if (selection.selectedGroundSpline && selection.selectedSplinePoint != -1)
     {
@@ -838,42 +930,45 @@ void Editor::handleKeyboard()
     std::vector<std::shared_ptr<GameObject>> newSelectedObjects;
     for (auto &obj : selection.selectedObjects)
     {
-      auto &config = getConfigForObject(obj);
-      std::string objType = getObjectType(obj);
-      if (objType == "player")
+      if (!obj)
         continue;
-      std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
-      config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
-      auto newObj = createObjectOfType(objType, config);
-      if (newObj)
+      try
       {
-        drawable.push_back(newObj);
-        configs.push_back({objType, config});
-        newSelectedObjects.push_back(newObj);
+        auto &config = getConfigForObject(obj);
+        std::string objType = getObjectType(obj);
+        if (objType == "player")
+          continue;
+        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
+        config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
+        auto newObj = createObjectOfType(objType, config);
+        if (newObj)
+        {
+          drawable.push_back(newObj);
+          configs.push_back({objType, config});
+          newSelectedObjects.push_back(newObj);
+        }
+      }
+      catch (...)
+      {
       }
     }
     Game::getGuiManager()->setEditorInfo("Duplicated " + std::to_string(selection.selectedObjects.size()) + " objects");
     selection.selectedObjects = newSelectedObjects;
   }
-  // ctrl + S - save
-  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)))
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
+           (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)))
   {
     this->save(levelPath);
     Game::getGuiManager()->setEditorInfo("Level saved to \"" + levelPath + "\"");
-    // std::cout << "Level saved to " << levelPath << "\n";
   }
   else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && selection.selectedGroundSpline)
   {
     bool newFinished = !selection.selectedGroundSpline->isFinished();
     selection.selectedGroundSpline->setFinished(newFinished);
-    if (newFinished == true)
-    {
+    if (newFinished)
       updateGroundShape();
-    }
     else
-    {
-      selection.selectedSplinePoint = selection.selectedGroundSpline->getPointCount() - 2;
-    }
+      selection.selectedSplinePoint = static_cast<int>(selection.selectedGroundSpline->getPointCount()) - 2;
   }
   else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H))
   {
@@ -881,37 +976,38 @@ void Editor::handleKeyboard()
   }
   else if (sf::Keyboard::isKeyPressed(sf::Keyboard::B) && !selection.selectedObjects.empty())
   {
-    // Collect indices of selected objects
     std::vector<size_t> indices;
     for (auto &obj : selection.selectedObjects)
     {
+      if (!obj)
+        continue;
       auto it = std::find(drawable.begin(), drawable.end(), obj);
       if (it != drawable.end())
-      {
-        indices.push_back(std::distance(drawable.begin(), it));
-      }
+        indices.push_back(static_cast<size_t>(std::distance(drawable.begin(), it)));
     }
-
-    // Sort indices so we remove from back to front (avoids invalidation issues)
     std::sort(indices.rbegin(), indices.rend());
-
     std::vector<std::shared_ptr<GameObject>> movedObjects;
     std::vector<std::pair<std::string, nlohmann::json>> movedConfigs;
-
-    // Extract selected objects/configs
     for (auto i : indices)
     {
-      movedObjects.push_back(drawable[i]);
-      movedConfigs.push_back(configs[i]);
-
-      drawable.erase(drawable.begin() + i);
-      configs.erase(configs.begin() + i);
+      if (i < drawable.size())
+      {
+        movedObjects.push_back(drawable[i]);
+        movedConfigs.push_back(configs[i]);
+        drawable.erase(drawable.begin() + static_cast<ptrdiff_t>(i));
+        configs.erase(configs.begin() + static_cast<ptrdiff_t>(i));
+      }
     }
-
-    // Insert them at the beginning in the same order as selection
-    drawable.insert(drawable.begin() + drawable.size() - 1, movedObjects.begin(), movedObjects.end());
-    configs.insert(configs.begin() + configs.size() - 1, movedConfigs.begin(), movedConfigs.end());
-
+    if (!drawable.empty())
+    {
+      drawable.insert(drawable.begin() + static_cast<ptrdiff_t>(drawable.size() - 1), movedObjects.begin(), movedObjects.end());
+      configs.insert(configs.begin() + static_cast<ptrdiff_t>(configs.size() - 1), movedConfigs.begin(), movedConfigs.end());
+    }
+    else
+    {
+      drawable.insert(drawable.end(), movedObjects.begin(), movedObjects.end());
+      configs.insert(configs.end(), movedConfigs.begin(), movedConfigs.end());
+    }
     Game::getGuiManager()->setEditorInfo("Moved " + std::to_string(movedObjects.size()) + " objects to the front");
   }
 }
@@ -922,23 +1018,23 @@ bool Editor::collide(const Hitbox &firstHitbox, const Hitbox &secondHitbox)
     return false;
   switch (secondHitbox.index())
   {
-    case 0:
-    case 1:
-      {
-        return collision_calculator::getGJKCollisionSimplex(firstHitbox, secondHitbox).size() != 0;
-      }
-    case 2:
-      {
-        auto &triangles = std::get<ConcaveHitbox>(secondHitbox).triangles;
-        for (auto triangle : triangles)
-        {
-          auto simplex = collision_calculator::getGJKCollisionSimplex(firstHitbox, triangle);
-          if (simplex.size() != 0)
-            return true;
-        }
-      }
-    default:
-      return false;
+  case 0:
+  case 1:
+  {
+    return collision_calculator::getGJKCollisionSimplex(firstHitbox, secondHitbox).size() != 0;
+  }
+  case 2:
+  {
+    auto &triangles = std::get<ConcaveHitbox>(secondHitbox).triangles;
+    for (auto triangle : triangles)
+    {
+      auto simplex = collision_calculator::getGJKCollisionSimplex(firstHitbox, triangle);
+      if (simplex.size() != 0)
+        return true;
+    }
+  }
+  default:
+    return false;
   }
   return false;
 }
@@ -1031,7 +1127,9 @@ const nlohmann::json &Editor::getTemplateConfigForObjectType(const std::string &
     return cameraConfigTemplate;
   else if (type == "background")
     return backgroundConfigTemplate;
-  throw std::runtime_error("Unknown object type: " + type);
+  else if (type == "rock")
+    return rockConfigTemplate;
+  return simpleBushObjectConfigTemplate;
 }
 
 void Editor::updateGroundShape()
@@ -1058,9 +1156,3 @@ void Editor::updateGroundShape()
   drawable.at(dIndex) = selection.selectedObject;
   selection.selectedObjects.at(sIndex) = selection.selectedObject;
 }
-
-// ЛКМ по объекту - select
-
-// СКМ + drag - сдвинуть камеру
-// СКМ up/down - приблизить/отдалить
-// ЛКМ по пустоте ... ЛКМ up - выделить много объектов

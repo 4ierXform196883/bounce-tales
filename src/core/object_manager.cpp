@@ -20,6 +20,7 @@
 #include "wind.hpp"
 #include "water.hpp"
 #include "particle.hpp"
+#include "rock.hpp"
 
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 #define dot(v1, v2) (v1.x * v2.x + v1.y * v2.y)
@@ -44,58 +45,77 @@ void ObjectManager::loadObject(std::shared_ptr<GameObject> obj, const nlohmann::
 
 std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string &type, const nlohmann::json &config)
 {
+  auto toVec2 = [](const nlohmann::json &arr) -> sf::Vector2f
+  {
+    if (!arr.is_array() || arr.size() < 2)
+      return {0.f, 0.f};
+    return sf::Vector2f(arr[0].get<float>(), arr[1].get<float>());
+  };
+
   if (type == "background")
   {
     if (!config.contains("islands") || !config.contains("clouds") || !config.contains("additional_distance"))
       return nullptr;
     return std::make_shared<Background>(config["islands"], config["clouds"], config["additional_distance"]);
   }
-  else if (type == "player")
+
+  if (type == "rock")
+  {
+    auto ptr = std::make_shared<Rock>();
+    loadObject(ptr, config);
+    return ptr;
+  }
+
+  if (type == "player")
   {
     if (!config.contains("spawn_pos") || !config.contains("control_force"))
       return nullptr;
-    auto ptr = std::make_shared<Player>(sf::Vector2f(config["spawn_pos"][0], config["spawn_pos"][1]), config["control_force"]);
+    auto ptr = std::make_shared<Player>(toVec2(config["spawn_pos"]), config["control_force"]);
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "trigger")
+
+  if (type == "trigger")
   {
     if (!config.contains("type"))
       return nullptr;
+
     std::shared_ptr<TriggerObject> ptr;
     if (config.contains("size"))
-      ptr = std::make_shared<TriggerObject>(sf::Vector2f(config["size"][0], config["size"][1]), config["type"]);
-    else if (config.contains("animation") && config["animation"] != "" && config.contains("texture") && config["texture"] != "")
+      ptr = std::make_shared<TriggerObject>(toVec2(config["size"]), config["type"]);
+    else if (config.contains("animation") && !config["animation"].get<std::string>().empty() &&
+             config.contains("texture") && !config["texture"].get<std::string>().empty())
       ptr = std::make_shared<TriggerObject>(config["texture"], config["animation"], config["fps"], config["type"]);
-    else if (config.contains("subtexture") && config["subtexture"] != "" && config.contains("texture") && config["texture"] != "")
+    else if (config.contains("subtexture") && !config["subtexture"].get<std::string>().empty() &&
+             config.contains("texture") && !config["texture"].get<std::string>().empty())
       ptr = std::make_shared<TriggerObject>(config["texture"], config["subtexture"], config["type"]);
-    else if (config.contains("texture") && config["texture"] != "")
+    else if (config.contains("texture") && !config["texture"].get<std::string>().empty())
       ptr = std::make_shared<TriggerObject>(config["texture"], config["type"]);
     else
       return nullptr;
+
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "platform")
-  {
-    if (!config.contains("texture") || config["texture"] == "" || !config.contains("verts") || !config.contains("path") || !config.contains("speed_mult"))
-      return nullptr;
-    std::vector<sf::Vector2f> verts, path;
-    verts.reserve(config["verts"].size());
-    path.reserve(config["path"].size());
 
-    for (const auto &point : config["verts"])
-      verts.emplace_back(sf::Vector2f(point[0], point[1]));
-    for (const auto &point : config["path"])
-      path.emplace_back(sf::Vector2f(point[0], point[1]));
+  if (type == "platform")
+  {
+    if (!config.contains("texture") || config["texture"].get<std::string>().empty() ||
+        !config.contains("verts") || !config.contains("path") || !config.contains("speed_mult"))
+      return nullptr;
+
+    std::vector<sf::Vector2f> verts, path;
+    for (const auto &p : config["verts"])
+      verts.push_back(toVec2(p));
+    for (const auto &p : config["path"])
+      path.push_back(toVec2(p));
 
     auto ptr = std::make_shared<Platform>(config["texture"], std::move(verts), std::move(path), config["speed_mult"]);
     loadObject(ptr, config);
     return ptr;
   }
 
-  // Jump pads
-  else if (type == "jump_pad")
+  if (type == "jump_pad")
   {
     if (!config.contains("power"))
       return nullptr;
@@ -103,8 +123,8 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
     loadObject(ptr, config);
     return ptr;
   }
-  // Spikes
-  else if (type == "spikes")
+
+  if (type == "spikes")
   {
     if (!config.contains("count"))
       return nullptr;
@@ -112,109 +132,122 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
     loadObject(ptr, config);
     return ptr;
   }
+
   if (type == "door")
   {
     if (!config.contains("tag") || !config.contains("start_pos") || !config.contains("elevation"))
       return nullptr;
-    auto ptr = std::make_shared<Door>(config["tag"], sf::Vector2f(config["start_pos"][0], config["start_pos"][1]), config["elevation"]);
+    auto ptr = std::make_shared<Door>(config["tag"], toVec2(config["start_pos"]), config["elevation"]);
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "switch")
+
+  if (type == "switch")
   {
     if (!config.contains("doors"))
       return nullptr;
-    std::vector<std::shared_ptr<Door>> doors(config["doors"].size());
+
+    std::vector<std::shared_ptr<Door>> doors;
     for (const auto &doorName : config["doors"])
     {
       auto it = std::find_if(drawable.begin(), drawable.end(),
-          [doorName](const std::shared_ptr<GameObject> &obj)
-          { return obj->getTag() == doorName; });
-      if (it == drawable.end())
-        continue;
-      if (auto doorPtr = std::dynamic_pointer_cast<Door>((*it)))
-        doors.push_back(doorPtr);
+                             [&](const std::shared_ptr<GameObject> &obj)
+                             { return obj->getTag() == doorName; });
+      if (it != drawable.end())
+        if (auto doorPtr = std::dynamic_pointer_cast<Door>(*it))
+          doors.push_back(doorPtr);
     }
+
     auto ptr = std::make_shared<Switch>(doors);
     if (config.contains("is_on"))
       ptr->setState(config["is_on"]);
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "wind")
+
+  if (type == "wind")
   {
     if (!config.contains("size") || !config.contains("direction"))
       return nullptr;
-    sf::Vector2f wSize = sf::Vector2f(config["size"][0], config["size"][1]);
-    sf::Vector2f wDirection = sf::Vector2f(config["direction"][0], config["direction"][1]);
-    auto ptr = std::make_shared<Wind>(wSize, wDirection);
-
+    auto ptr = std::make_shared<Wind>(toVec2(config["size"]), toVec2(config["direction"]));
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "water")
+
+  if (type == "water")
   {
     if (!config.contains("size"))
       return nullptr;
-    auto ptr = std::make_shared<Water>(sf::Vector2f(config["size"][0], config["size"][1]));
+    auto ptr = std::make_shared<Water>(toVec2(config["size"]));
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "ground")
+
+  if (type == "ground")
   {
     if (!config.contains("verts"))
       return nullptr;
     std::vector<sf::Vector2f> verts;
-    verts.reserve(config["verts"].size());
+    for (const auto &p : config["verts"])
+      verts.push_back(toVec2(p));
 
-    for (const auto &point : config["verts"])
-      verts.emplace_back(sf::Vector2f(point[0], point[1]));
     std::shared_ptr<Ground> ptr;
+    bool bezier = config.contains("bezier_verts") ? config["bezier_verts"].get<bool>() : false;
+
     if (config.contains("texture"))
-      ptr = std::make_shared<Ground>(std::move(verts), config["texture"], config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
+      ptr = std::make_shared<Ground>(std::move(verts), config["texture"], bezier);
     else if (config.contains("color"))
     {
       std::string colorStr = config["color"];
-      uint32_t ground_color = std::stoi(colorStr.substr(1), nullptr, 16);
-      ptr = std::make_shared<Ground>(std::move(verts), sf::Color(ground_color), config.contains("bezier_verts") ? (bool)config["bezier_verts"] : false);
+      uint32_t groundColor = std::stoul(colorStr.substr(1), nullptr, 16);
+      ptr = std::make_shared<Ground>(std::move(verts), sf::Color(groundColor), bezier);
     }
     else
       return nullptr;
+
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "simple")
+
+  if (type == "simple")
   {
     if (!config.contains("tag") || !config.contains("texture"))
       return nullptr;
+
     std::shared_ptr<SimpleObject> ptr;
-    if (config.contains("subtexture") && config["subtexture"] != "" && config.contains("texture") && config["texture"] != "")
+    if (config.contains("subtexture") && !config["subtexture"].get<std::string>().empty())
       ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["subtexture"]);
-    else if (config.contains("animation") && config["animation"] != "" && config.contains("texture") && config["texture"] != "")
+    else if (config.contains("animation") && !config["animation"].get<std::string>().empty())
       ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"], config["animation"], config["fps"]);
-    else if (config.contains("texture") && config["texture"] != "")
+    else if (!config["texture"].get<std::string>().empty())
       ptr = std::make_shared<SimpleObject>(config["tag"], config["texture"]);
     else
       return nullptr;
+
     loadObject(ptr, config);
     return ptr;
   }
-  else if (type == "camera")
+
+  if (type == "camera")
   {
     if (!config.contains("size"))
       return nullptr;
-    auto ptr = std::make_shared<Camera>(sf::Vector2f(config["size"][0], config["size"][1]));
+    auto ptr = std::make_shared<Camera>(toVec2(config["size"]));
     loadObject(ptr, config);
+
     if (config.contains("follow"))
     {
       auto followIt = std::find_if(drawable.begin(), drawable.end(),
-          [&config](const std::shared_ptr<GameObject> &obj)
-          { return obj->getTag() == static_cast<std::string>(config["follow"]); });
+                                   [&](const std::shared_ptr<GameObject> &obj)
+                                   {
+                                     return obj->getTag() == config["follow"].get<std::string>();
+                                   });
       if (followIt != drawable.end())
         ptr->setFollowObject(*followIt);
     }
     return ptr;
   }
+
   return nullptr;
 }
 
@@ -287,6 +320,17 @@ void ObjectManager::load(const std::string &path)
     drawable.push_back(ptr);
     updatable.push_back(ptr);
     collidable.push_back(ptr);
+  }
+
+  for (const auto &part : data["rocks"])
+  {
+    ptr = createObjectOfType("rock", part);
+    if (!ptr)
+      continue;
+    drawable.push_back(ptr);
+    updatable.push_back(ptr);
+    collidable.push_back(ptr);
+    physical.push_back(ptr);
   }
 
   // Platforms
@@ -470,6 +514,12 @@ void ObjectManager::drawAll(sf::RenderTarget &target)
     GameObject::draw((*it), target);
     ++it;
   }
+  // target.setView(defaultView);
+  // sf::RectangleShape overlay;
+  // overlay.setSize(camera->getView().getSize());
+  // overlay.setPosition(-0.5f * camera->getView().getSize());
+  // overlay.setFillColor(sf::Color(50, 0, 200, 50)); // purple with transparency (alpha = 50)
+  // target.draw(overlay, sf::BlendMultiply);
 }
 
 void ObjectManager::addObject(std::shared_ptr<GameObject> object)

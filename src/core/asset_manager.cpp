@@ -26,7 +26,7 @@ void AssetManager::loadFromJSON(const fs::path &path)
   file >> j;
 
   if (j.contains("repeated"))
-    repeated.emplace(filename, j["repeated"]);
+    repeated.emplace(filename, j["repeated"].get<bool>());
   if (j.contains("smooth"))
     smooth.emplace(filename, j["smooth"]);
   // SpriteBounds

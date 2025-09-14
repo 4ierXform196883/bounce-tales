@@ -18,7 +18,7 @@ std::vector<sf::Vector2f> Ground::getSplineVerts(const std::vector<sf::Vector2f>
     float xDelta = bezierSpline.getPoint((i + 1) * 3).x - bezierSpline.getPoint(i * 3).x;
     float yDelta = bezierSpline.getPoint((i + 1) * 3).y - bezierSpline.getPoint(i * 3).y;
     float splineLen = std::sqrt(xDelta * xDelta + yDelta * yDelta);
-    int numPoints = (int)splineLen / 10;
+    int numPoints = (int)splineLen / 2;
     for (float t = 0; t <= 1; t += 1.f / numPoints)
     {
       sf::Vector2f pos = bezierSpline.evaluate(i, t);

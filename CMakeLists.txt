@@ -21,6 +21,7 @@ add_subdirectory(${DEPS_DIR}/SFML)
 add_subdirectory(${DEPS_DIR}/TGUI)
 add_subdirectory(${DEPS_DIR}/json)
 
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
   sfml-graphics
   sfml-audio

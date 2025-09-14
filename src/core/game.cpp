@@ -154,6 +154,7 @@ void Game::render()
   window->clear(sf::Color::Black);
   objectManager->drawAll(*window);
   guiManager->gui->draw();
+
   window->display();
 }
 

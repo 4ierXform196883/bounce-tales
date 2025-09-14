@@ -52,9 +52,10 @@ nlohmann::json editorConfigValues = nlohmann::json{
     {"control_force", {{"type", "ufloat"}}},
     {"type", {{"type", "hide"} /*, {"values", {"death_zone", "win_zone", "egg", "change_skin:light", "change_skin:normal", "change_skin:heavy"}}*/}},
     {"size", {{"type", "vector"}}},
-    {"texture", {{"type", "hide"}}},
-    {"subtexture", {{"type", "hide"}}},
-    {"animation", {{"type", "hide"}}},
+    {"texture", {{"type", "string"}}},
+    {"subtexture", {{"type", "string"}}},
+    {"animation", {{"type", "string"}}},
+    {"fps", {{"type", "uint"}}},
     {"tag", {{"type", "string"}}},
     {"verts", {{"type", "hide"}}},
     {"path", {{"type", "hide"}}},
@@ -530,7 +531,7 @@ void GuiManager::connectObjectConfigGroupCallbacks()
   if (!editorData.objectConfig)
     return;
 
-  if (!editorData.objectConfig->contains("scale") && !editorData.objectConfig->contains("verts"))
+  if (!editorData.objectConfig->contains("scale") && !editorData.objectConfig->contains("verts") && !editorData.objectConfig->contains("size"))
     (*editorData.objectConfig)["scale"] = {1.0f, 1.0f};
   if (!editorData.objectConfig->contains("rotation") && !editorData.objectConfig->contains("verts"))
     (*editorData.objectConfig)["rotation"] = 0.0f;

@@ -71,6 +71,8 @@ void Spline::insertControlPoint(int nearIndex, const sf::Vector2f &point)
 
 int Spline::removeControlPoint(int mainIndex)
 {
+    if (controlPoints.size() <= 2)
+        return 0;
     if (mainIndex % 3 != 0)
         return 0;
     if (finished && (mainIndex == 0 || mainIndex == controlPoints.size() - 1))
