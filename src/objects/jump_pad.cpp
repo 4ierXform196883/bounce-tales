@@ -29,7 +29,7 @@ void JumpPad::update()
     {
         for (auto &obj : collidable->colliding)
         {
-            if (auto ptr = std::dynamic_pointer_cast<IPhysical>(obj.second))
+            if (auto ptr = std::dynamic_pointer_cast<IPhysical>(obj))
                 ptr->addForce({0, -power});
         }
         ++currentFrame;
@@ -78,6 +78,6 @@ void JumpPad::updateFrame(size_t newFrame)
     }
     for (auto &obj : collidable->colliding)
     {
-        obj.second->move({0, (float)-diff});
+        obj->move({0, (float)-diff});
     }
 }

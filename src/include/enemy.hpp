@@ -12,14 +12,17 @@ class Enemy : public GameObject, public ICollidable
 public:
     COLLIDABLE
 
-    Enemy(float walkDistance);
+    Enemy(const sf::Vector2f &startPos, float walkDistance, float speed);
     virtual ~Enemy() = default;
 
 protected:
     virtual void update() override;
     virtual void onCollision(std::shared_ptr<GameObject> other) override;
 
-    std::shared_ptr<Timer> hideTimer;
+    std::shared_ptr<Timer> downTimer;
     float walkDistance;
-    bool isHidden = false;
+    float fullHeight;
+    bool isDown = true;
+    float speed = 1.0f;
+    sf::Vector2f startPos;
 };

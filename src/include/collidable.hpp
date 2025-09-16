@@ -48,6 +48,6 @@ public:
     bool trigger;
     float fricCoef;
     Hitbox hitbox;
-    std::map<std::string, std::shared_ptr<GameObject>> colliding, prevColliding;
+    std::vector<std::shared_ptr<GameObject>> colliding, prevColliding;
     const Hitbox initHitbox;
 };

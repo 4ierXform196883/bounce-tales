@@ -60,6 +60,8 @@ nlohmann::json editorConfigValues = nlohmann::json{
     {"verts", {{"type", "hide"}}},
     {"path", {{"type", "hide"}}},
     {"speed_mult", {{"type", "ufloat"}}},
+    {"speed", {{"type", "ufloat"}}},
+    {"walk_distance", {{"type", "ufloat"}}},
     {"power", {{"type", "ufloat"}}},
     {"count", {{"type", "int"}}},
     {"elevation", {{"type", "ufloat"}}},

@@ -21,6 +21,7 @@
 #include "water.hpp"
 #include "particle.hpp"
 #include "rock.hpp"
+#include "enemy.hpp"
 
 #define norm(vec) (std::sqrt(vec.x * vec.x + vec.y * vec.y))
 #define dot(v1, v2) (v1.x * v2.x + v1.y * v2.y)
@@ -62,6 +63,15 @@ std::shared_ptr<GameObject> ObjectManager::createObjectOfType(const std::string 
   if (type == "rock")
   {
     auto ptr = std::make_shared<Rock>();
+    loadObject(ptr, config);
+    return ptr;
+  }
+
+  if (type == "enemy")
+  {
+    if (!config.contains("start_pos") || !config.contains("speed") || !config.contains("walk_distance") )
+      return nullptr;
+    auto ptr = std::make_shared<Enemy>(toVec2(config["start_pos"]), config["walk_distance"], config["speed"]);
     loadObject(ptr, config);
     return ptr;
   }
@@ -333,6 +343,17 @@ void ObjectManager::load(const std::string &path)
     physical.push_back(ptr);
   }
 
+  for (const auto &part : data["enemies"])
+  {
+    ptr = createObjectOfType("enemy", part);
+    if (!ptr)
+      continue;
+    drawable.push_back(ptr);
+    updatable.push_back(ptr);
+    collidable.push_back(ptr);
+    physical.push_back(ptr);
+  }
+
   // Platforms
   for (const auto &part : data["platforms"])
   {
@@ -473,6 +494,11 @@ void ObjectManager::updateAll()
     }
     GameObject::update((*it));
     ++it;
+  }
+  if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+  {
+    player->setPosition(Game::getMousePos());
+    player->addForce(-player->getSpeed());
   }
 }
 

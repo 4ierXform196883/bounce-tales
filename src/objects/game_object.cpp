@@ -34,8 +34,8 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
             return;
         if (notify)
         {
-            first->collidable->colliding.emplace(second->tag, second);
-            second->collidable->colliding.emplace(first->tag, first);
+            first->collidable->colliding.emplace_back(second);
+            second->collidable->colliding.emplace_back(first);
             first->onCollision(second);
             second->onCollision(first);
             notify = false;
@@ -57,8 +57,8 @@ void GameObject::calculateCollision(std::shared_ptr<GameObject> first, std::shar
                 continue;
             if (notify)
             {
-                first->collidable->colliding.emplace(second->tag, second);
-                second->collidable->colliding.emplace(first->tag, first);
+                first->collidable->colliding.emplace_back(second);
+                second->collidable->colliding.emplace_back(first);
                 first->onCollision(second);
                 second->onCollision(first);
                 notify = false;

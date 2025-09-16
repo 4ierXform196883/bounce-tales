@@ -53,11 +53,15 @@ void Stats::loadTotalEggs()
     nlohmann::json levelData;
     file >> levelData;
     file.close();
-    if (!levelData.contains("triggers"))
+    if (!levelData.contains("triggers") && !levelData.contains("enemies"))
       continue;
-    int eggCount = std::count_if(levelData.at("triggers").begin(), levelData.at("triggers").end(), [](const nlohmann::json &item)
-        { return item.contains("type") && item["type"] == "egg"; });
-    data[entry.path().stem().generic_string()]["total_eggs"] = eggCount;
+    int totalCount = 0;
+    if (levelData.contains("triggers"))
+      totalCount += std::count_if(levelData.at("triggers").begin(), levelData.at("triggers").end(), [](const nlohmann::json &item)
+                                  { return item.contains("type") && item["type"] == "egg"; });
+    if (levelData.contains("enemies"))
+      totalCount += levelData.at("enemies").size();
+    data[entry.path().stem().generic_string()]["total_eggs"] = totalCount;
   }
 }
 

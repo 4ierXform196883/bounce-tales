@@ -118,9 +118,9 @@ void Player::update()
         (*child)->rotate(this->physical->speed.x * 3);
     if (this->physical->mass != 10)
         this->rotate(this->physical->speed.x * 3);
-    if (hasWon && onGround && onGround && curTime - lastJumpTime > 0.25)
+    if (hasWon && onGround && curTime - lastJumpTime > 0.25)
     {
-        this->addForce({0, -10});
+        this->addForce({0, -3});
         lastJumpTime = curTime;
     }
 

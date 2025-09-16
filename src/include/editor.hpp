@@ -73,7 +73,7 @@ protected:
 
     std::string newObjectType = "player";
     std::shared_ptr<GameObject> newObject;
-    std::string newObjectTypes[27] = {"player", "jump_pad", "spikes",
+    std::string newObjectTypes[28] = {"player", "jump_pad", "spikes", "enemy",
                                       "door", "switch", "wind", "water",
                                       "trigger:death_zone", "trigger:egg",
                                       "simple:flower_white", "simple:flower_blue", "simple:flower_red", "simple:bush",

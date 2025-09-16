@@ -15,7 +15,9 @@ public:
 
     void changeSpeed(double speedMultiplier);
     void restart();
-    inline size_t getCurrentFrame() const { return currentFrame; };
+    inline void setStopped(bool stopped) { this->stopped = stopped; }
+    inline bool getStopped() const { return stopped; }
+    inline size_t getCurrentFrame() const { return currentFrame; }
 
 protected:
     void update();
@@ -25,4 +27,5 @@ protected:
 
     std::shared_ptr<Timer> changeBoundsTimer;
     size_t currentFrame = 0;
+    bool stopped = false;
 };

@@ -162,6 +162,11 @@ const nlohmann::json platformConfigTemplate = {
 
 const nlohmann::json jumpPadConfigTemplate = {
     {"power", 10.0f}};
+  
+const nlohmann::json enemyConfigTemplate = {
+    {"walk_distance", 100.0f},
+    {"speed", 1.0f},
+    {"start_pos", {0.0f, 0.0f}}};
 
 const nlohmann::json spikesConfigTemplate = {
     {"count", 5}};
@@ -278,6 +283,7 @@ void Editor::load(const std::string &path)
   loadArray("ground", "ground");
   loadArray("simple", "simple");
   loadArray("rocks", "rock");
+  loadArray("enemies", "enemy");
 
   // Camera
   ptr = createObjectOfType("camera", data.contains("camera") ? data["camera"] : cameraConfigTemplate);
@@ -332,6 +338,8 @@ void Editor::save(const std::string &path)
       data["ground"].push_back(configs.at(i).second);
     else if (type == "rock")
       data["rocks"].push_back(configs.at(i).second);
+    else if (type == "enemy")
+      data["enemies"].push_back(configs.at(i).second);
   }
 
   std::ofstream file(path);
@@ -527,7 +535,7 @@ void Editor::onLeftDown()
       auto &config = getConfigForObject(newObject);
       if (!config.is_object())
         config = nlohmann::json::object();
-      std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" ? "start_pos" : "pos"));
+      std::string key = (realType == "player" ? "spawn_pos" : (realType == "door" || realType == "enemy" ? "start_pos" : "pos"));
       config[key] = {newObject->getPosition().x, newObject->getPosition().y};
     }
     catch (...)
@@ -721,7 +729,8 @@ void Editor::onLeftUp()
         if (!config.is_object())
           config = nlohmann::json::object();
         std::string objType = getObjectType(obj);
-        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
+        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" || objType == "enemy" ? "start_pos" : "pos"));
+        std::cout << key << "\n";
         config[key] = {obj->getPosition().x, obj->getPosition().y};
       }
       catch (...)
@@ -938,7 +947,7 @@ void Editor::handleKeyboard()
         std::string objType = getObjectType(obj);
         if (objType == "player")
           continue;
-        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" ? "start_pos" : "pos"));
+        std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" || objType == "enemy" ? "start_pos" : "pos"));
         config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
         auto newObj = createObjectOfType(objType, config);
         if (newObj)
@@ -1113,6 +1122,8 @@ const nlohmann::json &Editor::getTemplateConfigForObjectType(const std::string &
     return jumpPadConfigTemplate;
   else if (type == "spikes")
     return spikesConfigTemplate;
+  else if (type == "enemy")
+    return enemyConfigTemplate;
   else if (type == "door")
     return doorConfigTemplate;
   else if (type == "switch")

@@ -57,7 +57,7 @@ void Switch::onCollision(std::shared_ptr<GameObject> other)
 {
     if (!std::dynamic_pointer_cast<Player>(other))
         return;
-    if (collidable->prevColliding.find(other->getTag()) != collidable->prevColliding.end())
+    if (std::find(collidable->prevColliding.begin(), collidable->prevColliding.end(), other) != collidable->prevColliding.end())
         return;
     this->switchState();
 }
