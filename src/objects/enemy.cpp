@@ -57,8 +57,7 @@ void Enemy::update()
     }
 
     float localSpeed = speed;
-    if (!isDown)
-        localSpeed = 0;
+    if (!isDown) localSpeed = 0;
     if (isDown && h > 0)
     {
         this->move(0, 2);
@@ -93,10 +92,9 @@ void Enemy::onCollision(std::shared_ptr<GameObject> other)
     otherPhys->addForce(5.0f * forceDir);
     if (!isDown && abs(forceDir.x) < 0.35)
     {
-        {
-            auto egg = std::make_shared<TriggerObject>("egg", "egg");
-            egg->setPosition(this->getPosition());
-            Game::getObjectManager()->addObject(egg);
-            this->alive = false;
-        }
+        auto egg = std::make_shared<TriggerObject>("egg", "egg");
+        egg->setPosition(this->getPosition());
+        Game::getObjectManager()->addObject(egg);
+        this->alive = false;
     }
+}
