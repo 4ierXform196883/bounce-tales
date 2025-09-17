@@ -137,6 +137,14 @@ void GuiManager::init()
       levelFilenames.push_back(entry.path().stem().generic_string());
     }
   }
+  for (size_t i = 0; i < levelFilenames.size(); i++) {
+    for (size_t j = 0; j < levelFilenames.size() - i - 1; j++) {
+      if (levelFilenames[j] > levelFilenames[j + 1]) {
+        std::swap(levelFilenames[j], levelFilenames[j + 1]);
+        std::swap(levelNames[j], levelNames[j + 1]);
+      }
+    }
+  }
 }
 
 void GuiManager::setUI(GuiManager::UI ui)

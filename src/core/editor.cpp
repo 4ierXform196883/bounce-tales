@@ -730,7 +730,6 @@ void Editor::onLeftUp()
           config = nlohmann::json::object();
         std::string objType = getObjectType(obj);
         std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" || objType == "enemy" ? "start_pos" : "pos"));
-        std::cout << key << "\n";
         config[key] = {obj->getPosition().x, obj->getPosition().y};
       }
       catch (...)
@@ -948,12 +947,13 @@ void Editor::handleKeyboard()
         if (objType == "player")
           continue;
         std::string key = (objType == "player" ? "spawn_pos" : (objType == "door" || objType == "enemy" ? "start_pos" : "pos"));
-        config[key] = {obj->getPosition().x + 20, obj->getPosition().y + 20};
         auto newObj = createObjectOfType(objType, config);
+        auto newConfig = config;
+        newConfig[key] = {newObj->getPosition().x + 20, newObj->getPosition().y + 20};
         if (newObj)
         {
           drawable.push_back(newObj);
-          configs.push_back({objType, config});
+          configs.push_back({objType, newConfig});
           newSelectedObjects.push_back(newObj);
         }
       }
